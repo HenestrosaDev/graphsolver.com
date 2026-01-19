@@ -1,1 +1,35 @@
 @import "tailwindcss";
+
+@layer components {
+	/* === App.vue styles === */
+	.btn-primary {
+		@apply bg-blue-600 text-white font-medium py-2 px-5 rounded-lg shadow-sm hover:bg-blue-700 hover:shadow-md transition-all duration-200 active:scale-95;
+	}
+
+	.btn-secondary {
+		@apply bg-white text-gray-700 border border-gray-300 font-medium py-2 px-5 rounded-lg shadow-sm hover:bg-gray-50 hover:text-gray-900 transition-all duration-200 active:scale-95;
+	}
+
+	/* Ocultar scrollbar en tabs pero permitir scroll */
+	.scrollbar-hide::-webkit-scrollbar {
+			display: none;
+	}
+
+	.scrollbar-hide {
+			-ms-overflow-style: none;
+			scrollbar-width: none;
+	}
+
+	/* === TabProperties.vue styles === */
+	.prop-card { 
+		@apply bg-gray-50 p-4 rounded border-l-4 border-blue-500 shadow-sm; 
+	}
+
+	.label { 
+		@apply text-xs font-bold text-gray-500 uppercase block mb-1; 
+	}
+
+	.value { 
+		@apply font-mono font-bold text-lg text-gray-800 break-words; 
+	}
+}
