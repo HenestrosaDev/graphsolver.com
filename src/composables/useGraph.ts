@@ -35,31 +35,25 @@ export function useGraph() {
     }
 
     const currentMatrix = rawMatrix.value;
+    const newMatrix: Matrix = [];
 
-    if (newN > oldN) {
-      // 1. Agrandar: Añadir columnas a las filas existentes
-      for (let i = 0; i < oldN; i++) {
-        for (let j = oldN; j < newN; j++) {
-          currentMatrix[i].push(''); // Rellenar nuevas columnas con vacío
+    // Crear nueva matriz con el tamaño correcto
+    for (let i = 0; i < newN; i++) {
+      const newRow: (number | string)[] = [];
+      for (let j = 0; j < newN; j++) {
+        if (i < oldN && j < oldN) {
+          // Copiar valores existentes
+          newRow.push(currentMatrix[i][j]);
+        } else {
+          // Nuevas celdas: diagonal = 0, resto = vacío
+          newRow.push(i === j ? 0 : '');
         }
       }
-      // 2. Agrandar: Añadir nuevas filas completas
-      for (let i = oldN; i < newN; i++) {
-        const newRow: (number | string)[] = [];
-        for (let j = 0; j < newN; j++) {
-          newRow.push(i === j ? 0 : ''); // Diagonal 0, resto vacío
-        }
-        currentMatrix.push(newRow);
-      }
-    } else if (newN < oldN) {
-      // 1. Encoger: Cortar filas sobrantes
-      currentMatrix.length = newN;
-      // 2. Encoger: Cortar columnas sobrantes de las filas restantes
-      for (let i = 0; i < newN; i++) {
-        currentMatrix[i].length = newN;
-      }
+      newMatrix.push(newRow);
     }
-    // No hace falta reasignar rawMatrix.value porque los arrays son reactivos en Vue
+
+    // Reasignar la matriz completa para asegurar reactividad
+    rawMatrix.value = newMatrix;
   });
 
   const getGraphData = (): GraphData => {
