@@ -25,6 +25,6 @@ const { show, message } = useToast();
 .toast-enter-from,
 .toast-leave-to {
   opacity: 0;
-  transform: translate(-50%, 20px);
+  transform: translate(0, 20px);
 }
 </style>

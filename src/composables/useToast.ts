@@ -13,7 +13,7 @@ export function useToast() {
 
 		timeout.value = window.setTimeout(() => {
 			show.value = false;
-		}, 3000);
+		}, 2000);
 	};
 
 	return { show, message, triggerToast };
