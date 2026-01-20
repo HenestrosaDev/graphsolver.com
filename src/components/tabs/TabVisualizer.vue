@@ -76,7 +76,7 @@ const drawGraph = () => {
     },
     interaction: {
       hover: true,
-      zoomView: true,  // Permite zoom con rueda
+      zoomView: false,  // NO permite zoom con rueda, ya que es raro con el touchpad
       dragView: true,  // Permite arrastrar lienzo
       dragNodes: true  // Permite mover nodos
     },
@@ -157,11 +157,6 @@ watch(
       </button>
 
     </div>
-
-    <div class="absolute top-4 left-4 bg-white/80 backdrop-blur-sm px-3 py-1.5 rounded-md border border-gray-200 shadow-sm pointer-events-none text-xs text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
-      🖱️ Rueda: Zoom | Arrastrar: Mover
-    </div>
-
   </div>
 </template>
 
