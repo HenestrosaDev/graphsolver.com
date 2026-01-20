@@ -1,15 +1,14 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import { useGraph } from '../../composables/useGraph';
+import { useToast } from '../../composables/useToast';
 
-// 1. Obtenemos acceso al composable global
-const { getGraphData, nodes } = useGraph();
+const { getGraphData, nodes, rawMatrix, numNodes } = useGraph();
+const { triggerToast } = useToast();
 
-// 2. Estado local
 const latexOutput = ref<string>('');
-const showToast = ref<boolean>(false);
 
-// 3. Generar código LaTeX
+// Generar código LaTeX automáticamente
 const generateLatex = () => {
   const { n, rawValues } = getGraphData();
   
@@ -23,16 +22,12 @@ const generateLatex = () => {
 
   // Filas
   for (let i = 0; i < n; i++) {
-    // Etiqueta de fila (A, B, C...)
-    t += nodes.value[i];
+    t += nodes.value[i]; // Etiqueta fila
     
     for (let j = 0; j < n; j++) {
       let val = rawValues[i][j];
       
-      // Lógica de visualización:
-      // Si es null o string vacío -> Espacio en blanco
-      // Si tiene valor -> El valor
-      // Nota: rawValues viene del input directo, así que conserva el formato visual
+      // Lógica de visualización cruda
       if (val === '' || val === null) {
         t += " & "; 
       } else {
@@ -47,88 +42,60 @@ const generateLatex = () => {
   latexOutput.value = t;
 };
 
-// 4. Copiar al portapapeles
+// Copiar al portapapeles
 const copyToClipboard = async () => {
   if (!latexOutput.value) return;
-  
   try {
     await navigator.clipboard.writeText(latexOutput.value);
-    // Mostrar Toast
-    showToast.value = true;
-    setTimeout(() => {
-      showToast.value = false;
-    }, 3000);
+    triggerToast('¡Código LaTeX copiado!');
   } catch (err) {
     console.error('Error al copiar: ', err);
   }
 };
+
+// Reactividad automática
+watch(
+  [rawMatrix, numNodes], 
+  () => generateLatex(), 
+  { deep: true, immediate: true }
+);
 </script>
 
 <template>
-  <div class="animate-fade-in relative">
-    
-    <div class="flex flex-col sm:flex-row gap-4 mb-4">
-      <button 
-        @click="generateLatex" 
-        class="bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-6 rounded-lg shadow-sm transition-colors duration-200 flex items-center justify-center gap-2"
-      >
-        <span>⚡ Generar LaTeX</span>
-      </button>
-
+  <div class="animate-fade-in">
+    <div class="relative group rounded-lg overflow-hidden border border-gray-200 shadow-sm bg-gray-900">
+      
       <button 
         @click="copyToClipboard" 
-        :disabled="!latexOutput"
-        class="bg-gray-600 hover:bg-gray-700 text-white font-medium py-2 px-6 rounded-lg shadow-sm transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+        class="absolute top-3 right-3 flex items-center gap-2 px-3 py-1.5 rounded-md bg-white/10 text-gray-300 hover:bg-white/20 hover:text-white border border-white/10 transition-all duration-200 backdrop-blur-md text-xs font-medium z-10 active:scale-95 opacity-70 group-hover:opacity-100"
+        title="Copiar al portapapeles"
       >
-        <span>📋 Copiar al Portapapeles</span>
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+        </svg>
+        <span>Copiar Código</span>
       </button>
-    </div>
 
-    <div class="relative">
       <textarea 
         v-model="latexOutput" 
         readonly
-        placeholder="Pulsa 'Generar LaTeX' para ver el código aquí..."
-        class="w-full h-80 p-4 border border-gray-300 rounded-lg font-mono text-sm focus:ring-2 focus:ring-green-500 outline-none bg-gray-50 text-gray-700 resize-none shadow-inner"
+        class="w-full h-80 p-5 font-mono text-sm bg-gray-900 text-gray-300 outline-none resize-none block selection:bg-blue-500/30"
+        spellcheck="false"
       ></textarea>
       
-      <div v-if="!latexOutput" class="absolute inset-0 flex items-center justify-center pointer-events-none opacity-40">
-        <span class="text-4xl">📝</span>
+      <div class="bg-gray-800 text-gray-500 px-4 py-1 text-[10px] font-mono border-t border-gray-700 flex justify-between">
+        <span>LaTeX Generated</span>
+        <span>{{ latexOutput.length }} chars</span>
       </div>
     </div>
-
-    <Transition name="toast">
-      <div v-if="showToast" class="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white px-4 py-2 rounded-lg shadow-lg flex items-center gap-2 text-sm z-10">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-400" viewBox="0 0 20 20" fill="currentColor">
-            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
-        </svg>
-        <span>¡Código copiado!</span>
-      </div>
-    </Transition>
-
+    
+    <p class="mt-3 text-xs text-gray-500 text-center">
+      Este código genera una tabla formateada lista para pegar en documentos LaTeX.
+    </p>
   </div>
 </template>
 
 <style scoped>
-/* Animación de entrada del contenido */
-.animate-fade-in {
-  animation: fadeIn 0.3s ease-in-out;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(5px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-/* Transición del Toast */
-.toast-enter-active,
-.toast-leave-active {
-  transition: all 0.3s ease;
-}
-
-.toast-enter-from,
-.toast-leave-to {
-  opacity: 0;
-  transform: translate(-50%, 10px);
-}
+.animate-fade-in { animation: fadeIn 0.4s ease-out; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 </style>
