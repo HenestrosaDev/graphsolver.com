@@ -1,16 +1,23 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { useGraph } from './composables/useGraph';
+
+// Componentes UI
+import Navbar from './components/Navbar.vue';
 import MatrixInput from './components/MatrixInput.vue';
-import FloydTab from './components/tabs/TabFloyd.vue';
-import PropertiesTab from './components/tabs/TabProperties.vue';
-import MstTab from './components/tabs/TabMst.vue';
-import LatexTab from './components/tabs/TabLatex.vue';
-import DijkstraTab from './components/tabs/TabDijkstra.vue';
 import ToastNotification from './components/ToastNotification.vue';
 
+// Tabs (Nombres corregidos)
+import TabFloyd from './components/tabs/TabFloyd.vue';
+import TabProperties from './components/tabs/TabProperties.vue';
+import TabMst from './components/tabs/TabMst.vue';
+import TabLatex from './components/tabs/TabLatex.vue';
+import TabDijkstra from './components/tabs/TabDijkstra.vue';
+
+// Lógica del grafo
 const { generateRandomGraph } = useGraph();
 
+// Estado de la navegación
 const activeTab = ref<string>('Floyd');
 const tabs = [
   { id: 'Dijkstra', label: 'Dijkstra' },
@@ -23,31 +30,38 @@ const tabs = [
 
 <template>
   <div class="min-h-screen bg-slate-50 font-sans text-slate-800 selection:bg-blue-100 selection:text-blue-900">
+    
+    <Navbar />
+
     <div class="max-w-5xl mx-auto p-4 md:p-8">
       
-      <header class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
-        <div class="text-center md:text-left">
+      <div class="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
+        
+<div class="text-center md:text-left">
           <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight">
             GraphSolver <span class="text-blue-600">Pro</span>
           </h1>
           <p class="text-slate-500 text-sm font-medium mt-1">Algoritmos y análisis de grafos</p>
         </div>
-        
-				<button 
+
+        <div class="flex gap-2">
+          <button 
             @click="generateRandomGraph" 
-            class="text-sm bg-indigo-50 text-indigo-600 border border-indigo-200 font-bold py-2 px-4 rounded-lg shadow-sm hover:bg-indigo-100 hover:text-indigo-800 transition-all active:scale-95 flex items-center gap-2"
-            title="Generar matriz con pesos aleatorios"
+            class="text-sm bg-white text-slate-600 border border-slate-200 font-medium py-2 px-4 rounded-lg shadow-sm hover:bg-slate-50 hover:text-indigo-600 transition-all active:scale-95 flex items-center gap-2"
+            title="Rellenar con valores aleatorios (mantiene tamaño)"
           >
             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.384-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
             </svg>
             Aleatorio
           </button>
-      </header>
+        </div>
+      </div>
 
       <MatrixInput />
 
       <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden min-h-[500px]">
+        
         <div class="flex overflow-x-auto border-b border-slate-200 bg-slate-50/50 scrollbar-hide">
           <button 
             v-for="tab in tabs" 
@@ -63,22 +77,24 @@ const tabs = [
         <div class="p-4 sm:p-8">
           <KeepAlive>
             <component :is="
-              activeTab === 'Floyd' ? FloydTab : 
-              activeTab === 'Properties' ? PropertiesTab :
-              activeTab === 'MST' ? MstTab :
-              activeTab === 'Latex' ? LatexTab :
-              activeTab === 'Dijkstra' ? DijkstraTab : null
+              activeTab === 'Floyd' ? TabFloyd : 
+              activeTab === 'Properties' ? TabProperties :
+              activeTab === 'MST' ? TabMst :
+              activeTab === 'Latex' ? TabLatex :
+              activeTab === 'Dijkstra' ? TabDijkstra : null
             " />
           </KeepAlive>
         </div>
       </div>
 
     </div>
+    
     <ToastNotification />
   </div>
 </template>
 
 <style>
+/* Utilidad para ocultar scrollbar en los tabs */
 .scrollbar-hide::-webkit-scrollbar { display: none; }
 .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
 </style>
