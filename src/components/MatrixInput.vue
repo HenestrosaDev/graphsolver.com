@@ -2,7 +2,6 @@
 import { onMounted } from 'vue';
 import { useGraph } from '../composables/useGraph';
 
-// Importamos numNodes directamente para usarlo en el v-model
 const { nodes, rawMatrix, numNodes, treatZeroAsNull, createGrid } = useGraph();
 
 onMounted(() => {
@@ -11,72 +10,87 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="bg-white p-6 rounded-xl shadow-sm mb-6 border border-gray-100">
+  <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden mb-6">
     
-    <div class="flex flex-col md:flex-row justify-between items-center gap-4 mb-6 pb-4 border-b border-gray-100">
+    <div class="bg-slate-50 px-4 py-3 border-b border-slate-200 flex flex-col sm:flex-row justify-between items-center gap-4">
       
-      <div class="flex items-center gap-3 bg-blue-50 px-4 py-2 rounded-lg border border-blue-100">
-        <label for="vertex-input" class="text-sm font-bold text-blue-800 uppercase tracking-wide">
-          Número de Vértices:
-        </label>
-        <div class="relative flex items-center">
+      <div class="flex items-center gap-3">
+        <span class="text-xs font-bold text-slate-500 uppercase tracking-wide select-none">
+          Vértices
+        </span>
+        <div class="flex items-center shadow-sm rounded-md overflow-hidden">
           <button 
             @click="numNodes > 2 ? numNodes-- : null"
-            class="w-8 h-8 flex items-center justify-center bg-white rounded-l border border-blue-200 text-blue-600 hover:bg-blue-100 font-bold transition"
-          >-</button>
+            class="w-8 h-8 flex items-center justify-center bg-white border-r border-slate-200 text-slate-500 hover:text-blue-600 hover:bg-slate-50 transition active:bg-blue-50"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd" />
+            </svg>
+          </button>
           <input 
-            id="vertex-input"
             type="number" 
             v-model.number="numNodes" 
             min="2" max="26"
-            class="w-12 h-8 text-center border-t border-b border-blue-200 text-blue-900 font-bold focus:outline-none appearance-none m-0"
+            class="w-10 h-8 text-center text-sm font-bold text-slate-700 focus:outline-none focus:bg-white bg-slate-50"
           >
           <button 
             @click="numNodes < 26 ? numNodes++ : null"
-            class="w-8 h-8 flex items-center justify-center bg-white rounded-r border border-blue-200 text-blue-600 hover:bg-blue-100 font-bold transition"
-          >+</button>
+            class="w-8 h-8 flex items-center justify-center bg-white border-l border-slate-200 text-slate-500 hover:text-blue-600 hover:bg-slate-50 transition active:bg-blue-50"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
+            </svg>
+          </button>
         </div>
       </div>
 
-      <div class="bg-gray-50 px-4 py-2 rounded-lg border border-gray-200">
-        <label class="flex items-center cursor-pointer select-none text-gray-700 font-medium text-sm">
-          <input type="checkbox" v-model="treatZeroAsNull" class="w-4 h-4 text-blue-600 rounded mr-2 focus:ring-blue-500">
-          Interpretar '0' como "Sin Conexión"
+      <div class="flex items-center gap-4 sm:gap-6">
+        
+        <label class="flex items-center cursor-pointer select-none group">
+          <input type="checkbox" v-model="treatZeroAsNull" class="w-4 h-4 text-blue-600 rounded border-slate-300 focus:ring-blue-500 cursor-pointer">
+          <span class="ml-2 text-sm text-slate-600 font-medium group-hover:text-slate-800 transition">
+            0 = Sin conexión
+          </span>
         </label>
+
+        <div class="h-4 w-px bg-slate-300 hidden sm:block"></div>
+
+        <span class="text-xs text-slate-400 font-medium bg-slate-100 px-2 py-1 rounded border border-slate-200 hidden sm:inline-block">
+          Vacío / -1 = ∞
+        </span>
       </div>
     </div>
     
-    <div class="flex justify-between items-center mb-4">
-      <h3 class="text-lg font-bold text-gray-700">Matriz de Adyacencia</h3>
-      <p class="text-xs text-gray-400">
-        Usa <span class="font-mono bg-gray-100 px-1 rounded text-gray-600">-1</span> para ∞
-      </p>
-    </div>
-    
-    <div class="overflow-x-auto pb-2 flex justify-start md:justify-center">
-      <table class="border-collapse table-fixed transition-all duration-300" v-if="rawMatrix.length">
+    <div class="p-4 sm:p-6 overflow-x-auto w-full flex justify-center bg-white">
+      <table class="border-collapse table-fixed w-auto" v-if="rawMatrix.length">
+        
+        <colgroup>
+          <col class="w-10 sm:w-12" />
+          <col v-for="n in nodes" :key="'col-'+n" class="w-14 sm:w-16" />
+        </colgroup>
+
         <thead>
           <tr>
-            <th class="w-10 p-2 border border-gray-200 bg-gray-50"></th>
-            <th v-for="node in nodes" :key="node" class="w-14 p-2 border border-gray-200 bg-gray-50 font-bold text-gray-600 text-sm text-center">
+            <th class="p-2 bg-slate-50 border border-slate-200 rounded-tl-lg"></th>
+            <th v-for="node in nodes" :key="node" class="p-2 border border-slate-200 bg-slate-50 font-bold text-slate-600 text-xs sm:text-sm text-center select-none">
               {{ node }}
             </th>
           </tr>
         </thead>
         <tbody>
           <tr v-for="(row, i) in rawMatrix" :key="i">
-            <td class="w-10 p-2 border border-gray-200 bg-gray-50 font-bold text-center text-gray-600 text-sm">
+            <td class="p-2 bg-slate-50 border border-slate-200 font-bold text-center text-slate-600 text-xs sm:text-sm select-none">
               {{ nodes[i] }}
             </td>
-            <td v-for="(_, j) in row" :key="j" class="p-1 border border-gray-200 text-center">
+            <td v-for="(_, j) in row" :key="j" class="p-0 border border-slate-200 text-center relative h-10 sm:h-11">
               <input 
                 type="number" 
                 v-model.number="rawMatrix[i][j]" 
                 :disabled="i === j"
                 placeholder="∞"
                 :class="[
-                  'w-12 py-1 px-0 text-sm border rounded text-center focus:ring-2 focus:ring-blue-500 outline-none transition placeholder-gray-200',
-                  i === j ? 'bg-gray-100 border-gray-200 cursor-not-allowed text-transparent' : 'border-gray-300 bg-white hover:border-blue-300'
+                  'w-full h-full text-center text-sm focus:ring-2 focus:ring-inset focus:ring-blue-500 outline-none transition font-medium',
+                  i === j ? 'bg-slate-100 cursor-not-allowed text-transparent' : 'bg-white hover:bg-slate-50 text-slate-800 placeholder-slate-300'
                 ]"
               >
             </td>
@@ -88,7 +102,7 @@ onMounted(() => {
 </template>
 
 <style scoped>
-/* Ocultar flechas del input number para un look más limpio */
+/* Eliminar flechas del input number */
 input[type=number]::-webkit-inner-spin-button, 
 input[type=number]::-webkit-outer-spin-button { 
   -webkit-appearance: none; 
