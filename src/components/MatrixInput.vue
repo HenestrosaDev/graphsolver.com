@@ -2,7 +2,7 @@
 import { onMounted } from 'vue';
 import { useGraph } from '../composables/useGraph';
 
-const { nodes, rawMatrix, numNodes, treatZeroAsNull, createGrid, clearMatrix } = useGraph();
+const { nodes, rawMatrix, numNodes, createGrid, clearMatrix } = useGraph();
 
 onMounted(() => {
   if (rawMatrix.value.length === 0) createGrid();
@@ -57,16 +57,6 @@ onMounted(() => {
       </div>
 
       <div class="flex items-center gap-4 sm:gap-6">
-        
-        <label class="flex items-center cursor-pointer select-none group">
-          <input type="checkbox" v-model="treatZeroAsNull" class="w-4 h-4 text-blue-600 rounded border-slate-300 focus:ring-blue-500 cursor-pointer">
-          <span class="ml-2 text-sm text-slate-600 font-medium group-hover:text-slate-800 transition">
-            0 = Sin conexión
-          </span>
-        </label>
-
-        <div class="h-4 w-px bg-slate-300 hidden sm:block"></div>
-
         <span class="text-xs text-slate-400 font-medium bg-slate-100 px-2 py-1 rounded border border-slate-200 hidden sm:inline-block">
           Vacío / -1 = ∞
         </span>

@@ -4,7 +4,6 @@ import type { Matrix, GraphData } from '../types/graph';
 // Estado global (compartido entre componentes)
 const numNodes = ref<number>(4);
 const rawMatrix = ref<Matrix>([]);
-const treatZeroAsNull = ref<boolean>(true);
 const highlightedPath = ref<string[]>([]);
 
 export function useGraph() {
@@ -77,7 +76,7 @@ export function useGraph() {
         const isZero = (numVal === 0);
         const isMinusOne = (numVal === -1);
         
-        const isConnection = !isEmpty && !isMinusOne && !isNaN(numVal) && !(isZero && treatZeroAsNull.value);
+        const isConnection = !isEmpty && !isMinusOne && !isNaN(numVal) && !isZero;
 
         if (!isConnection) {
           matrix[i][j] = Infinity;
@@ -173,7 +172,6 @@ export function useGraph() {
     return JSON.stringify({
       numNodes: numNodes.value,
       rawMatrix: rawMatrix.value,
-      treatZeroAsNull: treatZeroAsNull.value,
       timestamp: new Date().toISOString() // Metadato útil
     }, null, 2); // Indentado bonito
   };
@@ -190,9 +188,6 @@ export function useGraph() {
       // Aplicar datos
       numNodes.value = parsed.numNodes;
       rawMatrix.value = parsed.rawMatrix;
-      if (parsed.treatZeroAsNull !== undefined) {
-        treatZeroAsNull.value = parsed.treatZeroAsNull;
-      }
       
       return true; // Éxito
     } catch (e) {
@@ -207,7 +202,6 @@ export function useGraph() {
   return {
     numNodes,
     rawMatrix,
-    treatZeroAsNull,
     nodes,
     highlightedPath,
     clearHighlights,
