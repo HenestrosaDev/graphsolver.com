@@ -93,61 +93,67 @@ watch(
 
 <template>
   <div class="animate-fade-in" v-if="analysis">
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-      
-      <div class="col-span-full p-4 rounded-lg border flex items-center gap-3 shadow-sm transition-colors duration-500"
-           :class="analysis.isSymmetric ? 'bg-blue-50 border-blue-200 text-blue-900' : 'bg-purple-50 border-purple-200 text-purple-900'">
+    <!-- Graph Type Indicator -->
+    <div class="bg-white border border-slate-200 rounded-lg p-4 mb-4 shadow-sm">
+      <div class="flex items-center gap-3">
         <span class="text-2xl">{{ analysis.isSymmetric ? '↔️' : '↗️' }}</span>
         <div>
-          <strong class="block text-sm uppercase tracking-wide opacity-70">Tipo Detectado</strong>
-          <span class="text-lg font-bold">
-            {{ analysis.isSymmetric ? 'Grafo Simétrico (No Dirigido)' : 'Grafo Dirigido' }}
-          </span>
+          <div class="text-xs font-bold text-slate-500 uppercase tracking-wide">Tipo de Grafo</div>
+          <div class="text-lg font-bold text-slate-900">
+            {{ analysis.isSymmetric ? 'No Dirigido' : 'Dirigido' }}
+          </div>
         </div>
       </div>
-      
+    </div>
+
+    <!-- Properties Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
       <div class="space-y-4">
-        <div class="prop-card">
-          <span class="label">Orden (Vértices)</span>
-          <span class="value">{{ analysis.orden }}</span>
+        <div class="bg-white border border-slate-200 rounded-lg p-4 shadow-sm">
+          <div class="text-xs font-bold text-slate-500 uppercase tracking-wide mb-2">Orden (Vértices)</div>
+          <div class="text-2xl font-mono font-bold text-slate-900">{{ analysis.orden }}</div>
         </div>
-        <div class="prop-card">
-          <span class="label">Medida ({{ analysis.isSymmetric ? 'Aristas' : 'Arcos' }})</span>
-          <span class="value">{{ analysis.medida }}</span>
+
+        <div class="bg-white border border-slate-200 rounded-lg p-4 shadow-sm">
+          <div class="text-xs font-bold text-slate-500 uppercase tracking-wide mb-2">Medida ({{ analysis.isSymmetric ? 'Aristas' : 'Arcos' }})</div>
+          <div class="text-2xl font-mono font-bold text-slate-900">{{ analysis.medida }}</div>
         </div>
-        
-        <div class="prop-card">
-          <div class="flex justify-between items-center w-full mb-1">
-            <span class="label mb-0">Adyacentes a:</span>
-            <select v-model="adjTarget" class="bg-white border border-gray-300 rounded text-xs p-1 text-blue-600 font-bold cursor-pointer outline-none">
+
+        <div class="bg-white border border-slate-200 rounded-lg p-4 shadow-sm">
+          <div class="text-xs font-bold text-slate-500 uppercase tracking-wide mb-2">Adyacentes a</div>
+          <div class="flex items-center gap-2 mb-2">
+            <select v-model="adjTarget" class="bg-white border border-slate-300 rounded px-2 py-1 text-sm font-medium focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
               <option v-for="n in nodes" :key="n" :value="n">{{ n }}</option>
             </select>
           </div>
-          <span class="value text-base">{{ analysis.adjList || 'Ninguno' }}</span>
+          <div class="text-lg font-mono text-blue-600 font-medium">{{ analysis.adjList || 'Ninguno' }}</div>
         </div>
 
-        <div class="prop-card">
-          <span class="label">Secuencia de Grados</span>
-          <span class="value tracking-tighter">{{ analysis.seq }}</span>
+        <div class="bg-white border border-slate-200 rounded-lg p-4 shadow-sm">
+          <div class="text-xs font-bold text-slate-500 uppercase tracking-wide mb-2">Secuencia de Grados</div>
+          <div class="text-sm font-mono text-slate-900 break-all">{{ analysis.seq }}</div>
         </div>
       </div>
-      
+
       <div class="space-y-4">
-         <div class="prop-card">
-          <span class="label">Vértices Aislados</span>
-          <span class="value">{{ analysis.isolated }}</span>
+        <div class="bg-white border border-slate-200 rounded-lg p-4 shadow-sm">
+          <div class="text-xs font-bold text-slate-500 uppercase tracking-wide mb-2">Vértices Aislados</div>
+          <div class="text-2xl font-mono font-bold text-slate-900">{{ analysis.isolated }}</div>
         </div>
-        <div class="prop-card">
-          <span class="label">Componentes Conexas</span>
-          <span class="value">{{ analysis.cc }}</span>
+
+        <div class="bg-white border border-slate-200 rounded-lg p-4 shadow-sm">
+          <div class="text-xs font-bold text-slate-500 uppercase tracking-wide mb-2">Componentes Conexas</div>
+          <div class="text-2xl font-mono font-bold text-slate-900">{{ analysis.cc }}</div>
         </div>
-         <div class="prop-card border-l-purple-500">
-          <span class="label text-purple-600">Medida Complementario</span>
-          <span class="value">{{ analysis.compSize }}</span>
+
+        <div class="bg-white border border-slate-200 rounded-lg p-4 shadow-sm border-l-purple-500">
+          <div class="text-xs font-bold text-purple-600 uppercase tracking-wide mb-2">Medida Complementario</div>
+          <div class="text-2xl font-mono font-bold text-purple-900">{{ analysis.compSize }}</div>
         </div>
-        <div class="prop-card border-l-purple-500">
-          <span class="label text-purple-600">C.C. Complementario</span>
-          <span class="value">{{ analysis.compCc }}</span>
+
+        <div class="bg-white border border-slate-200 rounded-lg p-4 shadow-sm border-l-purple-500">
+          <div class="text-xs font-bold text-purple-600 uppercase tracking-wide mb-2">C.C. Complementario</div>
+          <div class="text-2xl font-mono font-bold text-purple-900">{{ analysis.compCc }}</div>
         </div>
       </div>
     </div>

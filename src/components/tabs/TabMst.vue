@@ -93,28 +93,36 @@ watch([rawMatrix, numNodes], solveMST, { deep: true, immediate: true });
 
 <template>
   <div class="animate-fade-in" v-if="result">
-    <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-6 space-y-4">
-      
-      <div class="bg-white p-4 rounded border-l-4 border-yellow-400 shadow-sm">
-        <span class="block text-xs font-bold text-gray-400 uppercase">Coste Mínimo (Kruskal)</span>
-        <span class="text-3xl font-mono font-bold text-gray-800">{{ result.cost }}</span>
-      </div>
+    <!-- Results Cards -->
+    <div class="space-y-4">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="bg-white border border-slate-200 rounded-lg p-4 shadow-sm">
+          <div class="text-xs font-bold text-slate-500 uppercase tracking-wide mb-2">Coste Mínimo (Kruskal)</div>
+          <div class="text-3xl font-mono font-bold text-slate-900">{{ result.cost }}</div>
+        </div>
 
-      <div class="bg-white p-4 rounded border-l-4 border-yellow-400 shadow-sm relative group">
-        <div class="flex justify-between items-start">
-          <div>
-            <span class="block text-xs font-bold text-gray-400 uppercase">Aristas Seleccionadas</span>
-            <span class="text-lg font-mono text-blue-600 block mt-1 break-all font-bold">{{ result.edges || '-' }}</span>
-          </div>
-          <button @click="copyResult" class="text-xs bg-gray-50 hover:bg-gray-100 text-gray-500 border border-gray-200 px-3 py-1 rounded transition font-medium">
-            Copiar
-          </button>
+        <div class="bg-white border border-slate-200 rounded-lg p-4 shadow-sm">
+          <div class="text-xs font-bold text-slate-500 uppercase tracking-wide mb-2">¿Solución Única?</div>
+          <div class="text-lg font-bold text-slate-700">{{ result.isUnique }}</div>
         </div>
       </div>
 
-      <div class="bg-white p-4 rounded border-l-4 border-yellow-400 shadow-sm">
-        <span class="block text-xs font-bold text-gray-400 uppercase">¿Es solución única?</span>
-        <span class="text-lg font-bold text-gray-700">{{ result.isUnique }}</span>
+      <div class="bg-white border border-slate-200 rounded-lg p-4 shadow-sm">
+        <div class="flex justify-between items-start">
+          <div class="flex-1">
+            <div class="text-xs font-bold text-slate-500 uppercase tracking-wide mb-2">Aristas Seleccionadas</div>
+            <div class="text-lg font-mono text-blue-600 font-medium break-all">{{ result.edges || '-' }}</div>
+          </div>
+          <button
+            @click="copyResult"
+            class="ml-4 px-3 py-2 text-xs bg-slate-100 hover:bg-slate-200 text-slate-600 border border-slate-300 rounded-md transition font-medium flex items-center gap-1"
+          >
+            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
+            </svg>
+            Copiar
+          </button>
+        </div>
       </div>
     </div>
   </div>

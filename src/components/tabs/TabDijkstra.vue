@@ -102,71 +102,65 @@ watch(
 
 <template>
   <div class="animate-fade-in">
-    <div class="flex flex-wrap items-center gap-6 mb-6 bg-blue-50 p-5 rounded-lg border border-blue-100 shadow-sm">
-      
-      <div class="flex items-center gap-3">
-        <label class="text-xs font-bold text-blue-800 uppercase">Origen</label>
-        <select v-model="startNode" class="bg-white border border-blue-300 text-blue-700 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block p-2 font-bold cursor-pointer outline-none">
-          <option v-for="n in nodes" :key="n" :value="n">{{ n }}</option>
-        </select>
-      </div>
+    <!-- Algorithm Controls -->
+    <div class="bg-slate-50 border border-slate-200 rounded-lg p-4 mb-6">
+      <div class="flex flex-wrap items-center gap-4">
+        <div class="flex items-center gap-2">
+          <label class="text-xs font-bold text-slate-700 uppercase tracking-wide">Origen</label>
+          <select v-model="startNode" class="bg-white border border-slate-300 text-slate-700 text-sm rounded-md px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-medium">
+            <option v-for="n in nodes" :key="n" :value="n">{{ n }}</option>
+          </select>
+        </div>
 
-      <div class="text-blue-300">➜</div>
+        <div class="text-slate-400">→</div>
 
-      <div class="flex items-center gap-3">
-        <label class="text-xs font-bold text-blue-800 uppercase">Destino</label>
-        <select v-model="endNode" class="bg-white border border-blue-300 text-blue-700 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block p-2 font-bold cursor-pointer outline-none">
-          <option v-for="n in nodes" :key="n" :value="n">{{ n }}</option>
-        </select>
-      </div>
-
-      <div class="ml-auto text-xs text-blue-400 italic font-medium">
-        Cálculo en tiempo real
+        <div class="flex items-center gap-2">
+          <label class="text-xs font-bold text-slate-700 uppercase tracking-wide">Destino</label>
+          <select v-model="endNode" class="bg-white border border-slate-300 text-slate-700 text-sm rounded-md px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-medium">
+            <option v-for="n in nodes" :key="n" :value="n">{{ n }}</option>
+          </select>
+        </div>
       </div>
     </div>
 
+    <!-- Results -->
     <div v-if="isSolved" class="space-y-6">
-      
-      <div class="bg-green-50 border border-green-200 rounded-lg p-6 flex flex-col md:flex-row gap-8 items-center md:items-start shadow-sm">
-        <div class="flex-1 w-full text-center md:text-left">
-          <span class="block text-xs font-bold text-gray-500 uppercase mb-1">Coste Mínimo</span>
-          <div class="bg-white p-3 rounded border border-green-200 inline-block w-full md:w-auto min-w-[120px]">
-            <span class="text-2xl font-mono font-bold text-green-700">{{ finalCost }}</span>
-          </div>
+      <!-- Summary Cards -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="bg-white border border-slate-200 rounded-lg p-4 shadow-sm">
+          <div class="text-xs font-bold text-slate-500 uppercase tracking-wide mb-2">Coste Mínimo</div>
+          <div class="text-2xl font-mono font-bold text-slate-900">{{ finalCost }}</div>
         </div>
-        <div class="flex-[2] w-full text-center md:text-left">
-          <span class="block text-xs font-bold text-gray-500 uppercase mb-1">Camino</span>
-          <div class="bg-white p-3 rounded border border-green-200 block w-full">
-            <span class="text-xl font-mono font-bold text-blue-600 tracking-wider break-all">
-              {{ finalPath }}
-            </span>
-          </div>
+        <div class="bg-white border border-slate-200 rounded-lg p-4 shadow-sm">
+          <div class="text-xs font-bold text-slate-500 uppercase tracking-wide mb-2">Camino Óptimo</div>
+          <div class="text-lg font-mono font-medium text-blue-600 break-all">{{ finalPath }}</div>
         </div>
       </div>
 
-      <div class="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm">
-        <div class="bg-gray-100 px-4 py-3 border-b border-gray-200 flex justify-between items-center">
-          <h3 class="font-bold text-gray-700 text-sm uppercase">Tabla de Pasos</h3>
-          <span class="text-xs text-gray-500 bg-white px-2 py-1 rounded border border-gray-200 font-mono">-1 = ∞</span>
+      <!-- Steps Table -->
+      <div class="bg-white border border-slate-200 rounded-lg overflow-hidden shadow-sm">
+        <div class="bg-slate-50 px-4 py-3 border-b border-slate-200 flex justify-between items-center">
+          <h3 class="font-bold text-slate-700 text-sm uppercase tracking-wide">Tabla de Iteraciones</h3>
+          <span class="text-xs text-slate-500 bg-white px-2 py-1 rounded border border-slate-200 font-mono">-1 = ∞</span>
         </div>
         <div class="overflow-x-auto">
-          <table class="w-full text-sm text-left">
-            <thead class="text-xs text-gray-500 uppercase bg-gray-50 border-b border-gray-200">
+          <table class="w-full text-sm">
+            <thead class="bg-slate-100 border-b border-slate-200">
               <tr>
-                <th class="px-4 py-3 font-bold">Iteración</th>
-                <th v-for="n in nodes" :key="n" class="px-4 py-3 text-center w-12">{{ n }}</th>
-                <th class="px-4 py-3 text-center text-blue-600 font-bold">Pivot</th>
+                <th class="px-4 py-3 font-bold text-slate-700 text-left">Iteración</th>
+                <th v-for="n in nodes" :key="n" class="px-4 py-3 text-center font-bold text-slate-600 w-12">{{ n }}</th>
+                <th class="px-4 py-3 text-center font-bold text-blue-600">Pivote</th>
               </tr>
             </thead>
-            <tbody class="divide-y divide-gray-100">
-              <tr v-for="row in steps" :key="row.step" class="hover:bg-blue-50/50 transition-colors">
-                <td class="px-4 py-3 font-medium text-gray-900 whitespace-nowrap">
-                  Paso i={{ row.step }}
+            <tbody class="divide-y divide-slate-100">
+              <tr v-for="row in steps" :key="row.step" class="hover:bg-slate-50 transition-colors">
+                <td class="px-4 py-3 font-medium text-slate-900">
+                  Paso {{ row.step }}
                 </td>
-                <td v-for="(val, idx) in row.dists" :key="idx" class="px-4 py-3 text-center font-mono text-gray-600">
+                <td v-for="(val, idx) in row.dists" :key="idx" class="px-4 py-3 text-center font-mono text-slate-600">
                   {{ val }}
                 </td>
-                <td class="px-4 py-3 text-center font-bold text-pink-600 bg-pink-50/30">
+                <td class="px-4 py-3 text-center font-bold text-blue-600 bg-blue-50">
                   {{ row.pivot }}
                 </td>
               </tr>

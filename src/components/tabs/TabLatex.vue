@@ -12,6 +12,12 @@ const latexOutput = ref<string>('');
 const generateLatex = () => {
   const { n, rawValues } = getGraphData();
   
+  // Safety check: ensure rawValues is properly initialized
+  if (!rawValues || rawValues.length !== n) {
+    latexOutput.value = '';
+    return;
+  }
+  
   // Definir columnas: |c|c|c|...
   const cols = "|c".repeat(n + 1) + "|";
 
@@ -25,10 +31,10 @@ const generateLatex = () => {
     t += nodes.value[i]; // Etiqueta fila
     
     for (let j = 0; j < n; j++) {
-      let val = rawValues[i][j];
+      let val = rawValues[i]?.[j]; // Safe access with optional chaining
       
       // Lógica de visualización cruda
-      if (val === '' || val === null) {
+      if (val === '' || val === null || val === undefined) {
         t += " & "; 
       } else {
         t += ` & ${val}`;

@@ -9,28 +9,27 @@ import Footer from './components/Footer.vue';
 import MatrixInput from './components/MatrixInput.vue';
 import ToastNotification from './components/ToastNotification.vue';
 
-// Tabs
-import TabFloyd from './components/tabs/TabFloyd.vue';
-import TabProperties from './components/tabs/TabProperties.vue';
-import TabMst from './components/tabs/TabMst.vue';
-import TabLatex from './components/tabs/TabLatex.vue';
-import TabDijkstra from './components/tabs/TabDijkstra.vue';
+// Always visible components
 import TabVisualizer from './components/tabs/TabVisualizer.vue';
+import TabProperties from './components/tabs/TabProperties.vue';
+import TabLatex from './components/tabs/TabLatex.vue';
+
+// Algorithm components
+import TabFloyd from './components/tabs/TabFloyd.vue';
+import TabMst from './components/tabs/TabMst.vue';
+import TabDijkstra from './components/tabs/TabDijkstra.vue';
 
 // Traemos las nuevas funciones
 const { generateRandomGraph, toJSON, loadFromJSON } = useGraph();
 const { triggerToast } = useToast();
 
-const activeTab = ref<string>('Graph');
+const selectedAlgorithm = ref<string>('dijkstra');
 const fileInput = ref<HTMLInputElement | null>(null); // Referencia al input oculto
 
-const tabs = [
-  { id: 'Graph', label: 'Visualizar Grafo' },
-  { id: 'Dijkstra', label: 'Dijkstra' },
-  { id: 'Floyd', label: 'Floyd-Warshall' },
-  { id: 'MST', label: 'MST (Kruskal)' },
-  { id: 'Properties', label: 'Propiedades' },
-  { id: 'Latex', label: 'LaTeX' }
+const algorithms = [
+  { id: 'dijkstra', label: 'Dijkstra', component: TabDijkstra },
+  { id: 'floyd', label: 'Floyd-Warshall', component: TabFloyd },
+  { id: 'mst', label: 'MST (Kruskal)', component: TabMst }
 ];
 
 // --- Lógica Exportar ---
@@ -181,45 +180,139 @@ const handleFileChange = (event: Event) => {
         Visualización y Algoritmos
       </h2>
 
-      <div
-        class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden min-h-[500px]"
-      >
-        <div class="flex overflow-x-auto border-b border-slate-200 bg-slate-50/50 scrollbar-hide">
-          <button
-            v-for="tab in tabs"
-            :key="tab.id"
-            @click="activeTab = tab.id"
-            class="flex-1 py-4 px-4 sm:px-6 text-xs sm:text-sm font-bold uppercase tracking-wider transition-all duration-200 border-b-2 outline-none whitespace-nowrap"
-            :class="
-              activeTab === tab.id
-                ? 'border-blue-600 text-blue-600 bg-white'
-                : 'border-transparent text-slate-400 hover:text-slate-600 hover:bg-slate-100'
-            "
-          >
-            {{ tab.label }}
-          </button>
+      <!-- Main Dashboard Layout -->
+      <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
+        <!-- Left Column: Always Visible Components -->
+        <div class="space-y-6">
+          <!-- Visual Graph -->
+          <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+            <div class="bg-slate-50 px-6 py-4 border-b border-slate-200">
+              <h3 class="text-lg font-bold text-slate-700 flex items-center gap-2">
+                <svg
+                  class="w-5 h-5 text-blue-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+                  />
+                </svg>
+                Visualización del Grafo
+              </h3>
+            </div>
+            <div class="p-6">
+              <TabVisualizer />
+            </div>
+          </div>
+
+          <!-- Properties -->
+          <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+            <div class="bg-slate-50 px-6 py-4 border-b border-slate-200">
+              <h3 class="text-lg font-bold text-slate-700 flex items-center gap-2">
+                <svg
+                  class="w-5 h-5 text-green-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+                  />
+                </svg>
+                Propiedades del Grafo
+              </h3>
+            </div>
+            <div class="p-6">
+              <TabProperties />
+            </div>
+          </div>
+
+          <!-- LaTeX Export -->
         </div>
 
-        <div class="p-4 sm:p-8">
-          <KeepAlive>
-            <component
-              :is="
-                activeTab === 'Graph'
-                  ? TabVisualizer
-                  : activeTab === 'Floyd'
-                    ? TabFloyd
-                    : activeTab === 'Properties'
-                      ? TabProperties
-                      : activeTab === 'MST'
-                        ? TabMst
-                        : activeTab === 'Latex'
-                          ? TabLatex
-                          : activeTab === 'Dijkstra'
-                            ? TabDijkstra
-                            : null
-              "
-            />
-          </KeepAlive>
+        <!-- Right Column: Algorithm Selection and Results -->
+        <div class="space-y-6">
+          <div>
+            <!-- Algorithm Selector -->
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+              <div class="bg-slate-50 px-6 py-4 border-b border-slate-200">
+                <h3 class="text-lg font-bold text-slate-700 flex items-center gap-2">
+                  <svg
+                    class="w-5 h-5 text-indigo-600"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"
+                    />
+                  </svg>
+                  Algoritmos
+                </h3>
+              </div>
+              <div class="p-6">
+                <div class="mb-4">
+                  <label
+                    for="algorithm-select"
+                    class="block text-sm font-medium text-slate-700 mb-2"
+                  >
+                    Seleccionar Algoritmo
+                  </label>
+                  <select
+                    id="algorithm-select"
+                    v-model="selectedAlgorithm"
+                    class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-slate-900"
+                  >
+                    <option v-for="algo in algorithms" :key="algo.id" :value="algo.id">
+                      {{ algo.label }}
+                    </option>
+                  </select>
+                </div>
+
+                <!-- Algorithm Results -->
+                <div class="mt-8">
+                  <KeepAlive>
+                    <component
+                      :is="algorithms.find((a) => a.id === selectedAlgorithm)?.component"
+                    />
+                  </KeepAlive>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+            <div class="bg-slate-50 px-6 py-4 border-b border-slate-200">
+              <h3 class="text-lg font-bold text-slate-700 flex items-center gap-2">
+                <svg
+                  class="w-5 h-5 text-purple-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M7 4V2a1 1 0 011-1h8a1 1 0 011 1v2m-9 0h10m-9 0V1m10 3V1m0 3l1 1v16a2 2 0 01-2 2H6a2 2 0 01-2-2V5l1-1z"
+                  />
+                </svg>
+                Exportar a LaTeX
+              </h3>
+            </div>
+            <div class="p-6">
+              <TabLatex />
+            </div>
+          </div>
         </div>
       </div>
     </main>

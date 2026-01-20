@@ -107,69 +107,79 @@ const queryResult = computed(() => {
 
 <template>
   <div class="animate-fade-in">
-    <div class="bg-cyan-50 border border-cyan-200 rounded-lg p-6 mb-8">
-       <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-          <div class="bg-white p-4 rounded border border-cyan-100 shadow-sm">
-            <span class="block text-xs font-bold text-gray-500 uppercase mb-1">Diámetro del Grafo</span>
-            <span class="text-2xl font-mono text-gray-800">
-              {{ diameter }} 
-              <span v-if="hasInfPairs" class="text-xs text-red-500 font-sans ml-2">(Existen pares inalcanzables)</span>
-            </span>
-          </div>
+    <!-- Summary Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+      <div class="bg-white border border-slate-200 rounded-lg p-4 shadow-sm">
+        <div class="text-xs font-bold text-slate-500 uppercase tracking-wide mb-2">Diámetro del Grafo</div>
+        <div class="text-2xl font-mono font-bold text-slate-900">
+          {{ diameter }}
+          <span v-if="hasInfPairs" class="text-xs text-red-500 ml-2">(pares inalcanzables)</span>
+        </div>
+      </div>
 
-          <div class="bg-white p-4 rounded border border-cyan-100 shadow-sm">
-            <span class="block text-xs font-bold text-gray-500 uppercase mb-2">Consulta de Camino</span>
-            <div class="flex items-center gap-2 mb-3">
-              <select v-model="startNode" class="bg-gray-50 border border-gray-300 rounded p-1 font-bold text-blue-600 cursor-pointer text-sm">
-                <option v-for="n in nodes" :key="n" :value="n">{{ n }}</option>
-              </select>
-              <span class="text-gray-400">➜</span>
-              <select v-model="endNode" class="bg-gray-50 border border-gray-300 rounded p-1 font-bold text-blue-600 cursor-pointer text-sm">
-                <option v-for="n in nodes" :key="n" :value="n">{{ n }}</option>
-              </select>
-            </div>
-            
-            <div v-if="queryResult" class="space-y-1">
-              <div class="flex justify-between border-b border-gray-100 pb-1">
-                <span class="text-gray-600 text-xs uppercase font-bold">Distancia</span> 
-                <strong class="text-gray-800">{{ queryResult.dist }}</strong>
-              </div>
-              <div class="flex justify-between pt-1">
-                <span class="text-gray-600 text-xs uppercase font-bold">Camino</span> 
-                <strong class="font-mono text-blue-600 text-sm">{{ queryResult.path }}</strong>
-              </div>
-            </div>
+      <div class="bg-white border border-slate-200 rounded-lg p-4 shadow-sm">
+        <div class="text-xs font-bold text-slate-500 uppercase tracking-wide mb-2">Consulta de Camino</div>
+        <div class="flex items-center gap-2 mb-3">
+          <select v-model="startNode" class="bg-white border border-slate-300 rounded px-3 py-2 text-sm font-medium focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+            <option v-for="n in nodes" :key="n" :value="n">{{ n }}</option>
+          </select>
+          <span class="text-slate-400">→</span>
+          <select v-model="endNode" class="bg-white border border-slate-300 rounded px-3 py-2 text-sm font-medium focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+            <option v-for="n in nodes" :key="n" :value="n">{{ n }}</option>
+          </select>
+        </div>
+
+        <div v-if="queryResult" class="space-y-2">
+          <div class="flex justify-between items-center py-1 border-b border-slate-100">
+            <span class="text-xs font-bold text-slate-500 uppercase">Distancia</span>
+            <span class="font-mono font-medium text-slate-900">{{ queryResult.dist }}</span>
           </div>
-       </div>
+          <div class="flex justify-between items-center py-1">
+            <span class="text-xs font-bold text-slate-500 uppercase">Camino</span>
+            <span class="font-mono text-sm text-blue-600 font-medium">{{ queryResult.path }}</span>
+          </div>
+        </div>
+      </div>
     </div>
 
-    <h3 class="text-lg font-bold text-gray-700 mb-4 flex items-center gap-2">
-      Matrices de Iteraciones
-      <span class="text-xs font-normal text-gray-400 bg-gray-100 px-2 py-1 rounded">Se actualiza automáticamente</span>
-    </h3>
-    
-    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-       <div v-for="(step, idx) in steps" :key="idx" class="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm">
-          <h4 class="bg-gray-100 px-4 py-2 font-bold text-gray-700 text-center border-b border-gray-200 text-xs uppercase tracking-wide">
+    <!-- Matrices Grid -->
+    <div class="mb-4">
+      <h3 class="text-lg font-bold text-slate-700 mb-4 flex items-center gap-2">
+        <svg class="w-5 h-5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2"/>
+        </svg>
+        Matrices de Iteraciones
+      </h3>
+    </div>
+
+    <div class="flex flex-col gap-4">
+      <div v-for="(step, idx) in steps" :key="idx" class="bg-white border border-slate-200 rounded-lg overflow-hidden shadow-sm">
+        <div class="bg-slate-50 px-4 py-3 border-b border-slate-200">
+          <h4 class="font-bold text-slate-700 text-center text-sm uppercase tracking-wide">
             {{ step.title }}
           </h4>
-          <div class="overflow-x-auto p-4 flex justify-center">
-            <table class="text-sm border-collapse">
+        </div>
+        <div class="p-4 flex justify-center">
+          <table class="text-sm border-collapse">
+            <thead>
               <tr>
-                <th class="p-1"></th>
-                <th v-for="n in nodes" :key="n" class="p-1 font-bold text-gray-500 text-xs w-8 text-center">{{ n }}</th>
+                <th class="p-2"></th>
+                <th v-for="n in nodes" :key="n" class="p-2 font-bold text-slate-500 text-xs w-8 text-center">{{ n }}</th>
               </tr>
+            </thead>
+            <tbody>
               <tr v-for="(row, i) in step.matrix" :key="i">
-                <th class="p-1 font-bold text-gray-500 text-xs w-8 text-center">{{ nodes[i] }}</th>
+                <th class="p-2 font-bold text-slate-500 text-xs w-8 text-center">{{ nodes[i] }}</th>
                 <td v-for="(val, j) in row" :key="j"
-                    class="p-1 border border-gray-100 text-center text-xs w-8 h-8"
-                    :class="{'bg-yellow-100 font-bold text-blue-700': i === step.pivot || j === step.pivot}">
+                    class="p-2 border border-slate-100 text-center text-xs w-8 h-8 font-mono"
+                    :class="{'bg-blue-50 font-bold text-blue-700 border-blue-200': i === step.pivot || j === step.pivot}">
                   {{ val === Infinity ? '∞' : val }}
                 </td>
               </tr>
-            </table>
-          </div>
+            </tbody>
+          </table>
         </div>
+      </div>
     </div>
   </div>
 </template>
