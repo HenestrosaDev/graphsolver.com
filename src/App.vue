@@ -169,9 +169,7 @@ const handleFileChange = (event: Event) => {
 
       <MatrixInput />
 
-      <div class="my-8 border-t border-slate-200"></div>
-
-      <h2 class="text-xl font-bold text-slate-700 flex items-center gap-2 mb-4">
+      <h2 class="mt-18 text-xl font-bold text-slate-700 flex items-center gap-2 mb-4">
         <span
           class="bg-purple-100 text-purple-700 text-xs px-2 py-1 rounded uppercase tracking-wider font-bold"
         >
