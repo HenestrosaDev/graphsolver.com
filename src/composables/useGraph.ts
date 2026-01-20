@@ -169,6 +169,38 @@ export function useGraph() {
     }
   };
 
+	const toJSON = () => {
+    return JSON.stringify({
+      numNodes: numNodes.value,
+      rawMatrix: rawMatrix.value,
+      treatZeroAsNull: treatZeroAsNull.value,
+      timestamp: new Date().toISOString() // Metadato útil
+    }, null, 2); // Indentado bonito
+  };
+
+  // --- NUEVO: Importar estado ---
+  const loadFromJSON = (jsonString: string): boolean => {
+    try {
+      const parsed = JSON.parse(jsonString);
+      
+      // Validaciones básicas para no romper la app
+      if (!parsed.rawMatrix || !Array.isArray(parsed.rawMatrix)) throw new Error("Formato inválido");
+      if (typeof parsed.numNodes !== 'number') throw new Error("Falta número de nodos");
+
+      // Aplicar datos
+      numNodes.value = parsed.numNodes;
+      rawMatrix.value = parsed.rawMatrix;
+      if (parsed.treatZeroAsNull !== undefined) {
+        treatZeroAsNull.value = parsed.treatZeroAsNull;
+      }
+      
+      return true; // Éxito
+    } catch (e) {
+      console.error("Error importando JSON:", e);
+      return false; // Error
+    }
+  };
+
   const toIdx = (char: string): number => char.toUpperCase().charCodeAt(0) - 65;
   const toChar = (idx: number): string => String.fromCharCode(65 + idx);
 
@@ -184,6 +216,8 @@ export function useGraph() {
     getGraphData,
     generateRandomGraph,
     clearMatrix,
+		toJSON,
+		loadFromJSON,
     toIdx,
     toChar
   };
