@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue';
+import { ref, watch, onUnmounted } from 'vue';
 import { useGraph } from '../../composables/useGraph';
 
 interface DijkstraStep {
@@ -8,7 +8,7 @@ interface DijkstraStep {
   pivot: string;
 }
 
-const { getGraphData, nodes, toIdx, rawMatrix, numNodes } = useGraph();
+const { getGraphData, nodes, toIdx, rawMatrix, numNodes, setHighlightPath, clearHighlights } = useGraph();
 
 const startNode = ref<string>('A');
 const endNode = ref<string>('B'); // Cambiado a B por defecto para que no sea el mismo
@@ -20,14 +20,14 @@ const isSolved = ref(false);
 const solveDijkstra = () => {
   const { n, matrix } = getGraphData();
   
-  // Validar límites: si reducimos vértices y teníamos seleccionada la 'Z', resetear.
+// Validar límites: si reducimos vértices y teníamos seleccionada la 'Z', resetear.
   if (toIdx(startNode.value) >= n) startNode.value = nodes.value[0];
   if (toIdx(endNode.value) >= n) endNode.value = nodes.value[n - 1] || nodes.value[0];
 
   const sIdx = toIdx(startNode.value);
   const eIdx = toIdx(endNode.value);
   
-  // Inicialización
+// Inicialización
   const dist = new Array(n).fill(Infinity);
   const visited = new Array(n).fill(false);
   const parent = new Array(n).fill(null);
@@ -65,20 +65,34 @@ const solveDijkstra = () => {
   if (dist[eIdx] === Infinity) {
     finalCost.value = "Inalcanzable";
     finalPath.value = "No existe camino";
+    
+    clearHighlights(); 
+
   } else {
     finalCost.value = dist[eIdx];
+    
+    // Reconstruir camino
     let curr: number | null = eIdx;
     let pathArr: string[] = [];
     while (curr !== null) {
       pathArr.push(nodes.value[curr]);
       curr = parent[curr];
     }
-    finalPath.value = pathArr.reverse().join(" → ");
+    
+    // Invertir para tener orden A -> B -> C
+    pathArr = pathArr.reverse();
+    
+    finalPath.value = pathArr.join(" → ");
+
+    // Envía el camino al grafo visual
+    setHighlightPath(pathArr); 
   }
   isSolved.value = true;
 };
 
-// Observar TODO: matriz, nº nodos, origen y destino
+// Opcional: Limpiar al salir de la pestaña si no quieres que persista
+// onUnmounted(() => clearHighlights()); 
+
 watch(
   [rawMatrix, numNodes, startNode, endNode], 
   () => solveDijkstra(),

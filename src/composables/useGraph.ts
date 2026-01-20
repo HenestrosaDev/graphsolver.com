@@ -1,10 +1,11 @@
 import { ref, computed, watch } from 'vue';
 import type { Matrix, GraphData } from '../types/graph';
 
-// Estado global
+// Estado global (compartido entre componentes)
 const numNodes = ref<number>(4);
 const rawMatrix = ref<Matrix>([]);
 const treatZeroAsNull = ref<boolean>(true);
+const highlightedPath = ref<string[]>([]);
 
 export function useGraph() {
   
@@ -26,7 +27,7 @@ export function useGraph() {
     rawMatrix.value = newMatrix;
   };
 
-  // --- NUEVO: Watcher para redimensionar reactivamente ---
+  // Watcher para redimensionar reactivamente
   watch(numNodes, (newN, oldN) => {
     if (newN < 2) return; // Mínimo de seguridad
     if (!rawMatrix.value.length) {
@@ -107,13 +108,12 @@ export function useGraph() {
     };
   };
 
-	const generateRandomGraph = () => {
-    // CAMBIO: Usamos el valor actual seleccionado por el usuario
+  const generateRandomGraph = () => {
     const n = numNodes.value;
     
     // Configuración
     const connectionProbability = 0.5; // 50% de probabilidad de conexión
-    const maxWeight = 20; // Pesos entre 1 y 20 para que no salgan números gigantes
+    const maxWeight = 20; 
     
     const newMatrix: Matrix = [];
 
@@ -121,18 +121,13 @@ export function useGraph() {
       const row: (number | string)[] = [];
       for (let j = 0; j < n; j++) {
         if (i === j) {
-          // Diagonal siempre 0
           row.push(0);
         } else {
-          // Decidir si hay conexión o está vacío
           const hasConnection = Math.random() < connectionProbability;
-          
           if (hasConnection) {
-            // Generar peso random
             const weight = Math.floor(Math.random() * maxWeight) + 1;
             row.push(weight);
           } else {
-            // Dejar vacío (infinito)
             row.push('');
           }
         }
@@ -140,22 +135,37 @@ export function useGraph() {
       newMatrix.push(row);
     }
     
-    // Actualizamos la matriz manteniendo el tamaño actual
     rawMatrix.value = newMatrix;
   };
 
-	const clearMatrix = () => {
+  const clearMatrix = () => {
     const n = numNodes.value;
-    // Recorremos la matriz existente y reseteamos valores
     for (let i = 0; i < n; i++) {
       for (let j = 0; j < n; j++) {
-        // La diagonal se mantiene en 0, el resto se vacía
         if (i === j) {
           rawMatrix.value[i][j] = 0;
         } else {
           rawMatrix.value[i][j] = ''; 
         }
       }
+    }
+  };
+
+  const clearHighlights = () => {
+    highlightedPath.value = [];
+  };
+
+  const setHighlightPath = (nodesInPath: string[]) => {
+    highlightedPath.value = [];
+    if (nodesInPath.length < 2) return;
+
+    for (let i = 0; i < nodesInPath.length - 1; i++) {
+      const u = nodesInPath[i];
+      const v = nodesInPath[i+1];
+      // Guardamos ambas direcciones para asegurar que vis-network lo detecte
+      // independientemente de cómo esté definida la arista internamente
+      highlightedPath.value.push(u + v); // Ej: "AB"
+      highlightedPath.value.push(v + u); // Ej: "BA"
     }
   };
 
@@ -167,10 +177,13 @@ export function useGraph() {
     rawMatrix,
     treatZeroAsNull,
     nodes,
+    highlightedPath,
+    clearHighlights,
+    setHighlightPath,
     createGrid,
     getGraphData,
     generateRandomGraph,
-		clearMatrix,
+    clearMatrix,
     toIdx,
     toChar
   };
