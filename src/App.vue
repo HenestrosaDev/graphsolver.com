@@ -13,13 +13,15 @@ import TabProperties from './components/tabs/TabProperties.vue';
 import TabMst from './components/tabs/TabMst.vue';
 import TabLatex from './components/tabs/TabLatex.vue';
 import TabDijkstra from './components/tabs/TabDijkstra.vue';
+import TabVisualizer from './components/tabs/TabVisualizer.vue';
 
 // Lógica del grafo
 const { generateRandomGraph } = useGraph();
 
 // Estado de la navegación
-const activeTab = ref<string>('Floyd');
+const activeTab = ref<string>('Graph');
 const tabs = [
+	{ id: 'Graph', label: 'Visualizar Grafo' },
   { id: 'Dijkstra', label: 'Dijkstra' },
   { id: 'Floyd', label: 'Floyd-Warshall' },
   { id: 'MST', label: 'MST (Kruskal)' },
@@ -77,6 +79,7 @@ const tabs = [
         <div class="p-4 sm:p-8">
           <KeepAlive>
             <component :is="
+							activeTab === 'Graph' ? TabVisualizer :
               activeTab === 'Floyd' ? TabFloyd : 
               activeTab === 'Properties' ? TabProperties :
               activeTab === 'MST' ? TabMst :
