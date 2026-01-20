@@ -4,10 +4,11 @@ import { useGraph } from './composables/useGraph';
 
 // Componentes UI
 import Navbar from './components/Navbar.vue';
+import Footer from './components/Footer.vue';
 import MatrixInput from './components/MatrixInput.vue';
 import ToastNotification from './components/ToastNotification.vue';
 
-// Tabs (Nombres corregidos)
+// Tabs
 import TabFloyd from './components/tabs/TabFloyd.vue';
 import TabProperties from './components/tabs/TabProperties.vue';
 import TabMst from './components/tabs/TabMst.vue';
@@ -35,7 +36,7 @@ const tabs = [
     
     <Navbar />
 
-    <div class="max-w-5xl mx-auto p-4 md:p-8">
+    <main class="max-w-5xl mx-auto p-4 md:p-8">
       
 <div class="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
         
@@ -96,7 +97,9 @@ const tabs = [
         </div>
       </div>
 
-    </div>
+    </main>
+
+		<Footer />
     
     <ToastNotification />
   </div>
