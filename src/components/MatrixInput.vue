@@ -2,7 +2,7 @@
 import { onMounted } from 'vue';
 import { useGraph } from '../composables/useGraph';
 
-const { nodes, rawMatrix, numNodes, treatZeroAsNull, createGrid } = useGraph();
+const { nodes, rawMatrix, numNodes, treatZeroAsNull, createGrid, clearMatrix } = useGraph();
 
 onMounted(() => {
   if (rawMatrix.value.length === 0) createGrid();
@@ -14,34 +14,46 @@ onMounted(() => {
     
     <div class="bg-slate-50 px-4 py-3 border-b border-slate-200 flex flex-col sm:flex-row justify-between items-center gap-4">
       
-      <div class="flex items-center gap-3">
-        <span class="text-xs font-bold text-slate-500 uppercase tracking-wide select-none">
-          Vértices
-        </span>
-        <div class="flex items-center shadow-sm rounded-md overflow-hidden">
-          <button 
-            @click="numNodes > 2 ? numNodes-- : null"
-            class="w-8 h-8 flex items-center justify-center bg-white border-r border-slate-200 text-slate-500 hover:text-blue-600 hover:bg-slate-50 transition active:bg-blue-50"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-              <path fill-rule="evenodd" d="M3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd" />
-            </svg>
-          </button>
-          <input 
-            type="number" 
-            v-model.number="numNodes" 
-            min="2" max="26"
-            class="w-10 h-8 text-center text-sm font-bold text-slate-700 focus:outline-none focus:bg-white bg-slate-50"
-          >
-          <button 
-            @click="numNodes < 26 ? numNodes++ : null"
-            class="w-8 h-8 flex items-center justify-center bg-white border-l border-slate-200 text-slate-500 hover:text-blue-600 hover:bg-slate-50 transition active:bg-blue-50"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-              <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
-            </svg>
-          </button>
+      <div class="flex items-center gap-4">
+        <div class="flex items-center gap-3">
+          <span class="text-xs font-bold text-slate-500 uppercase tracking-wide select-none">
+            Vértices
+          </span>
+          <div class="flex items-center shadow-sm rounded-md overflow-hidden">
+            <button 
+              @click="numNodes > 2 ? numNodes-- : null"
+              class="w-8 h-8 flex items-center justify-center bg-white border-r border-slate-200 text-slate-500 hover:text-blue-600 hover:bg-slate-50 transition active:bg-blue-50"
+            >
+              -
+            </button>
+            <input 
+              type="number" 
+              v-model.number="numNodes" 
+              min="2" max="26"
+              class="w-10 h-8 text-center text-sm font-bold text-slate-700 focus:outline-none focus:bg-white bg-slate-50"
+            >
+            <button 
+              @click="numNodes < 26 ? numNodes++ : null"
+              class="w-8 h-8 flex items-center justify-center bg-white border-l border-slate-200 text-slate-500 hover:text-blue-600 hover:bg-slate-50 transition active:bg-blue-50"
+            >
+              +
+            </button>
+          </div>
         </div>
+
+        <div class="h-6 w-px bg-slate-200 hidden sm:block"></div>
+
+        <button 
+          @click="clearMatrix"
+          class="flex items-center gap-1.5 px-3 py-1.5 rounded text-xs font-bold uppercase tracking-wide text-red-500 border border-red-200 bg-red-50 hover:bg-red-100 hover:text-red-600 transition active:scale-95"
+          title="Vaciar todos los valores de la matriz"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+          </svg>
+          <span class="hidden sm:inline">Vaciar</span>
+        </button>
+
       </div>
 
       <div class="flex items-center gap-4 sm:gap-6">

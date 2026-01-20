@@ -144,6 +144,21 @@ export function useGraph() {
     rawMatrix.value = newMatrix;
   };
 
+	const clearMatrix = () => {
+    const n = numNodes.value;
+    // Recorremos la matriz existente y reseteamos valores
+    for (let i = 0; i < n; i++) {
+      for (let j = 0; j < n; j++) {
+        // La diagonal se mantiene en 0, el resto se vacía
+        if (i === j) {
+          rawMatrix.value[i][j] = 0;
+        } else {
+          rawMatrix.value[i][j] = ''; 
+        }
+      }
+    }
+  };
+
   const toIdx = (char: string): number => char.toUpperCase().charCodeAt(0) - 65;
   const toChar = (idx: number): string => String.fromCharCode(65 + idx);
 
@@ -155,6 +170,7 @@ export function useGraph() {
     createGrid,
     getGraphData,
     generateRandomGraph,
+		clearMatrix,
     toIdx,
     toChar
   };
