@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onMounted } from 'vue';
-import { useGraph } from '../composables/useGraph';
+import { useGraph } from '../../composables/useGraph';
 
 const { nodes, rawMatrix, numNodes, createGrid, clearMatrix } = useGraph();
 

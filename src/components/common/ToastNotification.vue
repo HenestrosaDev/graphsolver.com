@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useToast } from '../composables/useToast';
+import { useToast } from '../../composables/useToast';
 
 // Vinculamos al estado global del composable
 const { show, message } = useToast();

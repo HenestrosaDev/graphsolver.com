@@ -97,7 +97,7 @@ watch([rawMatrix, numNodes], solveMST, { deep: true, immediate: true });
     <div class="space-y-4">
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div class="bg-white border border-slate-200 rounded-lg p-4 shadow-sm">
-          <div class="text-xs font-bold text-slate-500 uppercase tracking-wide mb-2">Coste Mínimo (Kruskal)</div>
+          <div class="text-xs font-bold text-slate-500 uppercase tracking-wide mb-2">Coste Mínimo</div>
           <div class="text-3xl font-mono font-bold text-slate-900">{{ result.cost }}</div>
         </div>
 

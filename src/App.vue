@@ -4,20 +4,20 @@ import { useGraph } from './composables/useGraph';
 import { useToast } from './composables/useToast'; // Usamos tu sistema de notificaciones
 
 // Componentes UI
-import Navbar from './components/Navbar.vue';
-import Footer from './components/Footer.vue';
-import MatrixInput from './components/MatrixInput.vue';
-import ToastNotification from './components/ToastNotification.vue';
+import Navbar from './components/common/Navbar.vue';
+import Footer from './components/common/Footer.vue';
+import MatrixInput from './components/sections/SectionMatrixInput.vue';
+import ToastNotification from './components/common/ToastNotification.vue';
 
 // Always visible components
-import TabVisualizer from './components/tabs/TabVisualizer.vue';
-import TabProperties from './components/tabs/TabProperties.vue';
-import TabLatex from './components/tabs/TabLatex.vue';
+import TabVisualizer from './components/sections/SectionVisualizer.vue';
+import TabProperties from './components/sections/SectionProperties.vue';
+import TabLatex from './components/sections/SectionLatex.vue';
 
 // Algorithm components
-import TabFloyd from './components/tabs/TabFloyd.vue';
-import TabMst from './components/tabs/TabMst.vue';
-import TabDijkstra from './components/tabs/TabDijkstra.vue';
+import AlgorithmFloyd from './components/algorithms/AlgorithmFloyd.vue';
+import AlgorithmKruskal from './components/algorithms/AlgorithmKruskal.vue';
+import AlgorithmDijkstra from './components/algorithms/AlgorithmDijkstra.vue';
 
 // Traemos las nuevas funciones
 const { generateRandomGraph, toJSON, loadFromJSON } = useGraph();
@@ -27,9 +27,9 @@ const selectedAlgorithm = ref<string>('dijkstra');
 const fileInput = ref<HTMLInputElement | null>(null); // Referencia al input oculto
 
 const algorithms = [
-  { id: 'dijkstra', label: 'Dijkstra', component: TabDijkstra },
-  { id: 'floyd', label: 'Floyd-Warshall', component: TabFloyd },
-  { id: 'mst', label: 'MST (Kruskal)', component: TabMst }
+  { id: 'dijkstra', label: 'Dijkstra', component: AlgorithmDijkstra },
+  { id: 'floyd', label: 'Floyd-Warshall', component: AlgorithmFloyd },
+  { id: 'mst', label: 'Kruskal (MST)', component: AlgorithmKruskal }
 ];
 
 // --- Lógica Exportar ---
@@ -83,7 +83,7 @@ const handleFileChange = (event: Event) => {
   >
     <Navbar />
 
-    <main class="flex-grow w-full max-w-5xl mx-auto p-4 md:p-8">
+    <main class="grow w-full max-w-5xl mx-auto p-4 md:p-8">
       <input type="file" ref="fileInput" class="hidden" accept=".json" @change="handleFileChange" />
 
       <div class="flex flex-col xl:flex-row justify-between items-center mb-6 gap-4">
