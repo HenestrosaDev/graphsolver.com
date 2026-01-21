@@ -11,6 +11,32 @@ const { triggerToast } = useToast();
 const networkContainer = ref<HTMLElement | null>(null);
 let networkInstance: Network | null = null;
 
+const isLocked = ref(true); // Iniciamos bloqueado para priorizar scroll
+const showOverlayHint = ref(false); // Controla el mensaje oscuro
+let overlayTimeout: number | null = null;
+
+// Al tocar el área bloqueada
+const handleTouchStart = () => {
+  if (overlayTimeout) clearTimeout(overlayTimeout);
+  showOverlayHint.value = true;
+};
+
+// Al levantar el dedo
+const handleTouchEnd = () => {
+  overlayTimeout = setTimeout(() => {
+    showOverlayHint.value = false;
+  }, 300);
+};
+
+// Alternar el candado
+const toggleLock = () => {
+  isLocked.value = !isLocked.value;
+  if (!isLocked.value) showOverlayHint.value = false;
+  
+  const msg = isLocked.value ? 'Modo scroll activado' : 'Modo interacción activado';
+  triggerToast(msg);
+};
+
 // --- Preparación de Datos ---
 const parseData = () => {
   const { n, matrix, isSymmetric } = getGraphData();
@@ -172,12 +198,53 @@ watch(
 
 <template>
   <div class="animate-fade-in relative group z-0">
-    <div 
-      ref="networkContainer" 
-      class="w-full h-[550px] border border-gray-200 rounded-xl bg-slate-50 shadow-inner cursor-grab active:cursor-grabbing overflow-hidden relative"
-    ></div>
+    
+    <div class="relative w-full h-[550px] border border-gray-200 rounded-xl bg-slate-50 shadow-inner overflow-hidden">
+        
+        <div 
+          ref="networkContainer" 
+          class="absolute inset-0 w-full h-full cursor-grab active:cursor-grabbing"
+        ></div>
 
-    <div class="absolute bottom-4 right-4 flex flex-col gap-2 z-10">
+        <div 
+          v-if="isLocked"
+          class="absolute inset-0 z-10 md:hidden touch-pan-y flex items-center justify-center pb-32"
+          @touchstart="handleTouchStart"
+          @touchend="handleTouchEnd"
+        >
+          <Transition name="fade">
+            <div 
+              v-if="showOverlayHint"
+              class="bg-slate-900/70 backdrop-blur-[2px] rounded-xl flex flex-col items-center justify-center text-white p-6 text-center select-none mx-6 shadow-2xl"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 mb-3 opacity-90" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+              </svg>
+              <p class="font-bold text-lg">Mapa bloqueado</p>
+              <p class="text-sm text-slate-200 mt-1 leading-snug">
+                Desbloquea el mapa para interactuar.
+              </p>
+            </div>
+          </Transition>
+        </div>
+    </div>
+
+    <div class="absolute bottom-4 right-4 flex flex-col gap-2 z-20">
+      
+      <button 
+        @click="toggleLock" 
+        class="md:hidden bg-white p-2 rounded-lg shadow-md border border-gray-200 text-gray-600 hover:text-blue-600 hover:bg-blue-50 transition active:scale-95 mb-2"
+        :class="{ 'ring-2 ring-blue-400 text-blue-600': !isLocked }"
+        :title="isLocked ? 'Desbloquear' : 'Bloquear'"
+      >
+        <svg v-if="isLocked" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+        </svg>
+        <svg v-else xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z" />
+        </svg>
+      </button>
+
       <button
         @click="exportImage" 
         class="bg-white p-2 rounded-lg shadow-md border border-gray-200 text-gray-600 hover:text-blue-600 hover:bg-blue-50 transition active:scale-95 mb-2"
@@ -221,8 +288,3 @@ watch(
     </div>
   </div>
 </template>
-
-<style scoped>
-.animate-fade-in { animation: fadeIn 0.4s ease-out; }
-@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-</style>
