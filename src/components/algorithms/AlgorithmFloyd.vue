@@ -12,6 +12,10 @@ const hasInfPairs = ref<boolean>(false);
 const finalDist = ref<number[][]>([]);
 const finalNext = ref<(number | null)[][]>([]);
 
+// --- CARROUSEL STATE ---
+const currentStepIndex = ref(0);
+const currentStep = computed(() => steps.value[currentStepIndex.value]);
+
 const startNode = ref<string>('A');
 const endNode = ref<string>('B');
 
@@ -27,9 +31,9 @@ const solveFloyd = () => {
 
   steps.value = [];
   
-  // Paso 0
+  // Paso 0: Matriz Inicial
   steps.value.push({ 
-    title: 'Matriz Inicial D(0)', 
+    title: 'Estado Inicial D(0)', 
     matrix: dist.map(r => [...r]),
     pivot: -1 
   });
@@ -70,18 +74,19 @@ const solveFloyd = () => {
 };
 
 // --- REACTIVIDAD AUTOMÁTICA ---
-// deep: true detecta cambios dentro de la matriz
-// immediate: true calcula nada más cargar el componente
 watch(
   [rawMatrix, numNodes], 
-  () => solveFloyd(), 
+  () => {
+    solveFloyd();
+    // Resetear el carrousel al inicio cuando cambie el grafo
+    currentStepIndex.value = 0;
+  }, 
   { deep: true, immediate: true }
 );
 
 const queryResult = computed(() => {
   if (!finalDist.value.length) return null;
   
-  // Validar que los nodos seleccionados existan (por si reducimos vértices)
   if (toIdx(startNode.value) >= numNodes.value) startNode.value = nodes.value[0];
   if (toIdx(endNode.value) >= numNodes.value) endNode.value = nodes.value[numNodes.value - 1];
 
@@ -103,12 +108,20 @@ const queryResult = computed(() => {
   }
   return { dist: d, path: pathArr.join(' → ') };
 });
+
+// --- FUNCIONES DE NAVEGACIÓN ---
+const nextStep = () => {
+  if (currentStepIndex.value < steps.value.length - 1) currentStepIndex.value++;
+};
+const prevStep = () => {
+  if (currentStepIndex.value > 0) currentStepIndex.value--;
+};
 </script>
 
 <template>
-  <div class="animate-fade-in">
-    <!-- Summary Cards -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+  <div class="animate-fade-in space-y-6">
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
       <div class="bg-white border border-slate-200 rounded-lg p-4 shadow-sm">
         <div class="text-xs font-bold text-slate-500 uppercase tracking-wide mb-2">Diámetro del Grafo</div>
         <div class="text-2xl font-mono font-bold text-slate-900">
@@ -142,44 +155,87 @@ const queryResult = computed(() => {
       </div>
     </div>
 
-    <!-- Matrices Grid -->
-    <div class="mb-4">
-      <h3 class="text-lg font-bold text-slate-700 mb-4 flex items-center gap-2">
-        <svg class="w-5 h-5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2"/>
-        </svg>
-        Matrices de Iteraciones
-      </h3>
-    </div>
+    <div 
+      v-if="steps.length > 0" 
+      class="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden"
+    >
+      <div class="bg-slate-50 border-b border-slate-200 p-4">
+        <div class="flex flex-col items-center">
+          <span class="inline-block bg-blue-100 text-blue-700 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">
+            Paso {{ currentStepIndex + 1 }} de {{ steps.length }}
+          </span>
 
-    <div class="flex flex-col gap-4">
-      <div v-for="(step, idx) in steps" :key="idx" class="bg-white border border-slate-200 rounded-lg overflow-hidden shadow-sm">
-        <div class="bg-slate-50 px-4 py-3 border-b border-slate-200">
-          <h4 class="font-bold text-slate-700 text-center text-sm uppercase tracking-wide">
-            {{ step.title }}
-          </h4>
-        </div>
-        <div class="p-4 flex justify-center">
-          <table class="text-sm border-collapse">
-            <thead>
-              <tr>
-                <th class="p-2"></th>
-                <th v-for="n in nodes" :key="n" class="p-2 font-bold text-slate-500 text-xs w-8 text-center">{{ n }}</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="(row, i) in step.matrix" :key="i">
-                <th class="p-2 font-bold text-slate-500 text-xs w-8 text-center">{{ nodes[i] }}</th>
-                <td v-for="(val, j) in row" :key="j"
-                    class="p-2 border border-slate-100 text-center text-xs w-8 h-8 font-mono"
-                    :class="{'bg-blue-50 font-bold text-blue-700 border-blue-200': i === step.pivot || j === step.pivot}">
-                  {{ val === Infinity ? '∞' : val }}
-                </td>
-              </tr>
-            </tbody>
-          </table>
+          <h3 class="font-bold text-slate-800 text-lg mt-3">
+            {{ currentStep.title }}
+          </h3>
+
+          <div class="flex items-center justify-center gap-3 w-full max-w-md -mb-1">
+            <button 
+              @click="prevStep" 
+              :disabled="currentStepIndex === 0"
+              class="p-1.5 rounded-full hover:bg-white hover:shadow-sm border border-transparent hover:border-slate-200 text-slate-500 disabled:opacity-30 disabled:hover:shadow-none disabled:hover:border-transparent transition-all"
+              title="Anterior">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+            </button>
+
+            <div class="flex-1 mx-2 relative flex items-center">
+              <input 
+                type="range" 
+                min="0" 
+                :max="steps.length - 1" 
+                v-model.number="currentStepIndex"
+                class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-blue-600 hover:accent-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30"
+              >
+            </div>
+
+            <button 
+              @click="nextStep" 
+              :disabled="currentStepIndex === steps.length - 1"
+              class="p-1.5 rounded-full hover:bg-white hover:shadow-sm border border-transparent hover:border-slate-200 text-slate-500 disabled:opacity-30 disabled:hover:shadow-none disabled:hover:border-transparent transition-all"
+              title="Siguiente">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+            </button>
+          </div>
         </div>
       </div>
+
+      <div class="p-6 overflow-x-auto flex justify-center min-h-[300px] items-center bg-white transition-all duration-300">
+        <table class="text-sm border-collapse shadow-sm rounded-lg overflow-hidden">
+          <thead>
+            <tr>
+              <th class="p-3 bg-slate-50 border-b border-slate-200"></th>
+              <th v-for="n in nodes" :key="n" class="p-3 bg-slate-50 border-b border-slate-200 font-bold text-slate-500 text-xs w-10 text-center">{{ n }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(row, i) in currentStep.matrix" :key="i">
+              <th class="p-3 bg-slate-50 border-r border-slate-200 font-bold text-slate-500 text-xs w-10 text-center">
+                {{ nodes[i] }}
+              </th>
+              
+              <td v-for="(val, j) in row" :key="j"
+                  class="p-3 border border-slate-100 text-center text-sm w-12 h-12 font-mono transition-colors duration-200"
+                  :class="{
+                    'bg-blue-50 font-bold text-blue-700 ring-1 ring-inset ring-blue-200': i === currentStep.pivot || j === currentStep.pivot,
+                    'text-slate-400': val === Infinity,
+                    'text-slate-800': val !== Infinity
+                  }">
+                {{ val === Infinity ? '∞' : val }}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+      </div>
+
+      <div class="bg-slate-50 p-3 text-xs text-slate-500 text-center border-t border-slate-200">
+        <span v-if="currentStep.pivot === -1">Matriz de adyacencia inicial. Los nodos no conectados directamente son ∞.</span>
+        <span v-else>
+          Calculando rutas pasando por el nodo intermedio <strong>{{ nodes[currentStep.pivot] }}</strong>.
+          Las filas y columnas resaltadas no cambian en esta iteración.
+        </span>
+      </div>
+
     </div>
   </div>
 </template>
