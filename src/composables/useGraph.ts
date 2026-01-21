@@ -34,6 +34,11 @@ export function useGraph() {
       return;
     }
 
+    // Si la matriz ya tiene el tamaño correcto, no redimensionar (para importaciones)
+    if (rawMatrix.value.length === newN && rawMatrix.value.every(row => row.length === newN)) {
+      return;
+    }
+
     const currentMatrix = rawMatrix.value;
     const newMatrix: Matrix = [];
 
@@ -176,6 +181,43 @@ export function useGraph() {
     }, null, 2); // Indentado bonito
   };
 
+  const toLaTeX = () => {
+    const n = numNodes.value;
+    let latex = '\\begin{pmatrix}\n';
+    for (let i = 0; i < n; i++) {
+      const row = [];
+      for (let j = 0; j < n; j++) {
+        const val = rawMatrix.value[i][j];
+        row.push(val === '' ? '-' : val.toString());
+      }
+      latex += row.join(' & ') + ' \\\\\n';
+    }
+    latex += '\\end{pmatrix}';
+    return latex;
+  };
+
+  const toDot = () => {
+    const { hasArc, isSymmetric } = getGraphData();
+    const n = numNodes.value;
+    let dot = isSymmetric ? 'graph G {\n' : 'digraph G {\n';
+    for (let i = 0; i < n; i++) {
+      for (let j = 0; j < n; j++) {
+        if (hasArc[i][j]) {
+          const u = nodes.value[i];
+          const v = nodes.value[j];
+          const weight = rawMatrix.value[i][j];
+          if (isSymmetric && i < j) {
+            dot += `  ${u} -- ${v} [label="${weight}"];\n`;
+          } else if (!isSymmetric) {
+            dot += `  ${u} -> ${v} [label="${weight}"];\n`;
+          }
+        }
+      }
+    }
+    dot += '}';
+    return dot;
+  };
+
   // --- NUEVO: Importar estado ---
   const loadFromJSON = (jsonString: string): boolean => {
     try {
@@ -196,6 +238,74 @@ export function useGraph() {
     }
   };
 
+  const loadFromLaTeX = (latexString: string): boolean => {
+    try {
+      // Simple parser for LaTeX matrix like \begin{pmatrix} a & b \\ c & d \end{pmatrix}
+      const matrixMatch = latexString.match(/\\begin\{pmatrix\}\s*(.*?)\s*\\end\{pmatrix\}/s);
+      if (!matrixMatch) throw new Error("Formato LaTeX inválido");
+
+      const rows = matrixMatch[1].split('\\\\').map(r => r.trim()).filter(r => r.length > 0);
+      const matrix = rows.map(row => row.split('&').map(cell => cell.trim()));
+
+      const n = matrix.length;
+      if (n === 0 || matrix[0].length !== n) throw new Error("Matriz no cuadrada");
+
+      numNodes.value = n;
+    rawMatrix.value = matrix.map(row => row.map(cell => cell === '-' || cell === '0' ? '' : cell));
+    
+    // Ensure diagonal is 0
+    for (let i = 0; i < n; i++) {
+      rawMatrix.value[i][i] = '0';
+    }
+      return true;
+    } catch (e) {
+      console.error("Error importando LaTeX:", e);
+      return false;
+    }
+  };
+
+  const loadFromDot = (dotString: string): boolean => {
+    try {
+      // Simple parser for dot format
+      const edgeRegex = /(\w+)\s*(--|->)\s*(\w+)\s*\[label="(\d+)"\]/g;
+      
+      const nodeSet = new Set<string>();
+      const edges = [];
+      
+      let match;
+      while ((match = edgeRegex.exec(dotString)) !== null) {
+        const u = match[1];
+        const type = match[2];
+        const v = match[3];
+        const weight = match[4];
+        nodeSet.add(u);
+        nodeSet.add(v);
+        edges.push({ u, v, weight, isUndirected: type === '--' });
+      }
+      
+      const nodesList = Array.from(nodeSet).sort();
+      const n = nodesList.length;
+      const matrix: Matrix = Array(n).fill(0).map(() => Array(n).fill(''));
+      
+      numNodes.value = n;
+      rawMatrix.value = matrix;
+      
+      edges.forEach(edge => {
+        const uIdx = nodesList.indexOf(edge.u);
+        const vIdx = nodesList.indexOf(edge.v);
+        rawMatrix.value[uIdx][vIdx] = edge.weight;
+        if (edge.isUndirected) {
+          rawMatrix.value[vIdx][uIdx] = edge.weight;
+        }
+      });
+      
+      return true;
+    } catch (e) {
+      console.error("Error importando Dot:", e);
+      return false;
+    }
+  };
+
   const toIdx = (char: string): number => char.toUpperCase().charCodeAt(0) - 65;
   const toChar = (idx: number): string => String.fromCharCode(65 + idx);
 
@@ -211,7 +321,11 @@ export function useGraph() {
     generateRandomGraph,
     clearMatrix,
 		toJSON,
+    toLaTeX,
+    toDot,
 		loadFromJSON,
+    loadFromLaTeX,
+    loadFromDot,
     toIdx,
     toChar
   };

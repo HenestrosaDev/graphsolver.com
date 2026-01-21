@@ -25,7 +25,19 @@ export interface GraphAnalysis {
 	isolated: number;
 	cc: number;
 	compSize: number;
-	compCc: number | string;
+	compCc: number;
+	density: number;                 // 0 to 1
+	isComplete: boolean;             // true if density is 1
+	minDegree: number;               // δ
+	maxDegree: number;               // Δ
+	isRegular: boolean;              // true if min == max
+	isTree: boolean;                 // true if connected & acyclic
+	isForest: boolean;               // true if acyclic (multiple trees)
+	eulerianType: string;            // 'No', 'Ciclo' or 'Camino'
+	isConnected: boolean;            // cc == 1
+	hasCycles: boolean;              // true si hay bucles
+	structureType: string;           // Clasificación detallada
+	isHamiltonian: boolean | string; // true, false o "NP"
 }
 
 export interface FloydStep {
