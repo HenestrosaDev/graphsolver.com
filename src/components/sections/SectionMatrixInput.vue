@@ -2,17 +2,15 @@
 import { onMounted, computed } from 'vue';
 import { useGraph } from '../../composables/useGraph';
 
-const { nodes, rawMatrix, numNodes: _numNodes, createGrid, clearMatrix } = useGraph();
+const { generateRandomGraph, nodes, rawMatrix, numNodes: _numNodes, createGrid, clearMatrix } = useGraph();
 
-// Handle validation
+// Validación de nodos
 const numNodes = computed({
   get: () => _numNodes.value,
   set: (val: number) => {
-    // If value is empty, NaN, or less than 2, force it to 2
     if (!val || val < 2) {
       _numNodes.value = 2;
     } 
-    // Otherwise, accept the value
     else {
       _numNodes.value = val;
     }
@@ -27,7 +25,7 @@ onMounted(() => {
 <template>
   <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden mb-6">
     <div class="bg-slate-50 px-4 py-3 border-b border-slate-200 flex flex-col sm:flex-row justify-between items-center gap-4">
-      <div class="flex items-center gap-4">
+      <div class="flex items-center w-full justify-between gap-4">
         <div class="flex items-center gap-3">
           <span class="text-xs font-bold text-slate-500 uppercase tracking-wide select-none">
             Vértices
@@ -57,66 +55,90 @@ onMounted(() => {
           </div>
         </div>
 
-        <div class="h-6 w-px bg-slate-200 hidden sm:block"></div>
+        <div class="flex items-center gap-2">
+          <button
+            @click="generateRandomGraph"
+            class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 hover:text-indigo-600 hover:border-indigo-300 transition-all active:scale-95"
+            title="Generar valores aleatorios"
+          >
+						<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-4">
+							<path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+							<path d="M3 5a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v14a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2v-14" />
+							<path d="M8 7.5a.5 .5 0 1 0 1 0a.5 .5 0 1 0 -1 0" fill="currentColor" />
+							<path d="M15 7.5a.5 .5 0 1 0 1 0a.5 .5 0 1 0 -1 0" fill="currentColor" />
+							<path d="M8 12a.5 .5 0 1 0 1 0a.5 .5 0 1 0 -1 0" fill="currentColor" />
+							<path d="M15 12a.5 .5 0 1 0 1 0a.5 .5 0 1 0 -1 0" fill="currentColor" />
+							<path d="M15 16.5a.5 .5 0 1 0 1 0a.5 .5 0 1 0 -1 0" fill="currentColor" />
+							<path d="M8 16.5a.5 .5 0 1 0 1 0a.5 .5 0 1 0 -1 0" fill="currentColor" />
+						</svg>
+            <span class="hidden sm:inline">Aleatorio</span>
+          </button>
 
-        <button 
-          @click="clearMatrix"
-          class="flex items-center gap-1.5 px-3 py-1.5 rounded text-xs font-bold uppercase tracking-wide text-red-500 border border-red-200 bg-red-50 hover:bg-red-100 hover:text-red-600 transition active:scale-95"
-          title="Vaciar todos los valores de la matriz"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-          </svg>
-          <span class="hidden sm:inline">Vaciar</span>
-        </button>
-      </div>
-
-      <div class="flex items-center gap-4 sm:gap-6">
-        <span class="text-xs text-slate-400 font-medium bg-slate-100 px-2 py-1 rounded border border-slate-200 hidden sm:inline-block">
-          Vacío / -1 = ∞
-        </span>
+          <button 
+            @click="clearMatrix"
+            class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium border border-red-200 bg-red-50 text-red-600 hover:bg-red-100 hover:border-red-300 transition active:scale-95"
+            title="Vaciar todos los valores"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+            </svg>
+            <span class="hidden sm:inline">Vaciar</span>
+          </button>
+        </div>
       </div>
     </div>
     
     <div class="p-4 sm:p-6 overflow-x-auto w-full flex justify-center bg-white">
-      <table class="border-collapse table-fixed w-auto" v-if="rawMatrix.length">
-        <thead>
-          <tr>
-            <th class="p-2 bg-slate-50 border border-slate-200 rounded-tl-lg"></th>
-            <th 
-              v-for="node in nodes" 
-              :key="'head-'+node" 
-              class="animate-fade-in p-2 border border-slate-200 bg-slate-50 font-bold text-slate-600 text-xs sm:text-sm text-center select-none w-14 sm:w-16"
-            >
-              {{ node }}
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="(row, i) in rawMatrix" :key="'row-'+nodes[i]">
-            <td class="p-2 bg-slate-50 border border-slate-200 font-bold text-center text-slate-600 text-xs sm:text-sm select-none">
-              {{ nodes[i] }}
-            </td>
-            <td 
-              v-for="(_, j) in row" 
-              :key="'cell-'+i+'-'+j" 
-              class="animate-fade-in p-0 border border-slate-200 text-center relative h-10 sm:h-11"
-            >
-              <input 
-                type="number" 
-                v-model.number="rawMatrix[i][j]" 
-                :disabled="i === j"
-                placeholder="∞"
-                :class="[
-                  'w-full h-full text-center text-sm focus:ring-2 focus:ring-inset focus:ring-blue-500 outline-none transition-colors font-medium',
-                  i === j ? 'bg-slate-100 cursor-not-allowed text-transparent' : 'bg-white hover:bg-slate-50 text-slate-800 placeholder-slate-300'
-                ]"
+      <div class="inline-block rounded-lg border border-slate-200 overflow-hidden shadow-sm" v-if="rawMatrix.length">
+        <table class="border-collapse table-fixed w-auto">
+          <thead>
+            <tr>
+              <th class="p-2 bg-slate-50 border-r border-b border-slate-200 w-10 sm:w-12"></th>
+              
+              <th 
+                v-for="node in nodes" 
+                :key="'head-'+node" 
+                class="animate-fade-in p-2 bg-slate-50 font-bold text-slate-600 text-xs sm:text-sm text-center select-none w-14 sm:w-16 border-b border-r border-slate-200 last:border-r-0"
               >
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+                {{ node }}
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(row, i) in rawMatrix" :key="'row-'+nodes[i]" class="last:border-b-0">
+							<td 
+								class="p-2 bg-slate-50 border-r border-slate-200 font-bold text-center text-slate-600 text-xs sm:text-sm select-none"
+								:class="{ 'border-b': i !== rawMatrix.length - 1 }"
+							>
+								{{ nodes[i] }}
+							</td>
+
+							<td 
+								v-for="(_, j) in row" 
+								:key="'cell-'+i+'-'+j" 
+								class="animate-fade-in p-0 text-center relative h-10 sm:h-11 border-r border-slate-200 last:border-r-0"
+								:class="{ 'border-b': i !== rawMatrix.length - 1 }"
+							>
+								<div 
+									v-if="i === j"
+									class="w-full h-full flex items-center justify-center bg-slate-100 text-slate-400 font-medium text-sm cursor-not-allowed select-none"
+								>
+									0
+								</div>
+
+								<input 
+									v-else
+									type="number" 
+									v-model.number="rawMatrix[i][j]" 
+									placeholder="∞"
+									class="w-full h-full text-center text-sm focus:ring-2 focus:ring-inset focus:ring-blue-500 outline-none transition-colors font-medium bg-white hover:bg-slate-50 text-slate-800 placeholder-slate-300"
+								>
+							</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      </div>
   </div>
 </template>
 
