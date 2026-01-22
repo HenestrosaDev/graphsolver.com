@@ -214,7 +214,7 @@ const handleFileChange = (event: Event) => {
   >
     <Navbar />
 
-    <main class="grow w-full max-w-5xl mx-auto p-4 md:p-8">
+    <main class="grow w-full max-w-5xl mx-auto p-4 py-6 md:p-8">
       <input type="file" ref="fileInput" class="hidden" @change="handleFileChange" />
       <div class="flex justify-between items-center mb-6 gap-4">
         <h2
