@@ -19,7 +19,7 @@ import AlgorithmKruskal from './components/algorithms/AlgorithmKruskal.vue';
 import AlgorithmDijkstra from './components/algorithms/AlgorithmDijkstra.vue';
 
 // Traemos las nuevas funciones
-const { generateRandomGraph, toJSON, toLaTeX, toDot, loadFromJSON, loadFromLaTeX, loadFromDot } = useGraph();
+const { toJSON, toLaTeX, toDot, loadFromJSON, loadFromLaTeX, loadFromDot } = useGraph();
 const { triggerToast } = useToast();
 
 const selectedAlgorithm = ref<string>('dijkstra');
@@ -216,16 +216,15 @@ const handleFileChange = (event: Event) => {
 
     <main class="grow w-full max-w-5xl mx-auto p-4 md:p-8">
       <input type="file" ref="fileInput" class="hidden" @change="handleFileChange" />
-
-      <div class="flex flex-col xl:flex-row justify-between items-center mb-6 gap-4">
+      <div class="flex justify-between items-center mb-6 gap-4">
         <h2
-          class="text-xl font-bold text-slate-700 flex items-center gap-2 self-start xl:self-center"
+          class="text-2xl font-bold text-slate-700 flex items-center gap-2"
         >
           Matriz de adyacencia
         </h2>
 
-        <div class="flex flex-wrap gap-2 w-full xl:w-auto justify-start xl:justify-end">
-          <div class="flex gap-2 mr-2 border-r border-slate-200 pr-4">
+        <div class="flex flex-wrap gap-2">
+          <div class="flex gap-2">
             <div class="relative">
               <button
                 @click="handleExport"
@@ -249,7 +248,6 @@ const handleFileChange = (event: Event) => {
                 <span class="hidden sm:inline">Exportar</span>
               </button>
 
-              <!-- Menú de formatos de exportación -->
               <Transition name="menu">
                 <div v-if="showExportMenu" class="absolute top-full mt-1 w-40 bg-white border border-slate-200 rounded-lg shadow-lg z-10">
                   <div class="px-4 py-2 text-xs font-bold text-slate-500 uppercase">JSON</div>
@@ -288,7 +286,6 @@ const handleFileChange = (event: Event) => {
                 <span class="hidden sm:inline">Importar</span>
               </button>
 
-              <!-- Menú de formatos de importación -->
               <Transition name="menu">
                 <div v-if="showImportMenu" class="absolute top-full mt-1 w-32 bg-white border border-slate-200 rounded-lg shadow-lg z-10">
                   <div class="px-4 py-2 text-xs font-bold text-slate-500 uppercase">Archivo</div>
@@ -301,67 +298,42 @@ const handleFileChange = (event: Event) => {
               </Transition>
             </div>
           </div>
-
-          <button
-            @click="generateRandomGraph"
-            class="text-sm bg-white text-slate-600 border border-slate-200 font-medium py-2 px-4 rounded-lg shadow-sm hover:bg-slate-50 hover:text-indigo-600 transition-all active:scale-95 flex items-center gap-2"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              class="h-4 w-4"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M19.428 15.428a2 2 0 00-1.022-.547l-2.384-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"
-              />
-            </svg>
-            Aleatorio
-          </button>
         </div>
       </div>
 
       <MatrixInput />
 
-      <h2 class="mt-18 text-xl font-bold text-slate-700 flex items-center gap-2 mb-6">
-        <span
-          class="bg-purple-100 text-purple-700 text-xs px-2 py-1 rounded uppercase tracking-wider font-bold"
-        >
-          Dashboard
-        </span>
-        Visualización y Algoritmos
+      <h2 class="mt-18 text-2xl font-bold text-slate-700 flex items-center gap-2 mb-6">
+        Análisis del grafo
       </h2>
 
-			<!-- Properties -->
-			<div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
-				<!-- Left Column: Visual Graph -->
-				<div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-					<div class="bg-slate-50 px-6 py-4 border-b border-slate-200">
-						<h3 class="text-lg font-bold text-slate-700 flex items-center gap-2">
-							<svg
-								class="w-5 h-5 text-blue-600"
-								fill="none"
-								stroke="currentColor"
-								viewBox="0 0 24 24"
-							>
-								<path
-									stroke-linecap="round"
-									stroke-linejoin="round"
-									stroke-width="2"
-									d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
-								/>
-							</svg>
-							Visualización del grafo
-						</h3>
-					</div>
-					<div class="p-6">
-						<TabVisualizer />
-					</div>
-				</div>
+      <div class="lg:grid lg:grid-cols-2 max-lg:flex max-lg:flex-col gap-6 items-stretch">
+        
+        <div class="h-full">
+          <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden h-full flex flex-col">
+            <div class="bg-slate-50 px-6 py-4 border-b border-slate-200 shrink-0">
+              <h3 class="text-lg font-bold text-slate-700 flex items-center gap-2">
+                <svg 
+                  class="size-5 text-amber-600"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                  <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+                  <path d="M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6" />
+                </svg>
+                Visualización
+              </h3>
+            </div>
+            <div class="p-6 flex-1 flex flex-col min-h-[400px]">
+              <TabVisualizer class="flex-1 w-full h-full" />
+            </div>
+          </div>
+        </div>
 
         <!-- Right Column: Algorithm Selection and Results -->
         <div class="space-y-6">
@@ -418,31 +390,29 @@ const handleFileChange = (event: Event) => {
           </div>
         </div>
 
-				<div class="bg-white col-span-2 rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-					<div class="bg-slate-50 px-6 py-4 border-b border-slate-200">
-						<h3 class="text-lg font-bold text-slate-700 flex items-center gap-2">
-							<svg
-								class="w-5 h-5 text-green-600"
-								fill="none"
-								stroke="currentColor"
-								viewBox="0 0 24 24"
-							>
-								<path
-									stroke-linecap="round"
-									stroke-linejoin="round"
-									stroke-width="2"
-									d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
-								/>
-							</svg>
-							Propiedades del grafo
-						</h3>
-					</div>
-					<div class="p-6">
-						<TabProperties />
-					</div>
-				</div>
-
-
+        <div class="bg-white col-span-2 rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+          <div class="bg-slate-50 px-6 py-4 border-b border-slate-200">
+            <h3 class="text-lg font-bold text-slate-700 flex items-center gap-2">
+              <svg
+                class="w-5 h-5 text-green-600"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+                />
+              </svg>
+              Propiedades
+            </h3>
+          </div>
+          <div class="p-6">
+            <TabProperties />
+          </div>
+        </div>
       </div>
     </main>
 
