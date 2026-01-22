@@ -45,7 +45,7 @@ const solveDijkstra = () => {
       }
     }
 
-    const currentDistDisplay = dist.map(d => d === Infinity ? -1 : d);
+    const currentDistDisplay = dist.map(d => d === Infinity ? "∞" : d);
     const pivotChar = (u !== -1) ? nodes.value[u] : "-";
     steps.value.push({ step: i, dists: currentDistDisplay, pivot: pivotChar });
 
@@ -104,7 +104,7 @@ watch(
   <div class="animate-fade-in">
     <!-- Algorithm Controls -->
     <div class="bg-slate-50 border border-slate-200 rounded-lg p-4 mb-6">
-      <div class="flex flex-wrap items-center gap-4">
+      <div class="flex flex-wrap items-center justify-between gap-4">
         <div class="flex items-center gap-2">
           <label class="text-xs font-bold text-slate-700 uppercase tracking-wide">Origen</label>
           <select v-model="startNode" class="bg-white border border-slate-300 text-slate-700 text-sm rounded-md px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-medium">
@@ -133,16 +133,16 @@ watch(
         </div>
         <div class="bg-white border border-slate-200 rounded-lg p-4 shadow-sm">
           <div class="text-xs font-bold text-slate-500 uppercase tracking-wide mb-2">Camino Óptimo</div>
-          <div class="text-lg font-mono font-medium text-blue-600 break-all">{{ finalPath }}</div>
+          <div class="text-2xl font-mono font-bold text-slate-900">{{ finalPath }}</div>
         </div>
       </div>
 
       <!-- Steps Table -->
       <div class="bg-white border border-slate-200 rounded-lg overflow-hidden shadow-sm">
         <div class="bg-slate-50 px-4 py-3 border-b border-slate-200 flex justify-between items-center">
-          <h3 class="font-bold text-slate-700 text-sm uppercase tracking-wide">Tabla de Iteraciones</h3>
-          <span class="text-xs text-slate-500 bg-white px-2 py-1 rounded border border-slate-200 font-mono">-1 = ∞</span>
+          <h3 class="font-bold text-slate-700 text-sm uppercase tracking-wide">Tabla de iteraciones</h3>
         </div>
+
         <div class="overflow-x-auto">
           <table class="w-full text-sm">
             <thead class="bg-slate-100 border-b border-slate-200">
@@ -152,6 +152,7 @@ watch(
                 <th class="px-4 py-3 text-center font-bold text-blue-600">Pivote</th>
               </tr>
             </thead>
+
             <tbody class="divide-y divide-slate-100">
               <tr v-for="row in steps" :key="row.step" class="hover:bg-slate-50 transition-colors">
                 <td class="px-4 py-3 font-medium text-slate-900">
