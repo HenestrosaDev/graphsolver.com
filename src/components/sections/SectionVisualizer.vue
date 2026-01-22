@@ -1,21 +1,22 @@
 <script setup lang="ts">
-import { ref, onMounted, watch } from 'vue';
+import { ref, onMounted, onUnmounted, watch } from 'vue'; // Added onUnmounted
 import { Network, type Data } from 'vis-network';
 import { DataSet } from 'vis-data';
 import { useGraph } from '../../composables/useGraph';
-import { useToast } from '../../composables/useToast'; // Importamos toast para feedback
+import { useToast } from '../../composables/useToast';
 
 const { getGraphData, nodes, highlightedPath } = useGraph();
 const { triggerToast } = useToast();
 
 const networkContainer = ref<HTMLElement | null>(null);
+const wrapperRef = ref<HTMLElement | null>(null);
 let networkInstance: Network | null = null;
+let resizeObserver: ResizeObserver | null = null;
 
-const isLocked = ref(true); // Iniciamos bloqueado para priorizar scroll
-const showOverlayHint = ref(false); // Controla el mensaje oscuro
+const isLocked = ref(true);
+const showOverlayHint = ref(false);
 let overlayTimeout: number | null = null;
 
-// Al tocar el área bloqueada
 const handleTouchStart = () => {
   if (overlayTimeout) clearTimeout(overlayTimeout);
   showOverlayHint.value = true;
@@ -23,12 +24,11 @@ const handleTouchStart = () => {
 
 // Al levantar el dedo
 const handleTouchEnd = () => {
-  overlayTimeout = setTimeout(() => {
+  overlayTimeout = window.setTimeout(() => {
     showOverlayHint.value = false;
   }, 300);
 };
 
-// Alternar el candado
 const toggleLock = () => {
   isLocked.value = !isLocked.value;
   if (!isLocked.value) showOverlayHint.value = false;
@@ -66,8 +66,7 @@ const parseData = () => {
       const weight = matrix[i][j];
       
       if (weight !== Infinity) {
-        // Lógica de resaltado (Dijkstra)
-        const edgeId = nodes.value[i] + nodes.value[j]; // Ej: "AB"
+        const edgeId = nodes.value[i] + nodes.value[j];
         const isHighlighted = highlightedPath.value.includes(edgeId);
 
         visEdgesArray.push({
@@ -75,10 +74,8 @@ const parseData = () => {
           to: j,
           label: String(weight),
           arrows: isSymmetric ? undefined : { to: { enabled: true, scaleFactor: 1 } },
-          // Color normal (gris/azul) o resaltado (rojo)
           color: isHighlighted ? { color: '#ef4444', highlight: '#ef4444' } : { color: '#64748b', highlight: '#2563EB' },
           font: { align: 'middle', color: '#000000', strokeWidth: 0, background: 'rgba(255,255,255,0.85)', size: 14 },
-          // Grosor normal (2) o resaltado (4)
           width: isHighlighted ? 4 : 2,
           smooth: { type: 'curvedCW', roundness: 0.2 } 
         });
@@ -97,6 +94,9 @@ const drawGraph = () => {
   const data = parseData();
   
   const options = {
+    // Make sure height is 100% to fill container
+    height: '100%',
+    width: '100%',
     physics: {
       enabled: true,
       solver: 'repulsion', 
@@ -122,11 +122,9 @@ const drawGraph = () => {
     layout: { randomSeed: 10 } 
   };
 
-  // Usamos doble casting 'as unknown as Data' para calmar a TypeScript
   networkInstance = new Network(networkContainer.value, data as unknown as Data, options);
 };
 
-// --- Controles de Zoom ---
 const zoomIn = () => {
   if (!networkInstance) return;
   const scale = networkInstance.getScale() + 0.3;
@@ -144,7 +142,6 @@ const fitGraph = () => {
   networkInstance.fit({ animation: { duration: 500, easingFunction: 'easeInOutQuad' } });
 };
 
-// --- NUEVA FUNCIÓN: Exportar Imagen ---
 const exportImage = () => {
   if (!networkContainer.value || !networkInstance) return;
 
@@ -186,9 +183,26 @@ const exportImage = () => {
 // --- Ciclo de Vida ---
 onMounted(() => {
   drawGraph();
+
+  // Watch for container resizing to update the canvas
+  if (wrapperRef.value) {
+    resizeObserver = new ResizeObserver(() => {
+        // This forces Vis.js to recalculate the canvas size
+        if (networkInstance) {
+            networkInstance.setSize('100%', '100%');
+            networkInstance.redraw();
+        }
+    });
+    resizeObserver.observe(wrapperRef.value);
+  }
 });
 
-// Observamos cambios en los datos y en el camino resaltado
+onUnmounted(() => {
+  if (resizeObserver) {
+    resizeObserver.disconnect();
+  }
+});
+
 watch(
   [() => getGraphData(), highlightedPath], 
   () => drawGraph(),
@@ -197,9 +211,12 @@ watch(
 </script>
 
 <template>
-  <div class="animate-fade-in relative group z-0">
+  <div class="animate-fade-in relative group z-0 w-full h-full">
     
-    <div class="relative w-full h-[550px] border border-gray-200 rounded-xl bg-slate-50 shadow-inner overflow-hidden">
+    <div 
+      ref="wrapperRef"
+      class="relative w-full h-full min-h-[550px] border border-gray-200 rounded-xl bg-slate-50 shadow-inner overflow-hidden"
+    >
         
         <div 
           ref="networkContainer" 
