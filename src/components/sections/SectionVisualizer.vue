@@ -169,14 +169,16 @@ const drawGraph = () => {
 // --- Controles ---
 const zoomIn = () =>
 	networkInstance?.moveTo({
-		scale: networkInstance.getScale() + 0.3,
-		animation: true,
+		scale: networkInstance.getScale() * 1.2,
+		animation: { duration: 200, easingFunction: "easeInOutQuad" },
 	});
+
 const zoomOut = () =>
 	networkInstance?.moveTo({
-		scale: networkInstance.getScale() - 0.3,
-		animation: true,
+		scale: networkInstance.getScale() / 1.2,
+		animation: { duration: 200, easingFunction: "easeInOutQuad" },
 	});
+
 const fitGraph = () => networkInstance?.fit({ animation: true });
 
 const exportImage = () => {
