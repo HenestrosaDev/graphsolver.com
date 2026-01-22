@@ -161,6 +161,9 @@ const drawGraph = () => {
 		data as unknown as Data,
 		options
 	);
+
+	// Fit the graph to view
+	networkInstance.fit();
 };
 
 // --- Controles ---
@@ -251,7 +254,7 @@ watch([() => getGraphData(), highlightedPath], () => drawGraph(), {
 				:class="[
 					isFullscreen
 						? 'fixed inset-0 z-[9999] w-screen h-screen rounded-none border-0' // z-9999 vence al Navbar
-						: 'relative w-full h-full rounded-xl border', // Se adapta al padre original
+						: 'relative w-full h-full min-h-[550px] rounded-xl border', // Se adapta al padre original
 				]"
 			>
 				<div
