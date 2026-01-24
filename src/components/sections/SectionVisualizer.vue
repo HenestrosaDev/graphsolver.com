@@ -345,7 +345,7 @@ watch([() => getGraphData(), highlightedPath], () => drawGraph(), {
 
 					<button
 						@click="fitGraph"
-						class="p-2 rounded-full text-blue-50 bg-blue-600 hover:text-blue-600 hover:bg-blue-50 transition"
+						class="p-2 rounded-full text-gray-500 hover:text-blue-600 hover:bg-blue-50 transition"
 						title="Ajustar vista"
 					>
 						<svg
@@ -484,3 +484,20 @@ watch([() => getGraphData(), highlightedPath], () => drawGraph(), {
 		</Teleport>
 	</div>
 </template>
+
+<style scoped>
+/* Soft animation for the overlay */
+.fade-enter-active,
+.fade-leave-active {
+	/* cubic-bezier for a smooth and natural "ease-out" effect */
+	transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.fade-enter-from,
+.fade-leave-to {
+	opacity: 0;
+	/* The element starts a bit lower (10px) and a bit smaller (0.95) */
+	/* This creates the effect of "floating in" instead of just blinking */
+	transform: translateY(10px) scale(0.95);
+}
+</style>
