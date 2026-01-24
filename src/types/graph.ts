@@ -13,7 +13,7 @@ export interface GraphData {
 export interface MSTResult {
 	cost: number;
 	edges: string;
-	isUnique: boolean | string; // Puede ser string "Grafo no conexo"
+	isUnique: boolean | string;
 }
 
 export interface GraphAnalysis {
@@ -26,6 +26,7 @@ export interface GraphAnalysis {
 	cc: number;
 	compSize: number;
 	compCc: number;
+	maxEdges: number;
 	density: number;                 // 0 to 1
 	isComplete: boolean;             // true if density is 1
 	minDegree: number;               // δ
