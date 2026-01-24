@@ -105,7 +105,7 @@ onMounted(() => {
             </tr>
           </thead>
           <tbody>
-            <tr v-for="(row, i) in rawMatrix" :key="'row-'+nodes[i]" class="last:border-b-0">
+            <tr v-for="(row, i) in rawMatrix" :key="'row-'+nodes[i]" class="last:border-b-0 tabular-nums">
 							<td 
 								class="p-2 bg-slate-50 border-r border-slate-200 font-bold text-center text-slate-600 text-xs sm:text-sm select-none"
 								:class="{ 'border-b': i !== rawMatrix.length - 1 }"
