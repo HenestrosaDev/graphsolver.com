@@ -140,12 +140,18 @@ const drawGraph = () => {
 			solver: "repulsion",
 			repulsion: {
 				nodeDistance: 250,
-				centralGravity: 0.2,
+				centralGravity: 0.2, // Gravedad baja ayuda a que no se apiñen
 				springLength: 250,
 				springConstant: 0.05,
 				damping: 0.09,
 			},
-			stabilization: { enabled: true, iterations: 1000, updateInterval: 25 },
+			// Importante: aseguramos que haga iteraciones antes de mostrarse
+			stabilization: { 
+                enabled: true, 
+                iterations: 1000, 
+                updateInterval: 25,
+                fit: true 
+            },
 		},
 		interaction: {
 			hover: true,
@@ -161,6 +167,19 @@ const drawGraph = () => {
 		data as unknown as Data,
 		options
 	);
+
+    // --- CÓDIGO AÑADIDO ---
+    // Una vez que el grafo calcula su posición inicial, desactivamos las físicas.
+    // Esto hace que los nodos se queden "congelados" en su sitio.
+    networkInstance.on("stabilizationIterationsDone", () => {
+        networkInstance.setOptions({ physics: { enabled: false } });
+    });
+
+    // Opcional: Si quieres reactivar físicas mientras arrastras (solo para ese nodo)
+    // y desactivarlas al soltar, puedes usar estos eventos. 
+    // Pero para lo que pides (que NO se mueva el resto), el código de arriba es suficiente.
+    
+    // ----------------------
 
 	// Fit the graph to view
 	networkInstance.fit();
