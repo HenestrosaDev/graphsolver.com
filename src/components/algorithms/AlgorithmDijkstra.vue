@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch } from "vue";
+import { ref, watch, onUnmounted, onActivated } from "vue";
 import { useGraph } from "../../composables/useGraph";
 import PropertiesCard from "../properties/PropertiesCard.vue";
 import PropertyRow from "../properties/PropertyRow.vue";
@@ -130,6 +130,14 @@ const solveDijkstra = () => {
 watch([rawMatrix, numNodes, startNode, endNode], () => solveDijkstra(), {
 	deep: true,
 	immediate: true,
+});
+
+onActivated(() => {
+	solveDijkstra();
+});
+
+onUnmounted(() => {
+	clearHighlights();
 });
 </script>
 

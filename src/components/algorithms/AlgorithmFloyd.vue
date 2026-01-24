@@ -1,11 +1,18 @@
 <script setup lang="ts">
-import { ref, computed, watch } from "vue";
+import { ref, computed, watch, onMounted, onActivated, nextTick } from "vue";
 import { useGraph } from "../../composables/useGraph";
 import PropertiesCard from "../properties/PropertiesCard.vue";
 import PropertyRow from "../properties/PropertyRow.vue";
 import type { FloydStep } from "../../types/graph";
-
-const { getGraphData, nodes, toIdx, rawMatrix, numNodes } = useGraph();
+const {
+	getGraphData,
+	nodes,
+	toIdx,
+	rawMatrix,
+	numNodes,
+	setHighlightPath,
+	clearHighlights,
+} = useGraph();
 
 const steps = ref<FloydStep[]>([]);
 const diameter = ref<number>(0);
@@ -80,6 +87,9 @@ const solveFloyd = () => {
 	}
 	diameter.value = maxD;
 	hasInfPairs.value = infFound;
+
+	// After computing, apply highlight for current selects
+	applyHighlight();
 };
 
 // --- REACTIVIDAD AUTOMÁTICA ---
@@ -123,7 +133,23 @@ const queryResult = computed(() => {
 		curr = nextNode;
 		pathArr.push(nodes.value[curr]);
 	}
-	return { dist: d, path: pathArr.join(" → ") };
+	return { dist: d, path: pathArr.join(" → "), pathArr };
+});
+
+const applyHighlight = () => {
+	const result = queryResult.value;
+	clearHighlights();
+	if (!result || typeof result.dist === "string") return;
+	if (result.pathArr && result.pathArr.length >= 2) setHighlightPath(result.pathArr);
+};
+
+watch(queryResult, applyHighlight, { immediate: true });
+onMounted(() => applyHighlight());
+onActivated(async () => {
+	// Recompute to make sure matrices exist, then highlight
+	solveFloyd();
+	await nextTick();
+	applyHighlight();
 });
 
 // --- FUNCIONES DE NAVEGACIÓN ---

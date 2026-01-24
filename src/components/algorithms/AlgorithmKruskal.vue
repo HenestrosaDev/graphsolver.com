@@ -5,7 +5,7 @@ import PropertiesCard from "../properties/PropertiesCard.vue";
 import PropertyRow from "../properties/PropertyRow.vue";
 import type { MSTResult } from '../../types/graph';
 
-const { getGraphData, nodes, rawMatrix, numNodes } = useGraph();
+const { getGraphData, nodes, rawMatrix, numNodes, clearHighlights } = useGraph();
 
 const result = ref<MSTResult | null>(null);
 
@@ -25,6 +25,7 @@ class UnionFind {
 }
 
 const solveMST = () => {
+  clearHighlights();
   const { n, matrix } = getGraphData();
   
   interface Edge { u: number; v: number; w: number; id: string }
