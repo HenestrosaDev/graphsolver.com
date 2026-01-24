@@ -41,7 +41,7 @@ const toggleLock = () => {
 	const msg = isLocked.value
 		? "Modo scroll activado"
 		: "Modo interacción activado";
-	triggerToast(msg);
+	triggerToast({ title: msg, severity: "info" });
 };
 
 // --- Pantalla completa ---
@@ -216,7 +216,7 @@ const exportImage = () => {
 	link.click();
 	document.body.removeChild(link);
 
-	triggerToast("Imagen descargada correctamente");
+	triggerToast({ title: "Imagen descargada correctamente", severity: "info" });
 };
 
 // --- Ciclo de Vida ---
