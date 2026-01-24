@@ -289,9 +289,9 @@ watch([() => getGraphData(), highlightedPath], () => drawGraph(), {
 									d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
 								/>
 							</svg>
-							<p class="font-bold text-lg">Mapa bloqueado</p>
+							<p class="font-bold text-lg">Interacción desactivada</p>
 							<p class="text-sm text-slate-200 mt-1 leading-snug">
-								Desbloquea el mapa para interactuar.
+								Pulsa el candado 🔒 de abajo para interactuar con el grafo.
 							</p>
 						</div>
 					</Transition>
@@ -369,66 +369,6 @@ watch([() => getGraphData(), highlightedPath], () => drawGraph(), {
 					</button>
 
 					<button
-						@click="toggleLock"
-						class="lg:hidden p-2 rounded-full text-gray-500 hover:text-blue-600 hover:bg-blue-50 transition"
-						:class="{
-							'text-blue-600 bg-blue-50 ring-1 ring-blue-200': !isLocked,
-						}"
-					>
-						<svg
-							v-if="isLocked"
-							xmlns="http://www.w3.org/2000/svg"
-							class="h-5 w-5"
-							fill="none"
-							viewBox="0 0 24 24"
-							stroke="currentColor"
-						>
-							<path
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								stroke-width="2"
-								d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
-							/>
-						</svg>
-						<svg
-							v-else
-							xmlns="http://www.w3.org/2000/svg"
-							class="h-5 w-5"
-							fill="none"
-							viewBox="0 0 24 24"
-							stroke="currentColor"
-						>
-							<path
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								stroke-width="2"
-								d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z"
-							/>
-						</svg>
-					</button>
-
-					<button
-						@click="exportImage"
-						class="p-2 rounded-full text-gray-500 hover:text-blue-600 hover:bg-blue-50 transition"
-						title="Exportar imagen"
-					>
-						<svg
-							xmlns="http://www.w3.org/2000/svg"
-							class="h-5 w-5"
-							fill="none"
-							viewBox="0 0 24 24"
-							stroke="currentColor"
-						>
-							<path
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								stroke-width="2"
-								d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
-							/>
-						</svg>
-					</button>
-
-					<button
 						@click="toggleFullscreen"
 						class="hidden lg:block p-2 rounded-full text-gray-500 hover:text-blue-600 hover:bg-blue-50 transition"
 						:class="{
@@ -470,6 +410,52 @@ watch([() => getGraphData(), highlightedPath], () => drawGraph(), {
 							<path stroke="none" d="M0 0h24v24H0z" fill="none" />
 							<path d="M18 6l-12 12" />
 							<path d="M6 6l12 12" />
+						</svg>
+					</button>
+
+					<button
+						@click="toggleLock"
+						class="relative lg:hidden p-2 rounded-full text-gray-500 hover:text-blue-600 hover:bg-blue-50 transition-all duration-300"
+						:class="{
+							'text-blue-600 bg-blue-50 ring-1 ring-blue-200': !isLocked,
+							'scale-110 bg-white ring-2 ring-blue-400 shadow-xl z-50':
+								showOverlayHint,
+						}"
+					>
+						<span
+							v-if="showOverlayHint"
+							class="absolute inset-0 -z-10 inline-flex h-full w-full rounded-full bg-blue-400 opacity-75 animate-ping"
+						/>
+
+						<svg
+							v-if="isLocked"
+							xmlns="http://www.w3.org/2000/svg"
+							class="h-5 w-5"
+							fill="none"
+							viewBox="0 0 24 24"
+							stroke="currentColor"
+						>
+							<path
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								stroke-width="2"
+								d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+							/>
+						</svg>
+						<svg
+							v-else
+							xmlns="http://www.w3.org/2000/svg"
+							class="h-5 w-5"
+							fill="none"
+							viewBox="0 0 24 24"
+							stroke="currentColor"
+						>
+							<path
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								stroke-width="2"
+								d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z"
+							/>
 						</svg>
 					</button>
 				</div>
