@@ -85,7 +85,7 @@ const exportInFormat = (format: string) => {
   document.body.removeChild(link);
   URL.revokeObjectURL(url);
 
-  triggerToast(`Archivo ${format} exportado correctamente`);
+  triggerToast({ title: `Archivo ${format} exportado correctamente`, severity: "success" });
   showExportMenu.value = false;
 };
 
@@ -106,9 +106,9 @@ const copyInFormat = async (format: string) => {
 
   try {
     await navigator.clipboard.writeText(content);
-    triggerToast(`Contenido ${format} copiado al portapapeles`);
+    triggerToast({ title: `Contenido ${format} copiado al portapapeles`, severity: "success" });
   } catch (err) {
-    triggerToast('Error al copiar al portapapeles');
+    triggerToast({ title: "Error al copiar al portapapeles", severity: "error" });
   }
   showExportMenu.value = false;
 };
@@ -159,10 +159,10 @@ const confirmPaste = () => {
       break;
   }
   if (success) {
-    triggerToast('Contenido importado correctamente');
-    localStorage.setItem('pasteFormat', selectedPasteFormat.value);
+    triggerToast({ title: "Contenido importado correctamente", severity: "success" });
+    localStorage.setItem("pasteFormat", selectedPasteFormat.value);
   } else {
-    triggerToast('Error: El contenido no es válido');
+    triggerToast({ title: "Error: El contenido no es válido", severity: "error" });
   }
   showPasteModal.value = false;
   pasteContent.value = '';
@@ -191,14 +191,14 @@ const handleFileChange = (event: Event) => {
         success = loadFromDot(content);
         break;
       default:
-        triggerToast('Formato de archivo no soportado');
+        triggerToast({ title: "Formato de archivo no soportado", severity: "error" });
         return;
     }
 
     if (success) {
-      triggerToast('Grafo importado con éxito');
+      triggerToast({ title: "Grafo importado con éxito", severity: "success" });
     } else {
-      triggerToast('Error: El archivo no es válido');
+      triggerToast({ title: "Error: El archivo no es válido", severity: "error" });
     }
 
     // Limpiar input para permitir cargar el mismo archivo 2 veces seguidas
@@ -210,7 +210,7 @@ const handleFileChange = (event: Event) => {
 
 <template>
   <div
-    class="min-h-screen bg-slate-50 font-sans text-slate-800 selection:bg-blue-100 selection:text-blue-900 flex flex-col"
+    class="min-h-screen bg-slate-50 font-sans text-slate-800 selection:bg-blue-100 selection:text-blue-900 flex flex-col overflow-x-hidden"
   >
     <Navbar />
 
@@ -362,9 +362,9 @@ const handleFileChange = (event: Event) => {
                 <div class="mb-4">
                   <label
                     for="algorithm-select"
-                    class="block text-sm font-medium text-slate-700 mb-2"
+                    class="block text-xs uppercase font-bold text-slate-500 mb-3"
                   >
-                    Seleccionar Algoritmo
+                    Algoritmo
                   </label>
                   <select
                     id="algorithm-select"
@@ -390,7 +390,7 @@ const handleFileChange = (event: Event) => {
           </div>
         </div>
 
-        <div class="bg-white col-span-2 rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+        <div class="bg-white col-span-2 rounded-xl shadow-sm border border-slate-200">
           <div class="bg-slate-50 px-6 py-4 border-b border-slate-200">
             <h3 class="text-lg font-bold text-slate-700 flex items-center gap-2">
               <svg
