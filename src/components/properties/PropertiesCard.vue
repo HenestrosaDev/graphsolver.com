@@ -16,12 +16,15 @@ const props = withDefaults(defineProps<Props>(), {
 
 const styles = {
 	default: {
-		header: "bg-slate-50",
-		container: "bg-white border-slate-200",
+		header: "bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-100",
+		container:
+			"bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800",
 	},
 	purple: {
-		header: "bg-purple-100 text-purple-700",
-		container: "bg-purple-50 border-purple-100",
+		header:
+			"bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-100",
+		container:
+			"bg-purple-50 dark:bg-purple-950/40 border-purple-100 dark:border-purple-800",
 	},
 };
 
@@ -30,7 +33,7 @@ const currentStyle = computed(() => styles[props.theme]);
 
 <template>
 	<div
-		class="rounded-lg shadow-sm border transition-colors"
+		class="rounded-lg shadow-sm border transition-colors text-slate-800 dark:text-slate-100"
 		:class="currentStyle.container"
 	>
 		<div class="rounded-t-lg" :class="currentStyle.header">

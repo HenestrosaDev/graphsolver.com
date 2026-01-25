@@ -22,7 +22,7 @@ const algorithmById = computed(() =>
 			<label class="text-eyebrow"> Algoritmo </label>
 			<select
 				v-model="selectedAlgorithm"
-				class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-slate-900"
+				class="w-full px-3 py-2 border border-slate-300 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 transition-colors"
 			>
 				<option v-for="algo in algorithms" :key="algo.id" :value="algo.id">
 					{{ algo.label }}

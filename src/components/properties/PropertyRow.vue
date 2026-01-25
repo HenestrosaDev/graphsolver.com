@@ -17,17 +17,18 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
 	variant: "badge",
 	theme: "default",
-	badgeClass: "bg-slate-50 text-slate-900 border-slate-200",
+	badgeClass:
+		"bg-slate-50 text-slate-900 border-slate-200 dark:bg-slate-800 dark:text-slate-100 dark:border-slate-700",
 });
 
 const themeStyles = {
 	default: {
-		label: "text-slate-600",
-		metric: "text-slate-900",
+		label: "text-slate-600 dark:text-slate-300",
+		metric: "text-slate-900 dark:text-slate-100",
 	},
 	purple: {
-		label: "text-purple-800",
-		metric: "text-purple-900",
+		label: "text-purple-800 dark:text-purple-100",
+		metric: "text-purple-900 dark:text-purple-100",
 	},
 };
 

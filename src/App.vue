@@ -68,7 +68,9 @@ const handlePasteResult = (success: boolean) => {
 </script>
 
 <template>
-	<div class="min-h-screen bg-slate-50 font-sans text-slate-800 flex flex-col">
+	<div
+		class="min-h-screen bg-slate-50 dark:bg-slate-950 font-sans text-slate-800 dark:text-slate-100 flex flex-col transition-colors"
+	>
 		<Navbar />
 
 		<main class="grow w-full max-w-5xl mx-auto p-4 py-6 md:p-8">
@@ -81,7 +83,7 @@ const handlePasteResult = (success: boolean) => {
 
 			<div>
 				<div class="flex justify-between items-center mb-6 gap-4">
-					<h2 class="text-2xl font-bold text-slate-700">
+					<h2 class="text-2xl font-bold text-slate-700 dark:text-slate-100">
 						Matriz de adyacencia
 					</h2>
 
@@ -95,7 +97,7 @@ const handlePasteResult = (success: boolean) => {
 			</div>
 
 			<div class="mt-12">
-				<h2 class="text-2xl font-bold text-slate-700 mb-6">
+				<h2 class="text-2xl font-bold text-slate-700 dark:text-slate-100 mb-6">
 					Análisis del grafo
 				</h2>
 

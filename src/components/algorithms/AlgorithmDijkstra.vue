@@ -102,7 +102,7 @@ onUnmounted(() => {
 							<select
 								id="start-node"
 								v-model="startNode"
-								class="bg-white border border-slate-300 text-slate-700 text-sm rounded-md px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-medium"
+								class="bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-100 text-sm rounded-md px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-medium transition-colors"
 							>
 								<option v-for="n in nodes" :key="n" :value="n">{{ n }}</option>
 							</select>
@@ -120,7 +120,7 @@ onUnmounted(() => {
 							<select
 								id="end-node"
 								v-model="endNode"
-								class="bg-white border border-slate-300 text-slate-700 text-sm rounded-md px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-medium"
+								class="bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-100 text-sm rounded-md px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-medium transition-colors"
 							>
 								<option v-for="n in nodes" :key="n" :value="n">{{ n }}</option>
 							</select>
@@ -147,10 +147,10 @@ onUnmounted(() => {
 			<h3 class="text-eyebrow">Tabla de iteraciones</h3>
 
 			<div
-				class="bg-white border border-slate-200 rounded-lg overflow-x-auto shadow-sm"
+				class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg overflow-x-auto shadow-sm transition-colors"
 			>
 				<table class="w-full text-sm">
-					<thead class="bg-slate-50 border-b border-slate-200">
+					<thead class="bg-slate-50 dark:bg-slate-800 border-b border-slate-200 dark:border-slate-800">
 						<tr>
 							<th class="px-4 py-3 text-left">Iteración</th>
 							<th
@@ -164,13 +164,13 @@ onUnmounted(() => {
 						</tr>
 					</thead>
 
-					<tbody class="divide-y divide-slate-100">
+					<tbody class="divide-y divide-slate-100 dark:divide-slate-800">
 						<tr
 							v-for="row in steps"
 							:key="row.step"
-							class="hover:bg-slate-50 transition-colors"
+							class="hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
 						>
-							<td class="px-4 py-3 font-medium text-slate-900">
+							<td class="px-4 py-3 font-medium text-slate-900 dark:text-slate-100">
 								Paso {{ row.step }}
 							</td>
 
@@ -179,9 +179,9 @@ onUnmounted(() => {
 								:key="idx"
 								class="px-4 py-3 text-center tabular-nums"
 								:class="{
-									'font-bold text-green-600': row.changes.includes(idx),
-									'text-slate-600': !row.changes.includes(idx) && val !== '∞',
-									'text-slate-300': val === '∞',
+									'font-bold text-green-600 dark:text-green-300': row.changes.includes(idx),
+									'text-slate-600 dark:text-slate-300': !row.changes.includes(idx) && val !== '∞',
+									'text-slate-300 dark:text-slate-600': val === '∞',
 								}"
 							>
 								{{ val }}
@@ -190,11 +190,11 @@ onUnmounted(() => {
 							<td class="px-4 py-3 text-center">
 								<span
 									v-if="row.pivot !== '-'"
-									class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-blue-50 border-2 border-blue-500 text-slate-900 font-medium text-sm"
+									class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-blue-50 dark:bg-blue-900/40 border-2 border-blue-500 dark:border-blue-400 text-slate-900 dark:text-slate-100 font-medium text-sm"
 								>
 									{{ row.pivot }}
 								</span>
-								<span v-else class="text-slate-300">-</span>
+								<span v-else class="text-slate-300 dark:text-slate-600">-</span>
 							</td>
 						</tr>
 					</tbody>

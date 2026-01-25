@@ -17,10 +17,6 @@ const calculateProperties = () => {
 		return;
 	}
 
-	// Validate target
-	if (toIdx(adjTarget.value) >= n && nodes.value.length)
-		adjTarget.value = nodes.value[0];
-
 	let totalArcs = 0;
 	let degrees = new Array(n).fill(0);
 	let inD = new Array(n).fill(0);
@@ -191,7 +187,8 @@ const hamiltonianStatus = computed(() => {
 		return {
 			text: value,
 			// Slate color with cursor-help for the warning tooltip
-			classes: "bg-slate-100 text-slate-500 border-slate-200 cursor-help",
+			classes:
+				"bg-slate-100 text-slate-500 border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700 cursor-help",
 			title: value,
 		};
 	}
@@ -200,7 +197,8 @@ const hamiltonianStatus = computed(() => {
 	if (value) {
 		return {
 			text: "Sí",
-			classes: "bg-green-100 text-green-700 border-green-200",
+			classes:
+				"bg-green-100 text-green-700 border-green-200 dark:bg-green-900/30 dark:text-green-200 dark:border-green-700",
 			title: undefined,
 		};
 	}
@@ -208,7 +206,7 @@ const hamiltonianStatus = computed(() => {
 	// Case 3: Boolean False
 	return {
 		text: "No",
-		classes: "bg-red-50 text-red-600 border-red-200",
+		classes: "bg-red-50 text-red-600 border-red-200 dark:bg-red-900/30 dark:text-red-200 dark:border-red-800",
 		title: undefined,
 	};
 });
@@ -304,7 +302,7 @@ watch([rawMatrix, numNodes, adjTarget], () => calculateProperties(), {
 							<select
 								v-model="adjTarget"
 								for="label-vortex"
-								class="ml-0.5 bg-slate-50 border border-slate-200 rounded px-2 py-0.5 text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none normal-case text-slate-700"
+								class="ml-0.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded px-2 py-0.5 text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none normal-case text-slate-700 dark:text-slate-100"
 							>
 								<option v-for="n in nodes" :key="n" :value="n">
 									{{ n }}
@@ -334,8 +332,8 @@ watch([rawMatrix, numNodes, adjTarget], () => calculateProperties(), {
 						variant="badge"
 						:badge-class="
 							analysis.isConnected
-								? 'bg-green-100 text-green-700 border-green-200'
-								: 'bg-red-50 text-red-600 border-red-200'
+								? 'bg-green-100 text-green-700 border-green-200 dark:bg-green-900/30 dark:text-green-200 dark:border-green-700'
+								: 'bg-red-50 text-red-600 border-red-200 dark:bg-red-900/30 dark:text-red-200 dark:border-red-800'
 						"
 					/>
 				</PropertiesCard>
@@ -354,8 +352,8 @@ watch([rawMatrix, numNodes, adjTarget], () => calculateProperties(), {
 						variant="badge"
 						:badge-class="
 							analysis.eulerianType !== 'No'
-								? 'bg-green-100 text-green-700 border-green-200'
-								: 'bg-red-50 text-red-600 border-red-200'
+								? 'bg-green-100 text-green-700 border-green-200 dark:bg-green-900/30 dark:text-green-200 dark:border-green-700'
+								: 'bg-red-50 text-red-600 border-red-200 dark:bg-red-900/30 dark:text-red-200 dark:border-red-800'
 						"
 					/>
 

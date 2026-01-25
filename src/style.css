@@ -1,8 +1,33 @@
 @import "tailwindcss";
 
+/* Tailwind v4 is configless; enable class-based dark mode */
+@custom-variant dark (&:where(.dark, .dark *));
+
+@layer base {
+	:root {
+		color-scheme: light;
+	}
+
+	body * {
+		@apply transition-colors duration-200;
+	}
+
+	.dark {
+		color-scheme: dark;
+	}
+
+	body {
+		@apply bg-slate-50 text-slate-800 dark:bg-slate-950 dark:text-slate-100 antialiased;
+	}
+
+	a {
+		@apply transition-colors;
+	}
+}
+
 @layer components {
 	.text-eyebrow {
-		@apply text-xs uppercase font-bold text-slate-500 mb-3;
+		@apply text-xs uppercase font-bold text-slate-500 dark:text-slate-300 mb-3;
 	}
 
 	button,

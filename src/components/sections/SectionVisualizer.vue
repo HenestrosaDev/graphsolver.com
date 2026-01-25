@@ -281,7 +281,7 @@ watch([() => getGraphData(), highlightedPath], () => drawGraph(), {
 		<Teleport to="body" :disabled="!isFullscreen">
 			<div
 				ref="wrapperRef"
-				class="border-gray-200 bg-slate-50 shadow-inner overflow-hidden flex flex-col"
+				class="border-gray-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 shadow-inner overflow-hidden flex flex-col transition-colors"
 				:class="[
 					isFullscreen
 						? 'fixed inset-0 z-[9999] w-screen h-screen rounded-none border-0' // z-9999 vence al Navbar
@@ -314,11 +314,11 @@ watch([() => getGraphData(), highlightedPath], () => drawGraph(), {
 				</div>
 
 				<div
-					class="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1 p-1.5 bg-white/90 backdrop-blur shadow-lg border border-gray-200/80 rounded-full animate-fade-in transition-all duration-300 hover:shadow-xl hover:scale-102"
+					class="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1 p-1.5 bg-white/90 dark:bg-slate-900/85 backdrop-blur shadow-lg border border-gray-200/80 dark:border-slate-700/70 rounded-full animate-fade-in transition-all duration-300 hover:shadow-xl hover:scale-102"
 				>
 					<button
 						@click="zoomOut"
-						class="p-2 rounded-full text-gray-500 hover:text-blue-600 hover:bg-blue-50 transition"
+						class="p-2 rounded-full text-gray-500 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-slate-800 transition"
 						title="Alejar"
 					>
 						<IconZoomOut class="size-5" />
@@ -326,7 +326,7 @@ watch([() => getGraphData(), highlightedPath], () => drawGraph(), {
 
 					<button
 						@click="zoomIn"
-						class="p-2 rounded-full text-gray-500 hover:text-blue-600 hover:bg-blue-50 transition"
+						class="p-2 rounded-full text-gray-500 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-slate-800 transition"
 						title="Acercar"
 					>
 						<IconZoomIn class="size-5" />
@@ -334,7 +334,7 @@ watch([() => getGraphData(), highlightedPath], () => drawGraph(), {
 
 					<button
 						@click="fitGraph"
-						class="p-2 rounded-full text-gray-500 hover:text-blue-600 hover:bg-blue-50 transition"
+						class="p-2 rounded-full text-gray-500 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-slate-800 transition"
 						title="Ajustar vista"
 					>
 						<IconKeyframeAlignCenter class="size-5" />
@@ -342,7 +342,7 @@ watch([() => getGraphData(), highlightedPath], () => drawGraph(), {
 
 					<button
 						@click="exportImage"
-						class="p-2 rounded-full text-gray-500 hover:text-blue-600 hover:bg-blue-50 transition"
+						class="p-2 rounded-full text-gray-500 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-slate-800 transition"
 						title="Descargar como imagen PNG"
 					>
 						<IconCamera class="size-5" />
@@ -350,9 +350,9 @@ watch([() => getGraphData(), highlightedPath], () => drawGraph(), {
 
 					<button
 						@click="toggleFullscreen"
-						class="hidden lg:block p-2 rounded-full text-gray-500 hover:text-blue-600 hover:bg-blue-50 transition"
+						class="hidden lg:block p-2 rounded-full text-gray-500 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-slate-800 transition"
 						:class="{
-							'text-blue-600 bg-blue-50 ring-1 ring-blue-200': isFullscreen,
+							'text-blue-600 bg-blue-50 ring-1 ring-blue-200 dark:text-blue-200 dark:bg-blue-900/40 dark:ring-blue-700': isFullscreen,
 						}"
 						title="Pantalla completa"
 					>
@@ -362,10 +362,10 @@ watch([() => getGraphData(), highlightedPath], () => drawGraph(), {
 
 					<button
 						@click="toggleLock"
-						class="relative lg:hidden p-2 rounded-full text-gray-500 hover:text-blue-600 hover:bg-blue-50 transition-all duration-300"
+						class="relative lg:hidden p-2 rounded-full text-gray-500 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-slate-800 transition-all duration-300"
 						:class="{
-							'text-blue-600 bg-blue-50 ring-1 ring-blue-200': !isLocked,
-							'scale-110 bg-white ring-2 ring-blue-400 shadow-xl z-50':
+							'text-blue-600 bg-blue-50 ring-1 ring-blue-200 dark:text-blue-200 dark:bg-blue-900/30 dark:ring-blue-700': !isLocked,
+							'scale-110 bg-white dark:bg-slate-900 ring-2 ring-blue-400 dark:ring-blue-700 shadow-xl z-50':
 								showOverlayHint,
 						}"
 					>
@@ -380,7 +380,7 @@ watch([() => getGraphData(), highlightedPath], () => drawGraph(), {
 
 				<div
 					v-if="isFullscreen"
-					class="absolute top-6 left-1/2 -translate-x-1/2 z-20 bg-white/90 backdrop-blur px-4 py-1.5 rounded-full text-xs font-medium text-slate-500 shadow-sm pointer-events-none animate-fade-in border border-gray-100"
+					class="absolute top-6 left-1/2 -translate-x-1/2 z-20 bg-white/90 dark:bg-slate-900/85 backdrop-blur px-4 py-1.5 rounded-full text-xs font-medium text-slate-500 dark:text-slate-200 shadow-sm pointer-events-none animate-fade-in border border-gray-100 dark:border-slate-700"
 				>
 					Pulsa ESC para salir
 				</div>

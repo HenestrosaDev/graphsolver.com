@@ -43,11 +43,11 @@ watch(
 	<div ref="containerRef" class="relative">
 		<button
 			@click="$emit('toggle')"
-			class="text-sm bg-white text-slate-600 border border-slate-200 font-medium py-2 px-3 rounded-lg shadow-sm hover:bg-slate-50 transition-all active:scale-95 flex items-center gap-2 group relative"
-			:class="{ 'bg-slate-50': isOpen }"
+			class="text-sm bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-200 border border-slate-200 dark:border-slate-700 font-medium py-2 px-3 rounded-lg shadow-sm hover:bg-slate-50 dark:hover:bg-slate-800 transition-all active:scale-95 flex items-center gap-2 group relative"
+			:class="{ 'bg-slate-50 dark:bg-slate-800': isOpen }"
 			:title="label"
 		>
-			<div class="text-slate-500 group-hover:text-blue-600 transition-colors">
+			<div class="text-slate-500 dark:text-slate-300 group-hover:text-blue-600 dark:group-hover:text-blue-300 transition-colors">
 				<slot name="icon" />
 			</div>
 			<span v-if="label" class="hidden sm:inline">{{ label }}</span>
@@ -56,7 +56,7 @@ watch(
 		<Transition name="menu">
 			<div
 				v-if="isOpen"
-				class="absolute top-full mt-1 bg-white border border-slate-200 rounded-lg shadow-lg overflow-hidden z-30"
+				class="absolute top-full mt-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg shadow-lg overflow-hidden z-30"
 				:class="[
 					menuClass || 'w-40',
 					calculatedAlign === 'right'

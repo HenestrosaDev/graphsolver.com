@@ -144,7 +144,7 @@ const prevStep = () => {
 							</label>
 							<select
 								v-model="startNode"
-								class="bg-white border border-slate-300 text-slate-700 text-sm rounded-md px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-medium"
+								class="bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-100 text-sm rounded-md px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-medium transition-colors"
 							>
 								<option v-for="n in nodes" :key="n" :value="n">{{ n }}</option>
 							</select>
@@ -158,7 +158,7 @@ const prevStep = () => {
 							</label>
 							<select
 								v-model="endNode"
-								class="bg-white border border-slate-300 text-slate-700 text-sm rounded-md px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-medium"
+								class="bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-100 text-sm rounded-md px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-medium transition-colors"
 							>
 								<option v-for="n in nodes" :key="n" :value="n">{{ n }}</option>
 							</select>
@@ -191,17 +191,17 @@ const prevStep = () => {
 
 			<div
 				v-if="steps.length > 0"
-				class="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden"
+				class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-sm overflow-hidden transition-colors"
 			>
-				<div class="bg-slate-50 border-b border-slate-200 p-4">
+				<div class="bg-slate-50 dark:bg-slate-800 border-b border-slate-200 dark:border-slate-800 p-4">
 					<div class="flex flex-col items-center">
 						<span
-							class="inline-block bg-blue-100 text-blue-700 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider"
+							class="inline-block bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-200 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider"
 						>
 							Paso {{ currentStepIndex + 1 }} de {{ steps.length }}
 						</span>
 
-						<h3 class="font-bold text-slate-800 text-lg mt-3">
+						<h3 class="font-bold text-slate-800 dark:text-slate-100 text-lg mt-3">
 							{{ currentStep.title }}
 						</h3>
 
@@ -211,7 +211,7 @@ const prevStep = () => {
 							<button
 								@click="prevStep"
 								:disabled="currentStepIndex === 0"
-								class="p-1.5 rounded-full hover:bg-white hover:shadow-sm border border-transparent hover:border-slate-200 text-slate-500 disabled:opacity-30 disabled:hover:shadow-none disabled:hover:border-transparent transition-all"
+								class="p-1.5 rounded-full hover:bg-white dark:hover:bg-slate-900 hover:shadow-sm border border-transparent hover:border-slate-200 dark:hover:border-slate-700 text-slate-500 dark:text-slate-300 disabled:opacity-30 disabled:hover:shadow-none disabled:hover:border-transparent transition-all"
 								title="Anterior"
 							>
 								<IconChevronLeft class="size-6" />
@@ -223,14 +223,14 @@ const prevStep = () => {
 									min="0"
 									:max="steps.length - 1"
 									v-model.number="currentStepIndex"
-									class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-blue-600 hover:accent-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30"
+									class="w-full h-2 bg-slate-200 dark:bg-slate-800 rounded-lg appearance-none cursor-pointer accent-blue-600 hover:accent-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30"
 								/>
 							</div>
 
 							<button
 								@click="nextStep"
 								:disabled="currentStepIndex === steps.length - 1"
-								class="p-1.5 rounded-full hover:bg-white hover:shadow-sm border border-transparent hover:border-slate-200 text-slate-500 disabled:opacity-30 disabled:hover:shadow-none disabled:hover:border-transparent transition-all"
+								class="p-1.5 rounded-full hover:bg-white dark:hover:bg-slate-900 hover:shadow-sm border border-transparent hover:border-slate-200 dark:hover:border-slate-700 text-slate-500 dark:text-slate-300 disabled:opacity-30 disabled:hover:shadow-none disabled:hover:border-transparent transition-all"
 								title="Siguiente"
 							>
 								<IconChevronRight class="size-6" />
@@ -240,18 +240,18 @@ const prevStep = () => {
 				</div>
 
 				<div
-					class="p-6 overflow-x-auto flex justify-center min-h-[300px] items-center bg-white transition-all duration-300"
+					class="p-6 overflow-x-auto flex justify-center min-h-[300px] items-center bg-white dark:bg-slate-900 transition-all duration-300"
 				>
 					<table
 						class="text-sm border-collapse shadow-sm rounded-lg overflow-hidden"
 					>
 						<thead>
 							<tr>
-								<th class="p-3 bg-slate-50 border-b border-slate-200"></th>
+								<th class="p-3 bg-slate-50 dark:bg-slate-800 border-b border-slate-200 dark:border-slate-800"></th>
 								<th
 									v-for="n in nodes"
 									:key="n"
-									class="p-3 bg-slate-50 border-b border-slate-200 font-bold text-slate-500 text-xs w-10 text-center"
+									class="p-3 bg-slate-50 dark:bg-slate-800 border-b border-slate-200 dark:border-slate-800 font-bold text-slate-500 dark:text-slate-300 text-xs w-10 text-center"
 								>
 									{{ n }}
 								</th>
@@ -260,7 +260,7 @@ const prevStep = () => {
 						<tbody>
 							<tr v-for="(row, i) in currentStep.matrix" :key="i">
 								<th
-									class="p-3 bg-slate-50 border-r border-slate-200 font-bold text-slate-500 text-xs w-10 text-center"
+									class="p-3 bg-slate-50 dark:bg-slate-800 border-r border-slate-200 dark:border-slate-800 font-bold text-slate-500 dark:text-slate-300 text-xs w-10 text-center"
 								>
 									{{ nodes[i] }}
 								</th>
@@ -268,12 +268,12 @@ const prevStep = () => {
 								<td
 									v-for="(val, j) in row"
 									:key="j"
-									class="p-3 border border-slate-100 text-center text-sm w-12 h-12 transition-colors duration-200"
+									class="p-3 border border-slate-100 dark:border-slate-800 text-center text-sm w-12 h-12 transition-colors duration-200"
 									:class="{
-										'bg-blue-50 font-bold text-blue-700 ring-1 ring-inset ring-blue-200':
+										'bg-blue-50 dark:bg-blue-900/30 font-bold text-blue-700 dark:text-blue-200 ring-1 ring-inset ring-blue-200 dark:ring-blue-800':
 											i === currentStep.pivot || j === currentStep.pivot,
-										'text-slate-400': val === Infinity,
-										'text-slate-800': val !== Infinity,
+										'text-slate-400 dark:text-slate-500': val === Infinity,
+										'text-slate-800 dark:text-slate-100': val !== Infinity,
 									}"
 								>
 									{{ val === Infinity ? "∞" : val }}
@@ -284,7 +284,7 @@ const prevStep = () => {
 				</div>
 
 				<div
-					class="bg-slate-50 p-3 text-xs text-slate-500 text-center border-t border-slate-200"
+					class="bg-slate-50 dark:bg-slate-800 p-3 text-xs text-slate-500 dark:text-slate-300 text-center border-t border-slate-200 dark:border-slate-800"
 				>
 					<span v-if="currentStep.pivot === -1">
 						Matriz de adyacencia inicial. Los nodos no conectados directamente
