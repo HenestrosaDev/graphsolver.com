@@ -2,6 +2,7 @@
 import { IconChevronLeft, IconChevronRight } from "@tabler/icons-vue";
 import { ref, computed, watch, onMounted, onActivated, nextTick } from "vue";
 import { useGraph } from "../../composables/useGraph";
+import { computeFloyd } from "../../composables/useFloyd";
 import PropertiesCard from "../properties/PropertiesCard.vue";
 import PropertyRow from "../properties/PropertyRow.vue";
 import type { FloydStep } from "../../types/graph";
@@ -27,17 +28,25 @@ const currentStep = computed(() => steps.value[currentStepIndex.value]);
 
 const startNode = ref<string>("A");
 const endNode = ref<string>("B");
+const safeStartNode = computed(() => {
+	const available = nodes.value;
+	if (!available.length) return startNode.value;
+	return available.includes(startNode.value) ? startNode.value : available[0];
+});
+const safeEndNode = computed(() => {
+	const available = nodes.value;
+	if (!available.length) return endNode.value;
+	return available.includes(endNode.value)
+		? endNode.value
+		: available[available.length - 1];
+});
 
 const queryResult = computed(() => {
 	if (!finalDist.value.length) return null;
+	if (!nodes.value.length) return null;
 
-	if (toIdx(startNode.value) >= numNodes.value)
-		startNode.value = nodes.value[0];
-	if (toIdx(endNode.value) >= numNodes.value)
-		endNode.value = nodes.value[numNodes.value - 1];
-
-	const u = toIdx(startNode.value);
-	const v = toIdx(endNode.value);
+	const u = toIdx(safeStartNode.value);
+	const v = toIdx(safeEndNode.value);
 
 	if (
 		u < 0 ||
@@ -70,71 +79,30 @@ const applyHighlight = () => {
 };
 
 const solveFloyd = () => {
-	const { n, matrix } = getGraphData();
+	const { matrix } = getGraphData();
+	const { steps: newSteps, dist, next, diameter: dia, hasInfPairs: inf } =
+		computeFloyd(matrix, nodes.value);
 
-	// Deep copy the matrix
-	let dist: number[][] = matrix.map((row) => [...row]);
-
-	// Make sure the diagonal is 0
-	for (let i = 0; i < n; i++) {
-		dist[i][i] = 0;
-	}
-
-	// Next matrix to reconstruct paths
-	let next: (number | null)[][] = Array.from({ length: n }, (_, i) =>
-		Array.from({ length: n }, (_, j) =>
-			matrix[i][j] !== Infinity && i !== j ? j : null
-		)
-	);
-
-	steps.value = [];
-
-	// Initial step
-	steps.value.push({
-		title: "Estado inicial",
-		matrix: dist.map((r) => [...r]),
-		pivot: -1,
-	});
-
-	// Algorithm
-	for (let k = 0; k < n; k++) {
-		for (let i = 0; i < n; i++) {
-			for (let j = 0; j < n; j++) {
-				if (dist[i][k] + dist[k][j] < dist[i][j]) {
-					dist[i][j] = dist[i][k] + dist[k][j];
-					next[i][j] = next[i][k];
-				}
-			}
-		}
-		steps.value.push({
-			title: `Iteración k=${k} (pivote ${nodes.value[k]})`,
-			matrix: dist.map((r) => [...r]),
-			pivot: k,
-		});
-	}
-
+	steps.value = newSteps;
 	finalDist.value = dist;
 	finalNext.value = next;
-
-	// Diameter
-	let maxD = 0;
-	let infFound = false;
-	for (let i = 0; i < n; i++) {
-		for (let j = 0; j < n; j++) {
-			if (i !== j) {
-				if (dist[i][j] === Infinity) infFound = true;
-				else if (dist[i][j] > maxD) maxD = dist[i][j];
-			}
-		}
-	}
-	diameter.value = maxD;
-	hasInfPairs.value = infFound;
-
-	// After computing, apply highlight for current selects
+	diameter.value = dia;
+	hasInfPairs.value = inf;
 	applyHighlight();
 };
 
 // --- REACTIVIDAD AUTOMÁTICA ---
+watch(
+	nodes,
+	(newNodes) => {
+		if (!newNodes.length) return;
+		if (!newNodes.includes(startNode.value)) startNode.value = newNodes[0];
+		if (!newNodes.includes(endNode.value))
+			endNode.value = newNodes[newNodes.length - 1];
+	},
+	{ immediate: true }
+);
+
 watch(
 	[rawMatrix, numNodes],
 	() => {
@@ -148,8 +116,6 @@ watch(
 watch(queryResult, applyHighlight, { immediate: true });
 onMounted(() => applyHighlight());
 onActivated(async () => {
-	// Recompute to make sure matrices exist, then highlight
-	solveFloyd();
 	await nextTick();
 	applyHighlight();
 });
