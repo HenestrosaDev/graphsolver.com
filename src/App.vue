@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
+import { ref, onMounted, computed } from "vue";
 import { useGraph } from "./composables/useGraph";
 import { useToast } from "./composables/useToast";
 import { useGraphIO } from "./composables/useGraphIO";
@@ -89,6 +89,10 @@ const algorithms = [
 	{ id: "floyd", label: "Floyd-Warshall", component: AlgorithmFloyd },
 	{ id: "mst", label: "Kruskal (MST)", component: AlgorithmKruskal },
 ];
+
+const algorithmById = computed(() =>
+	Object.fromEntries(algorithms.map((algo) => [algo.id, algo.component]))
+);
 
 // --- Export logic ---
 const handleExport = () => {
@@ -352,10 +356,7 @@ const handleFileChange = async (event: Event) => {
 							<div class="mt-8">
 								<KeepAlive>
 									<component
-										:is="
-											algorithms.find((a) => a.id === selectedAlgorithm)
-												?.component
-										"
+												:is="algorithmById[selectedAlgorithm]"
 									/>
 								</KeepAlive>
 							</div>
