@@ -5,7 +5,8 @@
 		@apply text-xs uppercase font-bold text-slate-500 mb-3;
 	}
 
-	button, select {
+	button,
+	select {
 		@apply cursor-pointer;
 	}
 }

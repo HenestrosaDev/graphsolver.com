@@ -17,7 +17,7 @@ defineProps<{
 		</div>
 
 		<div class="p-6" :class="bodyClass">
-			<slot/>
+			<slot />
 		</div>
 	</div>
 </template>

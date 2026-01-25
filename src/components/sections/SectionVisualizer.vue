@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { 
+import {
 	IconZoomOut,
 	IconZoomIn,
 	IconKeyframeAlignCenter,
@@ -7,8 +7,8 @@ import {
 	IconArrowsMaximize,
 	IconArrowsMinimize,
 	IconLock,
-	IconLockOpen
-} from '@tabler/icons-vue';
+	IconLockOpen,
+} from "@tabler/icons-vue";
 import { ref, onMounted, onUnmounted, watch, nextTick } from "vue";
 import { Network, type Data } from "vis-network";
 import { DataSet } from "vis-data";
@@ -156,12 +156,12 @@ const drawGraph = () => {
 				damping: 0.09,
 			},
 			// Importante: aseguramos que haga iteraciones antes de mostrarse
-			stabilization: { 
-                enabled: true, 
-                iterations: 1000, 
-                updateInterval: 25,
-                fit: true 
-            },
+			stabilization: {
+				enabled: true,
+				iterations: 1000,
+				updateInterval: 25,
+				fit: true,
+			},
 		},
 		interaction: {
 			hover: true,
@@ -178,18 +178,18 @@ const drawGraph = () => {
 		options
 	);
 
-    // --- CÓDIGO AÑADIDO ---
-    // Una vez que el grafo calcula su posición inicial, desactivamos las físicas.
-    // Esto hace que los nodos se queden "congelados" en su sitio.
-    networkInstance.on("stabilizationIterationsDone", () => {
-        networkInstance.setOptions({ physics: { enabled: false } });
-    });
+	// --- CÓDIGO AÑADIDO ---
+	// Una vez que el grafo calcula su posición inicial, desactivamos las físicas.
+	// Esto hace que los nodos se queden "congelados" en su sitio.
+	networkInstance.on("stabilizationIterationsDone", () => {
+		networkInstance.setOptions({ physics: { enabled: false } });
+	});
 
-    // Opcional: Si quieres reactivar físicas mientras arrastras (solo para ese nodo)
-    // y desactivarlas al soltar, puedes usar estos eventos. 
-    // Pero para lo que pides (que NO se mueva el resto), el código de arriba es suficiente.
-    
-    // ----------------------
+	// Opcional: Si quieres reactivar físicas mientras arrastras (solo para ese nodo)
+	// y desactivarlas al soltar, puedes usar estos eventos.
+	// Pero para lo que pides (que NO se mueva el resto), el código de arriba es suficiente.
+
+	// ----------------------
 
 	// Fit the graph to view
 	networkInstance.fit();

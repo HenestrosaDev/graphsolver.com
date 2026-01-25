@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { IconChevronLeft, IconChevronRight } from '@tabler/icons-vue';
+import { IconChevronLeft, IconChevronRight } from "@tabler/icons-vue";
 import { ref, computed, watch, onMounted, onActivated, nextTick } from "vue";
 import { useGraph } from "../../composables/useGraph";
 import PropertiesCard from "../properties/PropertiesCard.vue";
@@ -65,7 +65,8 @@ const applyHighlight = () => {
 	const result = queryResult.value;
 	clearHighlights();
 	if (!result || typeof result.dist === "string") return;
-	if (result.pathArr && result.pathArr.length >= 2) setHighlightPath(result.pathArr);
+	if (result.pathArr && result.pathArr.length >= 2)
+		setHighlightPath(result.pathArr);
 };
 
 const solveFloyd = () => {
@@ -171,9 +172,9 @@ const prevStep = () => {
 			<template #header>
 				<div class="flex flex-wrap items-center justify-between gap-4 w-full">
 					<div class="flex items-center gap-2">
-						<label class="text-xs font-bold uppercase tracking-wide"
-							>Origen</label
-						>
+						<label class="text-xs font-bold uppercase tracking-wide">
+							Origen
+						</label>
 						<select
 							v-model="startNode"
 							class="bg-white border border-slate-300 text-slate-700 text-sm rounded-md px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-medium"
@@ -185,9 +186,9 @@ const prevStep = () => {
 					<div class="text-lg text-slate-400">→</div>
 
 					<div class="flex items-center gap-2">
-						<label class="text-xs font-bold uppercase tracking-wide"
-							>Destino</label
-						>
+						<label class="text-xs font-bold uppercase tracking-wide">
+							Destino
+						</label>
 						<select
 							v-model="endNode"
 							class="bg-white border border-slate-300 text-slate-700 text-sm rounded-md px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-medium"

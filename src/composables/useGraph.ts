@@ -1,5 +1,5 @@
-import { ref, computed, watch } from 'vue';
-import type { Matrix, GraphData } from '../types/graph';
+import { ref, computed, watch } from "vue";
+import type { Matrix, GraphData } from "../types/graph";
 
 // Estado global (compartido entre componentes)
 const numNodes = ref<number>(4);
@@ -7,326 +7,350 @@ const rawMatrix = ref<Matrix>([]);
 const highlightedPath = ref<string[]>([]);
 
 export function useGraph() {
-  
-  const nodes = computed<string[]>(() => 
-    Array.from({ length: numNodes.value }, (_, i) => String.fromCharCode(65 + i))
-  );
+	const nodes = computed<string[]>(() =>
+		Array.from({ length: numNodes.value }, (_, i) =>
+			String.fromCharCode(65 + i)
+		)
+	);
 
-  // Función para inicializar desde cero (reset total)
-  const createGrid = (): void => {
-    const n = numNodes.value;
-    const newMatrix: Matrix = [];
-    for (let i = 0; i < n; i++) {
-      const row: (number | string)[] = [];
-      for (let j = 0; j < n; j++) {
-        row.push(i === j ? 0 : '');
-      }
-      newMatrix.push(row);
-    }
-    rawMatrix.value = newMatrix;
-  };
+	// Función para inicializar desde cero (reset total)
+	const createGrid = (): void => {
+		const n = numNodes.value;
+		const newMatrix: Matrix = [];
+		for (let i = 0; i < n; i++) {
+			const row: (number | string)[] = [];
+			for (let j = 0; j < n; j++) {
+				row.push(i === j ? 0 : "");
+			}
+			newMatrix.push(row);
+		}
+		rawMatrix.value = newMatrix;
+	};
 
-  // Watcher para redimensionar reactivamente
-  watch(numNodes, (newN, oldN) => {
-    if (newN < 2) return; // Mínimo de seguridad
-    if (!rawMatrix.value.length) {
-      createGrid();
-      return;
-    }
+	// Watcher para redimensionar reactivamente
+	watch(numNodes, (newN, oldN) => {
+		if (newN < 2) return; // Mínimo de seguridad
+		if (!rawMatrix.value.length) {
+			createGrid();
+			return;
+		}
 
-    // Si la matriz ya tiene el tamaño correcto, no redimensionar (para importaciones)
-    if (rawMatrix.value.length === newN && rawMatrix.value.every(row => row.length === newN)) {
-      return;
-    }
+		// Si la matriz ya tiene el tamaño correcto, no redimensionar (para importaciones)
+		if (
+			rawMatrix.value.length === newN &&
+			rawMatrix.value.every((row) => row.length === newN)
+		) {
+			return;
+		}
 
-    const currentMatrix = rawMatrix.value;
-    const newMatrix: Matrix = [];
+		const currentMatrix = rawMatrix.value;
+		const newMatrix: Matrix = [];
 
-    // Crear nueva matriz con el tamaño correcto
-    for (let i = 0; i < newN; i++) {
-      const newRow: (number | string)[] = [];
-      for (let j = 0; j < newN; j++) {
-        if (i < oldN && j < oldN) {
-          // Copiar valores existentes
-          newRow.push(currentMatrix[i][j]);
-        } else {
-          // Nuevas celdas: diagonal = 0, resto = vacío
-          newRow.push(i === j ? 0 : '');
-        }
-      }
-      newMatrix.push(newRow);
-    }
+		// Crear nueva matriz con el tamaño correcto
+		for (let i = 0; i < newN; i++) {
+			const newRow: (number | string)[] = [];
+			for (let j = 0; j < newN; j++) {
+				if (i < oldN && j < oldN) {
+					// Copiar valores existentes
+					newRow.push(currentMatrix[i][j]);
+				} else {
+					// Nuevas celdas: diagonal = 0, resto = vacío
+					newRow.push(i === j ? 0 : "");
+				}
+			}
+			newMatrix.push(newRow);
+		}
 
-    // Reasignar la matriz completa para asegurar reactividad
-    rawMatrix.value = newMatrix;
-  });
+		// Reasignar la matriz completa para asegurar reactividad
+		rawMatrix.value = newMatrix;
+	});
 
-  const getGraphData = (): GraphData => {
-    const n = numNodes.value;
-    const matrix: number[][] = [];
-    const hasArc: boolean[][] = [];
-    let isSymmetric = true;
+	const getGraphData = (): GraphData => {
+		const n = numNodes.value;
+		const matrix: number[][] = [];
+		const hasArc: boolean[][] = [];
+		let isSymmetric = true;
 
-    for(let i=0; i<n; i++) {
-      matrix[i] = [];
-      hasArc[i] = [];
-    }
+		for (let i = 0; i < n; i++) {
+			matrix[i] = [];
+			hasArc[i] = [];
+		}
 
-    for (let i = 0; i < n; i++) {
-      for (let j = 0; j < n; j++) {
-        const val = rawMatrix.value[i]?.[j]; // Optional chaining por seguridad
-        const numVal = typeof val === 'string' && val === '' ? NaN : Number(val);
-        
-        const isEmpty = (val === '' || val === null || val === undefined);
-        const isZero = (numVal === 0);
-        const isMinusOne = (numVal === -1);
-        
-        const isConnection = !isEmpty && !isMinusOne && !isNaN(numVal) && !isZero;
+		for (let i = 0; i < n; i++) {
+			for (let j = 0; j < n; j++) {
+				const val = rawMatrix.value[i]?.[j]; // Optional chaining por seguridad
+				const numVal =
+					typeof val === "string" && val === "" ? NaN : Number(val);
 
-        if (!isConnection) {
-          matrix[i][j] = Infinity;
-          hasArc[i][j] = false;
-        } else {
-          matrix[i][j] = numVal;
-          hasArc[i][j] = (i !== j);
-        }
-      }
-    }
+				const isEmpty = val === "" || val === null || val === undefined;
+				const isZero = numVal === 0;
+				const isMinusOne = numVal === -1;
 
-    for(let i=0; i<n; i++) {
-      for(let j=0; j<n; j++) {
-        if(hasArc[i][j] !== hasArc[j][i]) {
-          isSymmetric = false;
-          break;
-        }
-      }
-    }
+				const isConnection =
+					!isEmpty && !isMinusOne && !isNaN(numVal) && !isZero;
 
-    return { 
-      n, 
-      matrix, 
-      hasArc, 
-      isSymmetric, 
-      rawValues: rawMatrix.value, 
-      nodes: nodes.value 
-    };
-  };
+				if (!isConnection) {
+					matrix[i][j] = Infinity;
+					hasArc[i][j] = false;
+				} else {
+					matrix[i][j] = numVal;
+					hasArc[i][j] = i !== j;
+				}
+			}
+		}
 
-  const generateRandomGraph = () => {
-    const n = numNodes.value;
-    
-    // Configuración
-    const connectionProbability = 0.5; // 50% de probabilidad de conexión
-    const maxWeight = 20; 
-    
-    const newMatrix: Matrix = [];
+		for (let i = 0; i < n; i++) {
+			for (let j = 0; j < n; j++) {
+				if (hasArc[i][j] !== hasArc[j][i]) {
+					isSymmetric = false;
+					break;
+				}
+			}
+		}
 
-    for (let i = 0; i < n; i++) {
-      const row: (number | string)[] = [];
-      for (let j = 0; j < n; j++) {
-        if (i === j) {
-          row.push(0);
-        } else {
-          const hasConnection = Math.random() < connectionProbability;
-          if (hasConnection) {
-            const weight = Math.floor(Math.random() * maxWeight) + 1;
-            row.push(weight);
-          } else {
-            row.push('');
-          }
-        }
-      }
-      newMatrix.push(row);
-    }
-    
-    rawMatrix.value = newMatrix;
-  };
+		return {
+			n,
+			matrix,
+			hasArc,
+			isSymmetric,
+			rawValues: rawMatrix.value,
+			nodes: nodes.value,
+		};
+	};
 
-  const clearMatrix = () => {
-    const n = numNodes.value;
-    for (let i = 0; i < n; i++) {
-      for (let j = 0; j < n; j++) {
-        if (i === j) {
-          rawMatrix.value[i][j] = 0;
-        } else {
-          rawMatrix.value[i][j] = ''; 
-        }
-      }
-    }
-  };
+	const generateRandomGraph = () => {
+		const n = numNodes.value;
 
-  const clearHighlights = () => {
-    highlightedPath.value = [];
-  };
+		// Configuración
+		const connectionProbability = 0.5; // 50% de probabilidad de conexión
+		const maxWeight = 20;
 
-  const setHighlightPath = (nodesInPath: string[]) => {
-    highlightedPath.value = [];
-    if (nodesInPath.length < 2) return;
+		const newMatrix: Matrix = [];
 
-    for (let i = 0; i < nodesInPath.length - 1; i++) {
-      const u = nodesInPath[i];
-      const v = nodesInPath[i+1];
-      // Guardamos ambas direcciones para asegurar que vis-network lo detecte
-      // independientemente de cómo esté definida la arista internamente
-      highlightedPath.value.push(u + v); // Ej: "AB"
-      highlightedPath.value.push(v + u); // Ej: "BA"
-    }
-  };
+		for (let i = 0; i < n; i++) {
+			const row: (number | string)[] = [];
+			for (let j = 0; j < n; j++) {
+				if (i === j) {
+					row.push(0);
+				} else {
+					const hasConnection = Math.random() < connectionProbability;
+					if (hasConnection) {
+						const weight = Math.floor(Math.random() * maxWeight) + 1;
+						row.push(weight);
+					} else {
+						row.push("");
+					}
+				}
+			}
+			newMatrix.push(row);
+		}
+
+		rawMatrix.value = newMatrix;
+	};
+
+	const clearMatrix = () => {
+		const n = numNodes.value;
+		for (let i = 0; i < n; i++) {
+			for (let j = 0; j < n; j++) {
+				if (i === j) {
+					rawMatrix.value[i][j] = 0;
+				} else {
+					rawMatrix.value[i][j] = "";
+				}
+			}
+		}
+	};
+
+	const clearHighlights = () => {
+		highlightedPath.value = [];
+	};
+
+	const setHighlightPath = (nodesInPath: string[]) => {
+		highlightedPath.value = [];
+		if (nodesInPath.length < 2) return;
+
+		for (let i = 0; i < nodesInPath.length - 1; i++) {
+			const u = nodesInPath[i];
+			const v = nodesInPath[i + 1];
+			// Guardamos ambas direcciones para asegurar que vis-network lo detecte
+			// independientemente de cómo esté definida la arista internamente
+			highlightedPath.value.push(u + v); // Ej: "AB"
+			highlightedPath.value.push(v + u); // Ej: "BA"
+		}
+	};
 
 	const toJSON = () => {
-    return JSON.stringify({
-      numNodes: numNodes.value,
-      rawMatrix: rawMatrix.value,
-      timestamp: new Date().toISOString() // Metadato útil
-    }, null, 2); // Indentado bonito
-  };
+		return JSON.stringify(
+			{
+				numNodes: numNodes.value,
+				rawMatrix: rawMatrix.value,
+				timestamp: new Date().toISOString(), // Metadato útil
+			},
+			null,
+			2
+		); // Indentado bonito
+	};
 
-  const toLaTeX = () => {
-    const n = numNodes.value;
-    let latex = '\\begin{pmatrix}\n';
-    for (let i = 0; i < n; i++) {
-      const row = [];
-      for (let j = 0; j < n; j++) {
-        const val = rawMatrix.value[i][j];
-        row.push(val === '' ? '-' : val.toString());
-      }
-      latex += row.join(' & ') + ' \\\\\n';
-    }
-    latex += '\\end{pmatrix}';
-    return latex;
-  };
+	const toLaTeX = () => {
+		const n = numNodes.value;
+		let latex = "\\begin{pmatrix}\n";
+		for (let i = 0; i < n; i++) {
+			const row = [];
+			for (let j = 0; j < n; j++) {
+				const val = rawMatrix.value[i][j];
+				row.push(val === "" ? "-" : val.toString());
+			}
+			latex += row.join(" & ") + " \\\\\n";
+		}
+		latex += "\\end{pmatrix}";
+		return latex;
+	};
 
-  const toDot = () => {
-    const { hasArc, isSymmetric } = getGraphData();
-    const n = numNodes.value;
-    let dot = isSymmetric ? 'graph G {\n' : 'digraph G {\n';
-    for (let i = 0; i < n; i++) {
-      for (let j = 0; j < n; j++) {
-        if (hasArc[i][j]) {
-          const u = nodes.value[i];
-          const v = nodes.value[j];
-          const weight = rawMatrix.value[i][j];
-          if (isSymmetric && i < j) {
-            dot += `  ${u} -- ${v} [label="${weight}"];\n`;
-          } else if (!isSymmetric) {
-            dot += `  ${u} -> ${v} [label="${weight}"];\n`;
-          }
-        }
-      }
-    }
-    dot += '}';
-    return dot;
-  };
+	const toDot = () => {
+		const { hasArc, isSymmetric } = getGraphData();
+		const n = numNodes.value;
+		let dot = isSymmetric ? "graph G {\n" : "digraph G {\n";
+		for (let i = 0; i < n; i++) {
+			for (let j = 0; j < n; j++) {
+				if (hasArc[i][j]) {
+					const u = nodes.value[i];
+					const v = nodes.value[j];
+					const weight = rawMatrix.value[i][j];
+					if (isSymmetric && i < j) {
+						dot += `  ${u} -- ${v} [label="${weight}"];\n`;
+					} else if (!isSymmetric) {
+						dot += `  ${u} -> ${v} [label="${weight}"];\n`;
+					}
+				}
+			}
+		}
+		dot += "}";
+		return dot;
+	};
 
-  // --- NUEVO: Importar estado ---
-  const loadFromJSON = (jsonString: string): boolean => {
-    try {
-      const parsed = JSON.parse(jsonString);
-      
-      // Validaciones básicas para no romper la app
-      if (!parsed.rawMatrix || !Array.isArray(parsed.rawMatrix)) throw new Error("Formato inválido");
-      if (typeof parsed.numNodes !== 'number') throw new Error("Falta número de nodos");
+	// --- NUEVO: Importar estado ---
+	const loadFromJSON = (jsonString: string): boolean => {
+		try {
+			const parsed = JSON.parse(jsonString);
 
-      // Aplicar datos
-      numNodes.value = parsed.numNodes;
-      rawMatrix.value = parsed.rawMatrix;
-      
-      return true; // Éxito
-    } catch (e) {
-      console.error("Error importando JSON:", e);
-      return false; // Error
-    }
-  };
+			// Validaciones básicas para no romper la app
+			if (!parsed.rawMatrix || !Array.isArray(parsed.rawMatrix))
+				throw new Error("Formato inválido");
+			if (typeof parsed.numNodes !== "number")
+				throw new Error("Falta número de nodos");
 
-  const loadFromLaTeX = (latexString: string): boolean => {
-    try {
-      // Simple parser for LaTeX matrix like \begin{pmatrix} a & b \\ c & d \end{pmatrix}
-      const matrixMatch = latexString.match(/\\begin\{pmatrix\}\s*(.*?)\s*\\end\{pmatrix\}/s);
-      if (!matrixMatch) throw new Error("Formato LaTeX inválido");
+			// Aplicar datos
+			numNodes.value = parsed.numNodes;
+			rawMatrix.value = parsed.rawMatrix;
 
-      const rows = matrixMatch[1].split('\\\\').map(r => r.trim()).filter(r => r.length > 0);
-      const matrix = rows.map(row => row.split('&').map(cell => cell.trim()));
+			return true; // Éxito
+		} catch (e) {
+			console.error("Error importando JSON:", e);
+			return false; // Error
+		}
+	};
 
-      const n = matrix.length;
-      if (n === 0 || matrix[0].length !== n) throw new Error("Matriz no cuadrada");
+	const loadFromLaTeX = (latexString: string): boolean => {
+		try {
+			// Simple parser for LaTeX matrix like \begin{pmatrix} a & b \\ c & d \end{pmatrix}
+			const matrixMatch = latexString.match(
+				/\\begin\{pmatrix\}\s*(.*?)\s*\\end\{pmatrix\}/s
+			);
+			if (!matrixMatch) throw new Error("Formato LaTeX inválido");
 
-      numNodes.value = n;
-    rawMatrix.value = matrix.map(row => row.map(cell => cell === '-' || cell === '0' ? '' : cell));
-    
-    // Ensure diagonal is 0
-    for (let i = 0; i < n; i++) {
-      rawMatrix.value[i][i] = '0';
-    }
-      return true;
-    } catch (e) {
-      console.error("Error importando LaTeX:", e);
-      return false;
-    }
-  };
+			const rows = matrixMatch[1]
+				.split("\\\\")
+				.map((r) => r.trim())
+				.filter((r) => r.length > 0);
+			const matrix = rows.map((row) =>
+				row.split("&").map((cell) => cell.trim())
+			);
 
-  const loadFromDot = (dotString: string): boolean => {
-    try {
-      // Simple parser for dot format
-      const edgeRegex = /(\w+)\s*(--|->)\s*(\w+)\s*\[label="(\d+)"\]/g;
-      
-      const nodeSet = new Set<string>();
-      const edges = [];
-      
-      let match;
-      while ((match = edgeRegex.exec(dotString)) !== null) {
-        const u = match[1];
-        const type = match[2];
-        const v = match[3];
-        const weight = match[4];
-        nodeSet.add(u);
-        nodeSet.add(v);
-        edges.push({ u, v, weight, isUndirected: type === '--' });
-      }
-      
-      const nodesList = Array.from(nodeSet).sort();
-      const n = nodesList.length;
-      const matrix: Matrix = Array(n).fill(0).map(() => Array(n).fill(''));
-      
-      numNodes.value = n;
-      rawMatrix.value = matrix;
-      
-      edges.forEach(edge => {
-        const uIdx = nodesList.indexOf(edge.u);
-        const vIdx = nodesList.indexOf(edge.v);
-        rawMatrix.value[uIdx][vIdx] = edge.weight;
-        if (edge.isUndirected) {
-          rawMatrix.value[vIdx][uIdx] = edge.weight;
-        }
-      });
-      
-      return true;
-    } catch (e) {
-      console.error("Error importando Dot:", e);
-      return false;
-    }
-  };
+			const n = matrix.length;
+			if (n === 0 || matrix[0].length !== n)
+				throw new Error("Matriz no cuadrada");
 
-  const toIdx = (char: string): number => char.toUpperCase().charCodeAt(0) - 65;
-  const toChar = (idx: number): string => String.fromCharCode(65 + idx);
+			numNodes.value = n;
+			rawMatrix.value = matrix.map((row) =>
+				row.map((cell) => (cell === "-" || cell === "0" ? "" : cell))
+			);
 
-  return {
-    numNodes,
-    rawMatrix,
-    nodes,
-    highlightedPath,
-    clearHighlights,
-    setHighlightPath,
-    createGrid,
-    getGraphData,
-    generateRandomGraph,
-    clearMatrix,
+			// Ensure diagonal is 0
+			for (let i = 0; i < n; i++) {
+				rawMatrix.value[i][i] = "0";
+			}
+			return true;
+		} catch (e) {
+			console.error("Error importando LaTeX:", e);
+			return false;
+		}
+	};
+
+	const loadFromDot = (dotString: string): boolean => {
+		try {
+			// Simple parser for dot format
+			const edgeRegex = /(\w+)\s*(--|->)\s*(\w+)\s*\[label="(\d+)"\]/g;
+
+			const nodeSet = new Set<string>();
+			const edges = [];
+
+			let match;
+			while ((match = edgeRegex.exec(dotString)) !== null) {
+				const u = match[1];
+				const type = match[2];
+				const v = match[3];
+				const weight = match[4];
+				nodeSet.add(u);
+				nodeSet.add(v);
+				edges.push({ u, v, weight, isUndirected: type === "--" });
+			}
+
+			const nodesList = Array.from(nodeSet).sort();
+			const n = nodesList.length;
+			const matrix: Matrix = Array(n)
+				.fill(0)
+				.map(() => Array(n).fill(""));
+
+			numNodes.value = n;
+			rawMatrix.value = matrix;
+
+			edges.forEach((edge) => {
+				const uIdx = nodesList.indexOf(edge.u);
+				const vIdx = nodesList.indexOf(edge.v);
+				rawMatrix.value[uIdx][vIdx] = edge.weight;
+				if (edge.isUndirected) {
+					rawMatrix.value[vIdx][uIdx] = edge.weight;
+				}
+			});
+
+			return true;
+		} catch (e) {
+			console.error("Error importando Dot:", e);
+			return false;
+		}
+	};
+
+	const toIdx = (char: string): number => char.toUpperCase().charCodeAt(0) - 65;
+	const toChar = (idx: number): string => String.fromCharCode(65 + idx);
+
+	return {
+		numNodes,
+		rawMatrix,
+		nodes,
+		highlightedPath,
+		clearHighlights,
+		setHighlightPath,
+		createGrid,
+		getGraphData,
+		generateRandomGraph,
+		clearMatrix,
 		toJSON,
-    toLaTeX,
-    toDot,
+		toLaTeX,
+		toDot,
 		loadFromJSON,
-    loadFromLaTeX,
-    loadFromDot,
-    toIdx,
-    toChar
-  };
+		loadFromLaTeX,
+		loadFromDot,
+		toIdx,
+		toChar,
+	};
 }

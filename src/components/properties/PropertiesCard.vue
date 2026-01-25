@@ -34,7 +34,7 @@ const currentStyle = computed(() => styles[props.theme]);
 		:class="currentStyle.container"
 	>
 		<div class="rounded-t-lg" :class="currentStyle.header">
-            <div class="px-4 py-3 flex justify-between">
+			<div class="px-4 py-3 flex justify-between">
 				<div
 					class="text-xs font-bold uppercase tracking-wide shrink-0 flex items-center gap-2 flex-1"
 					:class="currentStyle.header"
@@ -49,7 +49,7 @@ const currentStyle = computed(() => styles[props.theme]);
 		</div>
 
 		<div class="rounded-b-lg">
-            <div class="px-4 py-3 space-y-2">
+			<div class="px-4 py-3 space-y-2">
 				<slot />
 			</div>
 		</div>
