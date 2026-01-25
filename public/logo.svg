@@ -1,11 +1,9 @@
 <svg 
 	xmlns="http://www.w3.org/2000/svg" 
-	viewBox="0 0 256 256" 
+	viewBox="36 44 192 168" 
 	aria-label="GraphSolver Logo"
 >
 	<defs>
-		<color id="baseColor" value="#1E293B" />
-		<color id="accentColor" value="#3B82F6" />
 		<filter id="softGlow" x="-20%" y="-20%" width="140%" height="140%">
 			<feGaussianBlur stdDeviation="3" result="blur" />
 			<feColorMatrix in="blur" type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 0.3 0"
