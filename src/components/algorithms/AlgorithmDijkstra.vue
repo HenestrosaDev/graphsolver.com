@@ -143,60 +143,62 @@ onUnmounted(() => {
 
 <template>
 	<div class="space-y-8">
-		<h3 class="text-eyebrow">Cálculo de ruta</h3>
+		<div>
+			<h3 class="text-eyebrow">Cálculo de ruta</h3>
 
-		<PropertiesCard>
-			<template #header>
-				<div class="flex flex-wrap items-center justify-between gap-4 w-full">
-					<div class="flex items-center gap-2">
-						<label
-							for="start-node"
-							class="text-xs font-bold uppercase tracking-wide"
-						>
-							Origen
-						</label>
-						<select
-							id="start-node"
-							v-model="startNode"
-							class="bg-white border border-slate-300 text-slate-700 text-sm rounded-md px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-medium"
-						>
-							<option v-for="n in nodes" :key="n" :value="n">{{ n }}</option>
-						</select>
+			<PropertiesCard>
+				<template #header>
+					<div class="flex flex-wrap items-center justify-between gap-4 w-full">
+						<div class="flex items-center gap-2">
+							<label
+								for="start-node"
+								class="text-xs font-bold uppercase tracking-wide"
+							>
+								Origen
+							</label>
+							<select
+								id="start-node"
+								v-model="startNode"
+								class="bg-white border border-slate-300 text-slate-700 text-sm rounded-md px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-medium"
+							>
+								<option v-for="n in nodes" :key="n" :value="n">{{ n }}</option>
+							</select>
+						</div>
+
+						<div class="text-lg text-slate-400">→</div>
+
+						<div class="flex items-center gap-2">
+							<label
+								for="end-node"
+								class="text-xs font-bold uppercase tracking-wide"
+							>
+								Destino
+							</label>
+							<select
+								id="end-node"
+								v-model="endNode"
+								class="bg-white border border-slate-300 text-slate-700 text-sm rounded-md px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-medium"
+							>
+								<option v-for="n in nodes" :key="n" :value="n">{{ n }}</option>
+							</select>
+						</div>
 					</div>
+				</template>
 
-					<div class="text-lg text-slate-400">→</div>
-
-					<div class="flex items-center gap-2">
-						<label
-							for="end-node"
-							class="text-xs font-bold uppercase tracking-wide"
-						>
-							Destino
-						</label>
-						<select
-							id="end-node"
-							v-model="endNode"
-							class="bg-white border border-slate-300 text-slate-700 text-sm rounded-md px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-medium"
-						>
-							<option v-for="n in nodes" :key="n" :value="n">{{ n }}</option>
-						</select>
-					</div>
-				</div>
-			</template>
-
-			<template v-if="isSolved">
-				<PropertyRow
-					label="Coste mínimo"
-					:value="finalCost"
-					:variant="typeof finalCost === 'string' ? 'badge' : 'metric'"
-				/>
-				<PropertyRow
-					label="Camino óptimo"
-					:value="finalPath"
-					:variant="typeof finalCost === 'string' ? 'badge' : 'metric'"
-				/>
-			</template>
-		</PropertiesCard>
+				<template v-if="isSolved">
+					<PropertyRow
+						label="Coste mínimo"
+						:value="finalCost"
+						:variant="typeof finalCost === 'string' ? 'badge' : 'metric'"
+					/>
+					<PropertyRow
+						label="Camino óptimo"
+						:value="finalPath"
+						:variant="typeof finalCost === 'string' ? 'badge' : 'metric'"
+					/>
+				</template>
+			</PropertiesCard>
+		</div>
 
 		<div v-if="isSolved">
 			<h3 class="text-eyebrow">Tabla de iteraciones</h3>

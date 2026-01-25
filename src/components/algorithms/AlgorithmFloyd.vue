@@ -166,166 +166,170 @@ const prevStep = () => {
 
 <template>
 	<div class="space-y-8">
-		<h3 class="text-eyebrow">Cálculo de ruta</h3>
+		<div>
+			<h3 class="text-eyebrow">Cálculo de ruta</h3>
 
-		<PropertiesCard>
-			<template #header>
-				<div class="flex flex-wrap items-center justify-between gap-4 w-full">
-					<div class="flex items-center gap-2">
-						<label class="text-xs font-bold uppercase tracking-wide">
-							Origen
-						</label>
-						<select
-							v-model="startNode"
-							class="bg-white border border-slate-300 text-slate-700 text-sm rounded-md px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-medium"
-						>
-							<option v-for="n in nodes" :key="n" :value="n">{{ n }}</option>
-						</select>
-					</div>
-
-					<div class="text-lg text-slate-400">→</div>
-
-					<div class="flex items-center gap-2">
-						<label class="text-xs font-bold uppercase tracking-wide">
-							Destino
-						</label>
-						<select
-							v-model="endNode"
-							class="bg-white border border-slate-300 text-slate-700 text-sm rounded-md px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-medium"
-						>
-							<option v-for="n in nodes" :key="n" :value="n">{{ n }}</option>
-						</select>
-					</div>
-				</div>
-			</template>
-
-			<PropertyRow
-				label="Coste mínimo"
-				:value="queryResult.dist"
-				:variant="typeof queryResult.dist === 'string' ? 'badge' : 'metric'"
-			/>
-			<!-- <span v-if="hasInfPairs" class="text-xs text-red-500 ml-2">(pares inalcanzables)</span>-->
-			<PropertyRow
-				label="Camino óptimo"
-				:value="queryResult.path"
-				:variant="typeof queryResult.dist === 'string' ? 'badge' : 'metric'"
-			/>
-			<PropertyRow
-				label="Diámetro del grafo"
-				tooltip="La mayor distancia mínima entre cualquier par de vértices conectados del grafo."
-				:value="diameter"
-				:variant="typeof diameter === 'string' ? 'badge' : 'metric'"
-			/>
-		</PropertiesCard>
-
-		<h3 v-if="steps.length > 0" class="text-eyebrow">Tabla de iteraciones</h3>
-
-		<div
-			v-if="steps.length > 0"
-			class="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden"
-		>
-			<div class="bg-slate-50 border-b border-slate-200 p-4">
-				<div class="flex flex-col items-center">
-					<span
-						class="inline-block bg-blue-100 text-blue-700 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider"
-					>
-						Paso {{ currentStepIndex + 1 }} de {{ steps.length }}
-					</span>
-
-					<h3 class="font-bold text-slate-800 text-lg mt-3">
-						{{ currentStep.title }}
-					</h3>
-
-					<div
-						class="flex items-center justify-center gap-3 w-full max-w-md -mb-1"
-					>
-						<button
-							@click="prevStep"
-							:disabled="currentStepIndex === 0"
-							class="p-1.5 rounded-full hover:bg-white hover:shadow-sm border border-transparent hover:border-slate-200 text-slate-500 disabled:opacity-30 disabled:hover:shadow-none disabled:hover:border-transparent transition-all"
-							title="Anterior"
-						>
-							<IconChevronLeft class="size-6" />
-						</button>
-
-						<div class="flex-1 mx-2 relative flex items-center">
-							<input
-								type="range"
-								min="0"
-								:max="steps.length - 1"
-								v-model.number="currentStepIndex"
-								class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-blue-600 hover:accent-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30"
-							/>
+			<PropertiesCard>
+				<template #header>
+					<div class="flex flex-wrap items-center justify-between gap-4 w-full">
+						<div class="flex items-center gap-2">
+							<label class="text-xs font-bold uppercase tracking-wide">
+								Origen
+							</label>
+							<select
+								v-model="startNode"
+								class="bg-white border border-slate-300 text-slate-700 text-sm rounded-md px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-medium"
+							>
+								<option v-for="n in nodes" :key="n" :value="n">{{ n }}</option>
+							</select>
 						</div>
 
-						<button
-							@click="nextStep"
-							:disabled="currentStepIndex === steps.length - 1"
-							class="p-1.5 rounded-full hover:bg-white hover:shadow-sm border border-transparent hover:border-slate-200 text-slate-500 disabled:opacity-30 disabled:hover:shadow-none disabled:hover:border-transparent transition-all"
-							title="Siguiente"
+						<div class="text-lg text-slate-400">→</div>
+
+						<div class="flex items-center gap-2">
+							<label class="text-xs font-bold uppercase tracking-wide">
+								Destino
+							</label>
+							<select
+								v-model="endNode"
+								class="bg-white border border-slate-300 text-slate-700 text-sm rounded-md px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-medium"
+							>
+								<option v-for="n in nodes" :key="n" :value="n">{{ n }}</option>
+							</select>
+						</div>
+					</div>
+				</template>
+
+				<PropertyRow
+					label="Coste mínimo"
+					:value="queryResult.dist"
+					:variant="typeof queryResult.dist === 'string' ? 'badge' : 'metric'"
+				/>
+				<!-- <span v-if="hasInfPairs" class="text-xs text-red-500 ml-2">(pares inalcanzables)</span>-->
+				<PropertyRow
+					label="Camino óptimo"
+					:value="queryResult.path"
+					:variant="typeof queryResult.dist === 'string' ? 'badge' : 'metric'"
+				/>
+				<PropertyRow
+					label="Diámetro del grafo"
+					tooltip="La mayor distancia mínima entre cualquier par de vértices conectados del grafo."
+					:value="diameter"
+					:variant="typeof diameter === 'string' ? 'badge' : 'metric'"
+				/>
+			</PropertiesCard>
+		</div>
+
+		<div>
+			<h3 v-if="steps.length > 0" class="text-eyebrow">Tabla de iteraciones</h3>
+
+			<div
+				v-if="steps.length > 0"
+				class="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden"
+			>
+				<div class="bg-slate-50 border-b border-slate-200 p-4">
+					<div class="flex flex-col items-center">
+						<span
+							class="inline-block bg-blue-100 text-blue-700 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider"
 						>
-							<IconChevronRight class="size-6" />
-						</button>
+							Paso {{ currentStepIndex + 1 }} de {{ steps.length }}
+						</span>
+
+						<h3 class="font-bold text-slate-800 text-lg mt-3">
+							{{ currentStep.title }}
+						</h3>
+
+						<div
+							class="flex items-center justify-center gap-3 w-full max-w-md -mb-1"
+						>
+							<button
+								@click="prevStep"
+								:disabled="currentStepIndex === 0"
+								class="p-1.5 rounded-full hover:bg-white hover:shadow-sm border border-transparent hover:border-slate-200 text-slate-500 disabled:opacity-30 disabled:hover:shadow-none disabled:hover:border-transparent transition-all"
+								title="Anterior"
+							>
+								<IconChevronLeft class="size-6" />
+							</button>
+
+							<div class="flex-1 mx-2 relative flex items-center">
+								<input
+									type="range"
+									min="0"
+									:max="steps.length - 1"
+									v-model.number="currentStepIndex"
+									class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-blue-600 hover:accent-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30"
+								/>
+							</div>
+
+							<button
+								@click="nextStep"
+								:disabled="currentStepIndex === steps.length - 1"
+								class="p-1.5 rounded-full hover:bg-white hover:shadow-sm border border-transparent hover:border-slate-200 text-slate-500 disabled:opacity-30 disabled:hover:shadow-none disabled:hover:border-transparent transition-all"
+								title="Siguiente"
+							>
+								<IconChevronRight class="size-6" />
+							</button>
+						</div>
 					</div>
 				</div>
-			</div>
 
-			<div
-				class="p-6 overflow-x-auto flex justify-center min-h-[300px] items-center bg-white transition-all duration-300"
-			>
-				<table
-					class="text-sm border-collapse shadow-sm rounded-lg overflow-hidden"
+				<div
+					class="p-6 overflow-x-auto flex justify-center min-h-[300px] items-center bg-white transition-all duration-300"
 				>
-					<thead>
-						<tr>
-							<th class="p-3 bg-slate-50 border-b border-slate-200"></th>
-							<th
-								v-for="n in nodes"
-								:key="n"
-								class="p-3 bg-slate-50 border-b border-slate-200 font-bold text-slate-500 text-xs w-10 text-center"
-							>
-								{{ n }}
-							</th>
-						</tr>
-					</thead>
-					<tbody>
-						<tr v-for="(row, i) in currentStep.matrix" :key="i">
-							<th
-								class="p-3 bg-slate-50 border-r border-slate-200 font-bold text-slate-500 text-xs w-10 text-center"
-							>
-								{{ nodes[i] }}
-							</th>
+					<table
+						class="text-sm border-collapse shadow-sm rounded-lg overflow-hidden"
+					>
+						<thead>
+							<tr>
+								<th class="p-3 bg-slate-50 border-b border-slate-200"></th>
+								<th
+									v-for="n in nodes"
+									:key="n"
+									class="p-3 bg-slate-50 border-b border-slate-200 font-bold text-slate-500 text-xs w-10 text-center"
+								>
+									{{ n }}
+								</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr v-for="(row, i) in currentStep.matrix" :key="i">
+								<th
+									class="p-3 bg-slate-50 border-r border-slate-200 font-bold text-slate-500 text-xs w-10 text-center"
+								>
+									{{ nodes[i] }}
+								</th>
 
-							<td
-								v-for="(val, j) in row"
-								:key="j"
-								class="p-3 border border-slate-100 text-center text-sm w-12 h-12 transition-colors duration-200"
-								:class="{
-									'bg-blue-50 font-bold text-blue-700 ring-1 ring-inset ring-blue-200':
-										i === currentStep.pivot || j === currentStep.pivot,
-									'text-slate-400': val === Infinity,
-									'text-slate-800': val !== Infinity,
-								}"
-							>
-								{{ val === Infinity ? "∞" : val }}
-							</td>
-						</tr>
-					</tbody>
-				</table>
-			</div>
+								<td
+									v-for="(val, j) in row"
+									:key="j"
+									class="p-3 border border-slate-100 text-center text-sm w-12 h-12 transition-colors duration-200"
+									:class="{
+										'bg-blue-50 font-bold text-blue-700 ring-1 ring-inset ring-blue-200':
+											i === currentStep.pivot || j === currentStep.pivot,
+										'text-slate-400': val === Infinity,
+										'text-slate-800': val !== Infinity,
+									}"
+								>
+									{{ val === Infinity ? "∞" : val }}
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
 
-			<div
-				class="bg-slate-50 p-3 text-xs text-slate-500 text-center border-t border-slate-200"
-			>
-				<span v-if="currentStep.pivot === -1">
-					Matriz de adyacencia inicial. Los nodos no conectados directamente son
-					∞.
-				</span>
-				<span v-else>
-					Calculando rutas pasando por el nodo intermedio
-					<strong>{{ nodes[currentStep.pivot] }}</strong>.
-					Las filas y columnas resaltadas no cambian en esta iteración.
-				</span>
+				<div
+					class="bg-slate-50 p-3 text-xs text-slate-500 text-center border-t border-slate-200"
+				>
+					<span v-if="currentStep.pivot === -1">
+						Matriz de adyacencia inicial. Los nodos no conectados directamente
+						son ∞.
+					</span>
+					<span v-else>
+						Calculando rutas pasando por el nodo intermedio
+						<strong>{{ nodes[currentStep.pivot] }}</strong
+						>. Las filas y columnas resaltadas no cambian en esta iteración.
+					</span>
+				</div>
 			</div>
 		</div>
 	</div>
