@@ -19,6 +19,28 @@
 	body {
 		@apply bg-slate-50 text-slate-800 dark:bg-slate-950 dark:text-slate-100 antialiased;
 	}
+
+	/* Not written in Tailwind for the sake of clarity */
+	select {
+		/* Reset the default appearance */
+		appearance: none;
+		-webkit-appearance: none;
+		-moz-appearance: none;
+
+		/* Define the new arrow using an encoded SVG (Data URI) */
+		/* Note: The color %236b7280 is a neutral gray (gray-500 from Tailwind) */
+		background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+
+		/* Arrow position */
+		background-position: right 0.5rem center;
+
+		/* Required properties for making the arrow appear */
+		background-repeat: no-repeat;
+		background-size: 1.5em 1.5em;
+
+		/* Right padding to prevent text from overlapping the arrow */
+		padding-right: 2.2rem !important;
+	}
 }
 
 @layer components {
