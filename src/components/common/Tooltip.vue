@@ -19,6 +19,8 @@ const isOpen = ref(false);
 const placement = ref({
 	isTop: true, // ¿Se muestra arriba o abajo?
 	xOffset: 0, // Desplazamiento horizontal (en px) para que no se salga
+	top: 0, // Posición absoluta top
+	left: 0, // Posición absoluta left
 });
 
 const updateDeviceType = () => {
@@ -39,9 +41,6 @@ const handleClickOutside = (event: Event) => {
 const recalculatePosition = async () => {
 	if (!rootRef.value || !tooltipRef.value) return;
 
-	// 1. Reseteamos valores para medir correctamente
-	placement.value = { isTop: true, xOffset: 0 };
-
 	// Esperamos al DOM para que el elemento tenga dimensiones reales
 	await nextTick();
 
@@ -49,28 +48,38 @@ const recalculatePosition = async () => {
 	const tooltipRect = tooltipRef.value.getBoundingClientRect();
 	const padding = 16; // Margen de seguridad con el borde de la pantalla
 
-	// --- A. Chequeo Vertical ---
-	// Si la distancia al techo es menor que la altura del tooltip, invertir a abajo
-	// (triggerRect.top es la distancia desde el botón al borde superior de la ventana)
-	if (triggerRect.top < tooltipRect.height + padding) {
-		placement.value.isTop = false;
+	// Calcular posición absoluta
+	const triggerCenterX = triggerRect.left + triggerRect.width / 2;
+	const triggerTop = triggerRect.top;
+	const triggerBottom = triggerRect.bottom;
+
+	// Posición vertical: decidir arriba o abajo
+	let isTop = true;
+	if (triggerTop < tooltipRect.height + padding) {
+		isTop = false;
 	}
 
-	// --- B. Chequeo Horizontal ---
-	let offset = 0;
+	// Posición horizontal: centrado inicialmente
+	let left = triggerCenterX - tooltipRect.width / 2;
 
-	// 1. ¿Se sale por la izquierda?
-	if (tooltipRect.left < padding) {
-		// Calculamos cuánto hay que empujar a la derecha
-		offset = padding - tooltipRect.left;
-	}
-	// 2. ¿Se sale por la derecha?
-	else if (tooltipRect.right > window.innerWidth - padding) {
-		// Calculamos cuánto hay que empujar a la izquierda (valor negativo)
-		offset = window.innerWidth - padding - tooltipRect.right;
+	// Ajustar si se sale por los lados
+	if (left < padding) {
+		left = padding;
+	} else if (left + tooltipRect.width > window.innerWidth - padding) {
+		left = window.innerWidth - padding - tooltipRect.width;
 	}
 
-	placement.value.xOffset = offset;
+	// Calcular offset para la flecha (diferencia entre centro deseado y actual)
+	const desiredCenter = triggerCenterX;
+	const actualCenter = left + tooltipRect.width / 2;
+	const xOffset = desiredCenter - actualCenter;
+
+	placement.value = {
+		isTop,
+		xOffset,
+		top: isTop ? triggerTop - tooltipRect.height - 8 : triggerBottom + 8,
+		left,
+	};
 };
 
 // Modificamos el show para que recalcule al abrir
@@ -137,16 +146,13 @@ const isVisible = computed(() => isOpen.value);
 
 		<div
 			ref="tooltipRef"
-			class="absolute left-1/2 mb-2 w-48 z-50 transition-opacity duration-200 ease-in-out pointer-events-none"
+			class="fixed w-48 z-50 transition-opacity duration-200 ease-in-out pointer-events-none"
 			:class="[
 				isVisible ? 'visible opacity-100' : 'invisible opacity-0',
-				// CLASE DINÁMICA: Si isTop es true usa 'bottom-full', si no, 'top-full' (para ponerlo debajo)
-				placement.isTop ? 'bottom-full mb-2' : 'top-full mt-2',
 			]"
 			:style="{
-				// 1. Centramos inicialmente con -50%
-				// 2. Sumamos el offset calculado en JS para corregir la posición
-				transform: `translateX(calc(-50% + ${placement.xOffset}px))`,
+				top: `${placement.top}px`,
+				left: `${placement.left}px`,
 			}"
 		>
 			<div
@@ -164,8 +170,8 @@ const isVisible = computed(() => isOpen.value);
 							: 'bottom-full border-b-slate-800',
 					]"
 					:style="{
-						// La flecha debe moverse EN CONTRA del contenedor para seguir apuntando al icono
-						transform: `translateX(${-placement.xOffset}px)`,
+						// La flecha debe moverse para apuntar al centro del trigger
+						transform: `translateX(${placement.xOffset}px)`,
 					}"
 				/>
 			</div>
