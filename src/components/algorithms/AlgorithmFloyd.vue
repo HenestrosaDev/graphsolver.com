@@ -28,6 +28,46 @@ const currentStep = computed(() => steps.value[currentStepIndex.value]);
 const startNode = ref<string>("A");
 const endNode = ref<string>("B");
 
+const queryResult = computed(() => {
+	if (!finalDist.value.length) return null;
+
+	if (toIdx(startNode.value) >= numNodes.value)
+		startNode.value = nodes.value[0];
+	if (toIdx(endNode.value) >= numNodes.value)
+		endNode.value = nodes.value[numNodes.value - 1];
+
+	const u = toIdx(startNode.value);
+	const v = toIdx(endNode.value);
+
+	if (
+		u < 0 ||
+		u >= finalDist.value.length ||
+		v < 0 ||
+		v >= finalDist.value.length
+	)
+		return null;
+
+	const d = finalDist.value[u][v];
+	if (d === Infinity) return { dist: "Inalcanzable", path: "No existe camino" };
+
+	let pathArr: string[] = [nodes.value[u]];
+	let curr: number = u;
+	while (curr !== v) {
+		const nextNode = finalNext.value[curr][v];
+		if (nextNode === null) break;
+		curr = nextNode;
+		pathArr.push(nodes.value[curr]);
+	}
+	return { dist: d, path: pathArr.join(" → "), pathArr };
+});
+
+const applyHighlight = () => {
+	const result = queryResult.value;
+	clearHighlights();
+	if (!result || typeof result.dist === "string") return;
+	if (result.pathArr && result.pathArr.length >= 2) setHighlightPath(result.pathArr);
+};
+
 const solveFloyd = () => {
 	const { n, matrix } = getGraphData();
 
@@ -103,46 +143,6 @@ watch(
 	},
 	{ deep: true, immediate: true }
 );
-
-const queryResult = computed(() => {
-	if (!finalDist.value.length) return null;
-
-	if (toIdx(startNode.value) >= numNodes.value)
-		startNode.value = nodes.value[0];
-	if (toIdx(endNode.value) >= numNodes.value)
-		endNode.value = nodes.value[numNodes.value - 1];
-
-	const u = toIdx(startNode.value);
-	const v = toIdx(endNode.value);
-
-	if (
-		u < 0 ||
-		u >= finalDist.value.length ||
-		v < 0 ||
-		v >= finalDist.value.length
-	)
-		return null;
-
-	const d = finalDist.value[u][v];
-	if (d === Infinity) return { dist: "Inalcanzable", path: "No existe camino" };
-
-	let pathArr: string[] = [nodes.value[u]];
-	let curr: number = u;
-	while (curr !== v) {
-		const nextNode = finalNext.value[curr][v];
-		if (nextNode === null) break;
-		curr = nextNode;
-		pathArr.push(nodes.value[curr]);
-	}
-	return { dist: d, path: pathArr.join(" → "), pathArr };
-});
-
-const applyHighlight = () => {
-	const result = queryResult.value;
-	clearHighlights();
-	if (!result || typeof result.dist === "string") return;
-	if (result.pathArr && result.pathArr.length >= 2) setHighlightPath(result.pathArr);
-};
 
 watch(queryResult, applyHighlight, { immediate: true });
 onMounted(() => applyHighlight());
