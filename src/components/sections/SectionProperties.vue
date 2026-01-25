@@ -127,7 +127,36 @@ const calculateProperties = () => {
 		else structureType = "Disconexo";
 	}
 
-	// 11. Hamiltonian Cycle (Backtracking)
+	// 11. Bipartite check (2-coloring over undirected view)
+	const isBipartite = (() => {
+		const colors = new Array(n).fill(0);
+		const hasEdge = (u: number, v: number) => hasArc[u][v] || hasArc[v][u];
+
+		// Self-loops break bipartiteness
+		for (let i = 0; i < n; i++) if (hasArc[i][i]) return false;
+
+		for (let i = 0; i < n; i++) {
+			if (colors[i] !== 0) continue;
+			colors[i] = 1;
+			const queue = [i];
+			while (queue.length) {
+				const u = queue.shift()!;
+				for (let v = 0; v < n; v++) {
+					if (!hasEdge(u, v)) continue;
+					if (colors[v] === 0) {
+						colors[v] = -colors[u];
+						queue.push(v);
+					} else if (colors[v] === colors[u]) {
+						return false;
+					}
+				}
+			}
+		}
+
+		return true;
+	})();
+
+	// 12. Hamiltonian Cycle (Backtracking)
 	let isHamiltonian: boolean | string = false;
 	if (n < 3) isHamiltonian = false;
 	else if (n > 12) isHamiltonian = "NP-Limit (>12)";
@@ -174,6 +203,7 @@ const calculateProperties = () => {
 		eulerianType,
 		isConnected,
 		hasCycles,
+		isBipartite,
 		structureType,
 		isHamiltonian,
 	};
@@ -343,6 +373,18 @@ watch([rawMatrix, numNodes, adjTarget], () => calculateProperties(), {
 						label="Clasificación estructural"
 						:value="analysis.structureType"
 						tooltip="Descripción del tipo de grafo según su estructura y propiedades básicas."
+					/>
+
+					<PropertyRow
+						label="Bipartito"
+						:value="analysis.isBipartite ? 'Sí' : 'No'"
+						tooltip="Un grafo es bipartito si sus vértices pueden dividirse en dos conjuntos disjuntos y cada arista conecta vértices de conjuntos distintos. Se comprueba con 2-coloración BFS sobre la versión no dirigida; los bucles o conflictos de color lo invalidan."
+						variant="badge"
+						:badge-class="
+							analysis.isBipartite
+								? 'bg-green-100 text-green-700 border-green-200 dark:bg-green-900/30 dark:text-green-200 dark:border-green-700'
+								: 'bg-red-50 text-red-600 border-red-200 dark:bg-red-900/30 dark:text-red-200 dark:border-red-800'
+						"
 					/>
 
 					<PropertyRow

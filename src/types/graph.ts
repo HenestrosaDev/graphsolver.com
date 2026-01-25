@@ -37,6 +37,7 @@ export interface GraphAnalysis {
 	eulerianType: string; // 'No', 'Ciclo' or 'Camino'
 	isConnected: boolean; // cc == 1
 	hasCycles: boolean; // true si hay bucles
+	isBipartite: boolean; // true si admite 2-coloración
 	structureType: string; // Clasificación detallada
 	isHamiltonian: boolean | string; // true, false o "NP"
 }
