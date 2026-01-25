@@ -2,13 +2,14 @@
 import { ref, onMounted } from 'vue';
 import { useGraph } from './composables/useGraph';
 import { useToast } from './composables/useToast';
+import { useGraphIO } from './composables/useGraphIO'; // <--- NUEVO IMPORT
 
 // Componentes UI
 import Navbar from './components/common/Navbar.vue';
 import Footer from './components/common/Footer.vue';
 import MatrixInput from './components/sections/SectionMatrixInput.vue';
 import ToastNotification from './components/common/ToastNotification.vue';
-import SectionCard from './components/sections/SectionCard.vue'; // <--- NUEVO IMPORT
+import SectionCard from './components/sections/SectionCard.vue';
 
 // Always visible components
 import TabVisualizer from './components/sections/SectionVisualizer.vue';
@@ -19,19 +20,21 @@ import AlgorithmFloyd from './components/algorithms/AlgorithmFloyd.vue';
 import AlgorithmKruskal from './components/algorithms/AlgorithmKruskal.vue';
 import AlgorithmDijkstra from './components/algorithms/AlgorithmDijkstra.vue';
 
-// Traemos las nuevas funciones
+// Composables
 const { toJSON, toLaTeX, toDot, loadFromJSON, loadFromLaTeX, loadFromDot } = useGraph();
 const { triggerToast } = useToast();
+const { downloadFile, copyToClipboard, readFileContent } = useGraphIO(); 
 
+// Refs
 const selectedAlgorithm = ref<string>('dijkstra');
-const fileInput = ref<HTMLInputElement | null>(null); // Referencia al input oculto
+const fileInput = ref<HTMLInputElement | null>(null);
 const showExportMenu = ref(false);
 const showImportMenu = ref(false);
 const showPasteModal = ref(false);
 const selectedPasteFormat = ref('JSON');
 const pasteContent = ref('');
 
-// Cargar formato guardado
+// Load saved format
 onMounted(() => {
   const saved = localStorage.getItem('pasteFormat');
   if (saved && ['JSON', 'LaTeX', 'Dot'].includes(saved)) {
@@ -45,17 +48,17 @@ const algorithms = [
   { id: 'mst', label: 'Kruskal (MST)', component: AlgorithmKruskal }
 ];
 
-// --- Lógica Exportar ---
+// --- Export logic ---
 const handleExport = () => {
   showExportMenu.value = !showExportMenu.value;
-  showImportMenu.value = false; // Cerrar el otro menú
+  showImportMenu.value = false;
 };
 
 const exportInFormat = (format: string) => {
   let content = '';
   let mimeType = '';
   let extension = '';
-  let filename = `grafo-${new Date().getTime()}`;
+  const filename = `grafo-${new Date().getTime()}`;
 
   switch (format) {
     case 'JSON':
@@ -75,64 +78,34 @@ const exportInFormat = (format: string) => {
       break;
   }
 
-  const blob = new Blob([content], { type: mimeType });
-  const url = URL.createObjectURL(blob);
-
-  const link = document.createElement('a');
-  link.href = url;
-  link.download = `${filename}.${extension}`;
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-  URL.revokeObjectURL(url);
-
-  triggerToast({ title: `Archivo ${format} exportado correctamente`, severity: "success" });
+  downloadFile(content, filename, extension, mimeType);
   showExportMenu.value = false;
 };
 
 const copyInFormat = async (format: string) => {
   let content = '';
-
   switch (format) {
-    case 'JSON':
-      content = toJSON();
-      break;
-    case 'LaTeX':
-      content = toLaTeX();
-      break;
-    case 'Dot':
-      content = toDot();
-      break;
+    case 'JSON': content = toJSON(); break;
+    case 'LaTeX': content = toLaTeX(); break;
+    case 'Dot': content = toDot(); break;
   }
 
-  try {
-    await navigator.clipboard.writeText(content);
-    triggerToast({ title: `Contenido ${format} copiado al portapapeles`, severity: "success" });
-  } catch (err) {
-    triggerToast({ title: "Error al copiar al portapapeles", severity: "error" });
-  }
+  await copyToClipboard(content, format);
   showExportMenu.value = false;
 };
 
-// --- Lógica Importar ---
+// --- Import logic ---
 const triggerImport = () => {
   showImportMenu.value = !showImportMenu.value;
-  showExportMenu.value = false; // Cerrar el otro menú
+  showExportMenu.value = false;
 };
 
 const importInFormat = (format: string) => {
-  // Set accept type based on format
   let accept = '';
   switch (format) {
-    case 'JSON':
-      accept = '.json';
-      break;
-    case 'LaTeX':
-      accept = '.tex';
-      break;
-    case 'Dot':
-      accept = '.dot,.gv';
-      break;
+    case 'JSON': accept = '.json'; break;
+    case 'LaTeX': accept = '.tex'; break;
+    case 'Dot': accept = '.dot,.gv'; break;
   }
   if (fileInput.value) {
     fileInput.value.accept = accept;
@@ -149,15 +122,9 @@ const pasteFromClipboard = () => {
 const confirmPaste = () => {
   let success = false;
   switch (selectedPasteFormat.value) {
-    case 'JSON':
-      success = loadFromJSON(pasteContent.value);
-      break;
-    case 'LaTeX':
-      success = loadFromLaTeX(pasteContent.value);
-      break;
-    case 'Dot':
-      success = loadFromDot(pasteContent.value);
-      break;
+    case 'JSON': success = loadFromJSON(pasteContent.value); break;
+    case 'LaTeX': success = loadFromLaTeX(pasteContent.value); break;
+    case 'Dot': success = loadFromDot(pasteContent.value); break;
   }
   if (success) {
     triggerToast({ title: "Contenido importado correctamente", severity: "success" });
@@ -169,17 +136,17 @@ const confirmPaste = () => {
   pasteContent.value = '';
 };
 
-const handleFileChange = (event: Event) => {
+const handleFileChange = async (event: Event) => {
   const target = event.target as HTMLInputElement;
   const file = target.files?.[0];
   if (!file) return;
 
-  const reader = new FileReader();
-  reader.onload = (e) => {
-    const content = e.target?.result as string;
+  try {
+    const content = await readFileContent(file);
+    
     let success = false;
-
     const extension = file.name.split('.').pop()?.toLowerCase();
+
     switch (extension) {
       case 'json':
         success = loadFromJSON(content);
@@ -201,50 +168,33 @@ const handleFileChange = (event: Event) => {
     } else {
       triggerToast({ title: "Error: El archivo no es válido", severity: "error" });
     }
+  } catch (error) {
+    triggerToast({ title: "Error al leer el archivo", severity: "error" });
+  }
 
-    // Limpiar input para permitir cargar el mismo archivo 2 veces seguidas
-    if (fileInput.value) fileInput.value.value = '';
-  };
-  reader.readAsText(file);
+  // Reset file input
+  if (fileInput.value) fileInput.value.value = '';
 };
 </script>
 
 <template>
-  <div
-    class="min-h-screen bg-slate-50 font-sans text-slate-800 selection:bg-blue-100 selection:text-blue-900 flex flex-col overflow-x-hidden"
-  >
+  <div class="min-h-screen bg-slate-50 font-sans text-slate-800 selection:bg-blue-100 selection:text-blue-900 flex flex-col overflow-x-hidden">
     <Navbar />
 
     <main class="grow w-full max-w-5xl mx-auto p-4 py-6 md:p-8">
       <input type="file" ref="fileInput" class="hidden" @change="handleFileChange" />
+      
       <div class="flex justify-between items-center mb-6 gap-4">
-        <h2
-          class="text-2xl font-bold text-slate-700 flex items-center gap-2"
-        >
+        <h2 class="text-2xl font-bold text-slate-700 flex items-center gap-2">
           Matriz de adyacencia
         </h2>
 
         <div class="flex flex-wrap gap-2">
           <div class="flex gap-2">
             <div class="relative">
-              <button
-                @click="handleExport"
-                class="text-sm bg-white text-slate-600 border border-slate-200 font-medium py-2 px-3 rounded-lg shadow-sm hover:bg-slate-50 hover:text-green-600 transition-all active:scale-95 flex items-center gap-2"
-                title="Seleccionar formato para exportar"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  class="h-4 w-4"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
-                  />
+              <button @click="handleExport" class="text-sm bg-white text-slate-600 border border-slate-200 font-medium py-2 px-3 rounded-lg shadow-sm hover:bg-slate-50 hover:text-green-600 transition-all active:scale-95 flex items-center gap-2" title="Seleccionar formato para exportar">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                 </svg>
                 <span class="hidden sm:inline">Exportar</span>
               </button>
@@ -265,24 +215,9 @@ const handleFileChange = (event: Event) => {
             </div>
 
             <div class="relative">
-              <button
-                @click="triggerImport"
-                class="text-sm bg-white text-slate-600 border border-slate-200 font-medium py-2 px-3 rounded-lg shadow-sm hover:bg-slate-50 hover:text-blue-600 transition-all active:scale-95 flex items-center gap-2"
-                title="Seleccionar formato para importar"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  class="h-4 w-4"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"
-                  />
+              <button @click="triggerImport" class="text-sm bg-white text-slate-600 border border-slate-200 font-medium py-2 px-3 rounded-lg shadow-sm hover:bg-slate-50 hover:text-blue-600 transition-all active:scale-95 flex items-center gap-2" title="Seleccionar formato para importar">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
                 </svg>
                 <span class="hidden sm:inline">Importar</span>
               </button>
@@ -317,15 +252,7 @@ const handleFileChange = (event: Event) => {
             body-class="flex-1 flex flex-col min-h-[400px]"
           >
             <template #icon>
-              <svg 
-                class="size-5 text-amber-600"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              >
+              <svg class="size-5 text-amber-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
                 <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
                 <path d="M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6" />
@@ -339,44 +266,19 @@ const handleFileChange = (event: Event) => {
           <div>
             <SectionCard title="Algoritmos">
               <template #icon>
-                <svg
-                  class="w-5 h-5 text-indigo-600"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"
-                  />
+                <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
                 </svg>
               </template>
-
               <div class="mb-4">
-                <label
-                  for="algorithm-select"
-                  class="block text-xs uppercase font-bold text-slate-500 mb-3"
-                >
-                  Algoritmo
-                </label>
-                <select
-                  id="algorithm-select"
-                  v-model="selectedAlgorithm"
-                  class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-slate-900"
-                >
-                  <option v-for="algo in algorithms" :key="algo.id" :value="algo.id">
-                    {{ algo.label }}
-                  </option>
+                <label for="algorithm-select" class="block text-xs uppercase font-bold text-slate-500 mb-3">Algoritmo</label>
+                <select id="algorithm-select" v-model="selectedAlgorithm" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-slate-900">
+                  <option v-for="algo in algorithms" :key="algo.id" :value="algo.id">{{ algo.label }}</option>
                 </select>
               </div>
-
               <div class="mt-8">
                 <KeepAlive>
-                  <component
-                    :is="algorithms.find((a) => a.id === selectedAlgorithm)?.component"
-                  />
+                  <component :is="algorithms.find((a) => a.id === selectedAlgorithm)?.component" />
                 </KeepAlive>
               </div>
             </SectionCard>
@@ -385,24 +287,14 @@ const handleFileChange = (event: Event) => {
 
         <SectionCard title="Propiedades" class="col-span-2">
           <template #icon>
-            <svg
-              class="w-5 h-5 text-green-600"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
-              />
+            <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
             </svg>
           </template>
           <TabProperties />
         </SectionCard>
       </div>
-      </main>
+    </main>
 
     <div v-if="showExportMenu || showImportMenu" class="fixed inset-0 z-5" @click="showExportMenu = false; showImportMenu = false"></div>
 
