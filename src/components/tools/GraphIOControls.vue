@@ -18,7 +18,7 @@ const { formats, formatOrder } = useGraphFormats();
 const { downloadFile, copyToClipboard } = useGraphIO();
 const { t } = useI18n();
 
-// Estado: Controlamos qué menú está abierto mediante un string
+// State: We control which menu is open via a string
 const activeMenu = ref<"export" | "import" | null>(null);
 
 const toggleMenu = (menu: "export" | "import") => {
@@ -29,7 +29,7 @@ const closeMenu = () => {
 	activeMenu.value = null;
 };
 
-// --- Acciones de Negocio ---
+// --- Business Actions ---
 const handleExport = (format: FormatKey) => {
 	const fmt = formats[format];
 	downloadFile(fmt.serialize(), `grafo-${Date.now()}`, fmt.ext, fmt.mime);

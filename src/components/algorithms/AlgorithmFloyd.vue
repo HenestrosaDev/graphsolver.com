@@ -26,7 +26,7 @@ const finalNext = ref<(number | null)[][]>([]);
 const { t } = useI18n();
 const { isDark } = useTheme();
 
-// --- CARROUSEL STATE ---
+// --- CAROUSEL STATE ---
 const currentStepIndex = ref(0);
 const currentStep = computed(() => steps.value[currentStepIndex.value]);
 
@@ -114,7 +114,7 @@ const solveFloyd = () => {
 	applyHighlight();
 };
 
-// --- REACTIVIDAD AUTOMÁTICA ---
+// --- AUTOMATIC REACTIVITY ---
 watch(
 	nodes,
 	(newNodes) => {
@@ -130,7 +130,7 @@ watch(
 	[rawMatrix, numNodes],
 	() => {
 		solveFloyd();
-		// Reset the carrousel to the beginning
+		// Reset the carousel to the beginning
 		currentStepIndex.value = 0;
 	},
 	{ deep: true, immediate: true }
@@ -143,7 +143,7 @@ onActivated(async () => {
 	applyHighlight();
 });
 
-// --- FUNCIONES DE NAVEGACIÓN ---
+// --- NAVIGATION FUNCTIONS ---
 const nextStep = () => {
 	if (currentStepIndex.value < steps.value.length - 1) currentStepIndex.value++;
 };

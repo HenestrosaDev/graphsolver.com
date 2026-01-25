@@ -15,7 +15,7 @@ const {
 
 const { t } = useI18n();
 
-// Validación de nodos
+// Node validation
 const numNodes = computed({
 	get: () => _numNodes.value,
 	set: (val: number) => {

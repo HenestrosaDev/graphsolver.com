@@ -27,27 +27,27 @@ const wrapperRef = ref<HTMLElement | null>(null);
 let networkInstance: Network | null = null;
 let resizeObserver: ResizeObserver | null = null;
 
-// Estados
+// States
 const isLocked = ref(true);
 const isFullscreen = ref(false);
 const showOverlayHint = ref(false);
 let overlayTimeout: number | null = null;
 
-// --- Interacciones Táctiles ---
-// Al tocar la pantalla
+// --- TOUCH INTERACTIONS ---
+// When touching the screen
 const handleTouchStart = () => {
 	if (overlayTimeout) clearTimeout(overlayTimeout);
 	showOverlayHint.value = true;
 };
 
-// Al levantar el dedo
+// When lifting the finger
 const handleTouchEnd = () => {
 	overlayTimeout = window.setTimeout(() => {
 		showOverlayHint.value = false;
 	}, 300);
 };
 
-// --- Bloqueo / Desbloqueo ---
+// --- Lock / Unlock ---
 const toggleLock = () => {
 	isLocked.value = !isLocked.value;
 	if (!isLocked.value) showOverlayHint.value = false;
@@ -58,11 +58,11 @@ const toggleLock = () => {
 	triggerToast({ title: msg, severity: "info" });
 };
 
-// --- Pantalla completa ---
+// --- Fullscreen ---
 const toggleFullscreen = async () => {
 	isFullscreen.value = !isFullscreen.value;
 
-	// Esperar a que el Teleport mueva el DOM y Vue actualice clases
+	// Wait for the Teleport to move the DOM and Vue to update classes
 	await nextTick();
 
 	if (networkInstance) {
@@ -78,11 +78,11 @@ const handleKeydown = (e: KeyboardEvent) => {
 	}
 };
 
-// --- Preparación de Datos (Igual que antes) ---
+// --- DATA PREPARATION (Same as before) ---
 const parseData = () => {
 	const { n, matrix, isSymmetric } = getGraphData();
 
-	// 1. Nodos
+	// 1. Nodes
 	const visNodes = new DataSet(
 		nodes.value.map((label, id) => ({
 			id,
@@ -105,7 +105,7 @@ const parseData = () => {
 		}))
 	);
 
-	// 2. Aristas
+	// 2. Edges
 	const visEdgesArray = [];
 	const limit = n;
 
@@ -158,12 +158,12 @@ const drawGraph = () => {
 			solver: "repulsion",
 			repulsion: {
 				nodeDistance: 250,
-				centralGravity: 0.2, // Gravedad baja ayuda a que no se apiñen
+				centralGravity: 0.2, // Low gravity helps prevent clustering
 				springLength: 250,
 				springConstant: 0.05,
 				damping: 0.09,
 			},
-			// Importante: aseguramos que haga iteraciones antes de mostrarse
+			// Important: we ensure it performs iterations before showing
 			stabilization: {
 				enabled: true,
 				iterations: 1000,
@@ -186,16 +186,16 @@ const drawGraph = () => {
 		options
 	);
 
-	// --- CÓDIGO AÑADIDO ---
-	// Una vez que el grafo calcula su posición inicial, desactivamos las físicas.
-	// Esto hace que los nodos se queden "congelados" en su sitio.
+	// --- ADDED CODE ---
+	// Once the graph calculates its initial position, we disable physics.
+	// This makes the nodes stay "frozen" in place.
 	networkInstance.on("stabilizationIterationsDone", () => {
 		networkInstance.setOptions({ physics: { enabled: false } });
 	});
 
-	// Opcional: Si quieres reactivar físicas mientras arrastras (solo para ese nodo)
-	// y desactivarlas al soltar, puedes usar estos eventos.
-	// Pero para lo que pides (que NO se mueva el resto), el código de arriba es suficiente.
+	// Optional: If you want to reactivate physics while dragging (only for that node)
+	// and disable them when releasing, you can use these events.
+	// But for what you ask (that the rest does NOT move), the code above is enough.
 
 	// ----------------------
 
@@ -203,7 +203,7 @@ const drawGraph = () => {
 	networkInstance.fit();
 };
 
-// --- Controles ---
+// --- Controls ---
 const zoomIn = () =>
 	networkInstance?.moveTo({
 		scale: networkInstance.getScale() * 1.2,
@@ -221,31 +221,31 @@ const fitGraph = () => networkInstance?.fit({ animation: true });
 const exportImage = () => {
 	if (!networkContainer.value || !networkInstance) return;
 
-	// 1. Encontrar el elemento canvas dentro del contenedor
+	// 1. Find the canvas element inside the container
 	const canvas = networkContainer.value.querySelector("canvas");
 	if (!canvas) return;
 
-	// 2. Obtener el contexto 2D
+	// 2. Get the 2D context
 	const ctx = canvas.getContext("2d");
 	if (!ctx) return;
 
-	// 3. Guardar el estado actual del canvas
+	// 3. Save the current canvas state
 	ctx.save();
 
-	// 4. Dibujar un fondo blanco detrás de todo (destination-over)
-	// Esto es necesario porque el canvas de vis-network es transparente por defecto.
+	// 4. Draw a white background behind everything (destination-over)
+	// This is necessary because the vis-network canvas is transparent by default.
 	ctx.globalCompositeOperation = "destination-over";
 	ctx.fillStyle = isDark.value ? "#0f172a" : "#ffffff";
-	// Usamos el ancho/alto interno del canvas para cubrirlo todo
+	// We use the internal width/height of the canvas to cover everything
 	ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-	// 5. Obtener la imagen en base64
+	// 5. Get the image in base64
 	const dataURL = canvas.toDataURL("image/png");
 
-	// 6. Restaurar el estado del canvas (volver a hacerlo transparente para la interacción)
+	// 6. Restore the canvas state (make it transparent again for interaction)
 	ctx.restore();
 
-	// 7. Crear un enlace temporal para forzar la descarga
+	// 7. Create a temporary link to force the download
 	const link = document.createElement("a");
 	link.href = dataURL;
 	link.download = `grafo-exportado-${new Date().getTime()}.png`;

@@ -38,7 +38,7 @@ watch(
 	() => props.isOpen,
 	(isOpen) => {
 		if (isOpen) {
-			content.value = ""; // Limpiar contenido al abrir
+			content.value = ""; // Clear content when opening
 			document.addEventListener("keydown", handleKeydown);
 		} else {
 			document.removeEventListener("keydown", handleKeydown);

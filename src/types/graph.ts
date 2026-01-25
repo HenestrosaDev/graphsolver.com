@@ -3,11 +3,11 @@ export type Matrix = MatrixRow[];
 
 export interface GraphData {
 	n: number;
-	matrix: number[][]; // Matriz procesada con Infinity/números
-	hasArc: boolean[][]; // Matriz booleana de adyacencia
+	matrix: number[][]; // Processed matrix with Infinity/numbers
+	hasArc: boolean[][]; // Boolean adjacency matrix
 	isSymmetric: boolean;
-	rawValues: Matrix; // Matriz cruda (inputs del usuario)
-	nodes: string[]; // Array de etiquetas ['A', 'B', 'C'...]
+	rawValues: Matrix; // Raw matrix (user inputs)
+	nodes: string[]; // Array of labels ['A', 'B', 'C'...]
 }
 
 export interface MSTResult {
@@ -36,8 +36,8 @@ export interface GraphAnalysis {
 	isForest: boolean; // true if acyclic (multiple trees)
 	eulerianType: "cycle" | "path" | "none";
 	isConnected: boolean; // cc == 1
-	hasCycles: boolean; // true si hay bucles
-	isBipartite: boolean; // true si admite 2-coloración
+	hasCycles: boolean; // true if there are cycles
+	isBipartite: boolean; // true if it admits 2-coloring
 	structureType:
 		| "tree"
 		| "forest"

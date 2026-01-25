@@ -14,7 +14,7 @@ import SectionAlgorithms from "./components/sections/SectionAlgorithms.vue";
 import SectionVisualizer from "./components/sections/SectionVisualizer.vue";
 import SectionProperties from "./components/sections/SectionProperties.vue";
 import GraphIOControls from "./components/tools/GraphIOControls.vue";
-import ModalPaste from "./components/tools/ModalPaste.vue"; // Nuevo
+import ModalPaste from "./components/tools/ModalPaste.vue";
 import { IconEye, IconCpu, IconChartBar } from "@tabler/icons-vue";
 
 // Composables

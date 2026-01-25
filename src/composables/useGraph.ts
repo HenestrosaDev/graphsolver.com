@@ -1,7 +1,7 @@
 import { ref, computed, watch } from "vue";
 import type { Matrix, GraphData } from "../types/graph";
 
-// Estado global (compartido entre componentes)
+// Global state (shared between components)
 const numNodes = ref<number>(4);
 const rawMatrix = ref<Matrix>([]);
 const highlightedPath = ref<string[]>([]);
@@ -13,7 +13,7 @@ export function useGraph() {
 		)
 	);
 
-	// Función para inicializar desde cero (reset total)
+	// Function to initialize from scratch (total reset)
 	const createGrid = (): void => {
 		const n = numNodes.value;
 		const newMatrix: Matrix = [];
@@ -27,15 +27,15 @@ export function useGraph() {
 		rawMatrix.value = newMatrix;
 	};
 
-	// Watcher para redimensionar reactivamente
+	// Watcher to resize reactively
 	watch(numNodes, (newN, oldN) => {
-		if (newN < 2) return; // Mínimo de seguridad
+		if (newN < 2) return; // Minimum safety
 		if (!rawMatrix.value.length) {
 			createGrid();
 			return;
 		}
 
-		// Si la matriz ya tiene el tamaño correcto, no redimensionar (para importaciones)
+		// If the matrix already has the correct size, do not resize (for imports)
 		if (
 			rawMatrix.value.length === newN &&
 			rawMatrix.value.every((row) => row.length === newN)
@@ -46,22 +46,22 @@ export function useGraph() {
 		const currentMatrix = rawMatrix.value;
 		const newMatrix: Matrix = [];
 
-		// Crear nueva matriz con el tamaño correcto
+		// Create new matrix with the correct size
 		for (let i = 0; i < newN; i++) {
 			const newRow: (number | string)[] = [];
 			for (let j = 0; j < newN; j++) {
 				if (i < oldN && j < oldN) {
-					// Copiar valores existentes
+					// Copy existing values
 					newRow.push(currentMatrix[i][j]);
 				} else {
-					// Nuevas celdas: diagonal = 0, resto = vacío
+					// New cells: diagonal = 0, rest = empty
 					newRow.push(i === j ? 0 : "");
 				}
 			}
 			newMatrix.push(newRow);
 		}
 
-		// Reasignar la matriz completa para asegurar reactividad
+		// Reassign the complete matrix to ensure reactivity
 		rawMatrix.value = newMatrix;
 	});
 
@@ -78,7 +78,7 @@ export function useGraph() {
 
 		for (let i = 0; i < n; i++) {
 			for (let j = 0; j < n; j++) {
-				const val = rawMatrix.value[i]?.[j]; // Optional chaining por seguridad
+				const val = rawMatrix.value[i]?.[j]; // Optional chaining for safety
 				const numVal =
 					typeof val === "string" && val === "" ? NaN : Number(val);
 
@@ -121,8 +121,8 @@ export function useGraph() {
 	const generateRandomGraph = () => {
 		const n = numNodes.value;
 
-		// Configuración
-		const connectionProbability = 0.5; // 50% de probabilidad de conexión
+		// Configuration
+		const connectionProbability = 0.5; // 50% connection probability
 		const maxWeight = 20;
 
 		const newMatrix: Matrix = [];
@@ -172,10 +172,10 @@ export function useGraph() {
 		for (let i = 0; i < nodesInPath.length - 1; i++) {
 			const u = nodesInPath[i];
 			const v = nodesInPath[i + 1];
-			// Guardamos ambas direcciones para asegurar que vis-network lo detecte
-			// independientemente de cómo esté definida la arista internamente
-			highlightedPath.value.push(u + v); // Ej: "AB"
-			highlightedPath.value.push(v + u); // Ej: "BA"
+			// We save both directions to ensure vis-network detects it
+			// regardless of how the edge is defined internally
+			highlightedPath.value.push(u + v); // Ex: "AB"
+			highlightedPath.value.push(v + u); // Ex: "BA"
 		}
 	};
 
@@ -184,11 +184,11 @@ export function useGraph() {
 			{
 				numNodes: numNodes.value,
 				rawMatrix: rawMatrix.value,
-				timestamp: new Date().toISOString(), // Metadato útil
+				timestamp: new Date().toISOString(), // Useful metadata
 			},
 			null,
 			2
-		); // Indentado bonito
+		); // Pretty indented
 	};
 
 	const toLaTeX = () => {
@@ -228,24 +228,24 @@ export function useGraph() {
 		return dot;
 	};
 
-	// --- NUEVO: Importar estado ---
+	// --- NEW: Import state ---
 	const loadFromJSON = (jsonString: string): boolean => {
 		try {
 			const parsed = JSON.parse(jsonString);
 
-			// Validaciones básicas para no romper la app
+			// Basic validations to not break the app
 			if (!parsed.rawMatrix || !Array.isArray(parsed.rawMatrix))
-				throw new Error("Formato inválido");
+				throw new Error("Invalid format");
 			if (typeof parsed.numNodes !== "number")
-				throw new Error("Falta número de nodos");
+				throw new Error("Missing number of nodes");
 
-			// Aplicar datos
+			// Apply data
 			numNodes.value = parsed.numNodes;
 			rawMatrix.value = parsed.rawMatrix;
 
-			return true; // Éxito
+			return true; // Success
 		} catch (e) {
-			console.error("Error importando JSON:", e);
+			console.error("Error importing JSON:", e);
 			return false; // Error
 		}
 	};
@@ -256,7 +256,7 @@ export function useGraph() {
 			const matrixMatch = latexString.match(
 				/\\begin\{pmatrix\}\s*(.*?)\s*\\end\{pmatrix\}/s
 			);
-			if (!matrixMatch) throw new Error("Formato LaTeX inválido");
+			if (!matrixMatch) throw new Error("Invalid LaTeX format");
 
 			const rows = matrixMatch[1]
 				.split("\\\\")
@@ -268,7 +268,7 @@ export function useGraph() {
 
 			const n = matrix.length;
 			if (n === 0 || matrix[0].length !== n)
-				throw new Error("Matriz no cuadrada");
+				throw new Error("Non-square matrix");
 
 			numNodes.value = n;
 			rawMatrix.value = matrix.map((row) =>
@@ -281,7 +281,7 @@ export function useGraph() {
 			}
 			return true;
 		} catch (e) {
-			console.error("Error importando LaTeX:", e);
+			console.error("Error importing LaTeX:", e);
 			return false;
 		}
 	};
@@ -326,7 +326,7 @@ export function useGraph() {
 
 			return true;
 		} catch (e) {
-			console.error("Error importando Dot:", e);
+			console.error("Error importing Dot:", e);
 			return false;
 		}
 	};
