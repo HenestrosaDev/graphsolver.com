@@ -216,7 +216,7 @@ watch([rawMatrix, numNodes, adjTarget], () => calculateProperties(), {
 
 <template>
 	<div v-if="analysis" class="animate-fade-in">
-		<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+		<div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
 			<div class="space-y-4">
 				<PropertiesCard title="Propiedades básicas">
 					<PropertyRow
@@ -285,57 +285,29 @@ watch([rawMatrix, numNodes, adjTarget], () => calculateProperties(), {
 						:badge-class="`${analysis.isRegular ? 'bg-indigo-100 text-indigo-700 border-indigo-200' : 'bg-slate-50 text-slate-900 border-slate-200'}`"
 					/>
 				</PropertiesCard>
-
-				<PropertiesCard
-					tooltip="Muestra las aristas conectadas directamente al nodo seleccionado."
-				>
-					<template #header>
-						<span id="label-vortex">Vértices adyacentes a</span>
-
-						<select
-							v-model="adjTarget"
-							for="label-vortex"
-							class="bg-slate-50 border border-slate-200 rounded px-2 py-0.5 text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none normal-case text-slate-700"
-						>
-							<option v-for="n in nodes" :key="n" :value="n">
-								{{ n }}
-							</option>
-						</select>
-					</template>
-
-					<PropertyRow :value="analysis.adjList || '∅'" variant="metric" />
-				</PropertiesCard>
 			</div>
 
 			<div class="space-y-4">
-				<PropertiesCard title="Topología">
-					<PropertyRow
-						label="Clasificación estructural"
-						:value="analysis.structureType"
-						tooltip="Descripción del tipo de grafo según su estructura y propiedades básicas."
-					/>
+				<PropertiesCard title="Vértices">
+					<PropertyRow 
+						label="Adyacentes a"
+						:value="analysis.adjList || '∅'" 
+						variant="metric"
+						tooltip="Muestra los vértices conectados directamente al vértice seleccionado."
+					>
+						<template #label>
+							<select
+								v-model="adjTarget"
+								for="label-vortex"
+								class="ml-0.5 bg-slate-50 border border-slate-200 rounded px-2 py-0.5 text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none normal-case text-slate-700"
+							>
+								<option v-for="n in nodes" :key="n" :value="n">
+									{{ n }}
+								</option>
+							</select>
+						</template>
+					</PropertyRow>
 
-					<PropertyRow
-						label="Euleriano"
-						:value="analysis.eulerianType"
-						tooltip="Un grafo es <b>euleriano</b> si contiene un ciclo que recorre todas las aristas exactamente una vez.<br><br><b>Dificultad computacional:</b> Determinar si un grafo es euleriano es un problema polinomialmente resoluble (P). <br><br><b>Tipos:</b><br>• <b>Ciclo</b>: Todos los vértices tienen grado par.<br>• <b>Camino</b>: Exactamente dos vértices tienen grado impar.<br>• <b>No</b>: No cumple las condiciones anteriores."
-						variant="badge"
-						:badge-class="
-							analysis.eulerianType !== 'No'
-								? 'bg-green-100 text-green-700 border-green-200'
-								: 'bg-red-50 text-red-600 border-red-200'
-						"
-					/>
-
-					<PropertyRow
-						label="Hamiltoniano"
-						:value="hamiltonianStatus.text"
-						tooltip=" Un grafo es <b>hamiltoniano</b> si contiene un ciclo que visita cada vértice exactamente una vez.<br><br><b>Dificultad computacional:</b> Determinar si un grafo es hamiltoniano es un problema NP-completo. <br><br><b>Nota</b>: No se realizará el análisis para grafos con más de 12 vértices debido a limitaciones computacionales."
-						:badge-class="hamiltonianStatus.classes"
-					/>
-				</PropertiesCard>
-
-				<PropertiesCard title="Conectividad">
 					<PropertyRow
 						label="Componentes conexas"
 						:value="analysis.cc"
@@ -363,6 +335,33 @@ watch([rawMatrix, numNodes, adjTarget], () => calculateProperties(), {
 					/>
 				</PropertiesCard>
 
+				<PropertiesCard title="Topología">
+					<PropertyRow
+						label="Clasificación estructural"
+						:value="analysis.structureType"
+						tooltip="Descripción del tipo de grafo según su estructura y propiedades básicas."
+					/>
+
+					<PropertyRow
+						label="Euleriano"
+						:value="analysis.eulerianType"
+						tooltip="Un grafo es <b>euleriano</b> si contiene un ciclo que recorre todas las aristas exactamente una vez.<br><br><b>Dificultad computacional:</b> Determinar si un grafo es euleriano es un problema polinomialmente resoluble (P). <br><br><b>Tipos:</b><br>• <b>Ciclo</b>: Todos los vértices tienen grado par.<br>• <b>Camino</b>: Exactamente dos vértices tienen grado impar.<br>• <b>No</b>: No cumple las condiciones anteriores."
+						variant="badge"
+						:badge-class="
+							analysis.eulerianType !== 'No'
+								? 'bg-green-100 text-green-700 border-green-200'
+								: 'bg-red-50 text-red-600 border-red-200'
+						"
+					/>
+
+					<PropertyRow
+						label="Hamiltoniano"
+						:value="hamiltonianStatus.text"
+						tooltip=" Un grafo es <b>hamiltoniano</b> si contiene un ciclo que visita cada vértice exactamente una vez.<br><br><b>Dificultad computacional:</b> Determinar si un grafo es hamiltoniano es un problema NP-completo. <br><br><b>Nota</b>: No se realizará el análisis para grafos con más de 12 vértices debido a limitaciones computacionales."
+						:badge-class="hamiltonianStatus.classes"
+					/>
+				</PropertiesCard>
+
 				<PropertiesCard
 					title="Grafo complementario"
 					tooltip='El grafo complementario <span style="text-decoration: overline;">G</span> tiene los mismos vértices que el original, pero sus aristas son exactamente los pares de vértices que no son adyacentes (no tienen arista directa) en el grafo base. Es como el "negativo" del grafo base: donde ahora hay camino, desaparece, y donde no lo hay, aparece.'
@@ -370,7 +369,7 @@ watch([rawMatrix, numNodes, adjTarget], () => calculateProperties(), {
 				>
 					<PropertyRow
 						label="Orden"
-						tooltip="Tiene el mismo orden que el grafo original."
+						tooltip="Número de aristas del grafo complementario. Tiene el mismo orden que el grafo original."
 						:value="analysis.orden"
 						variant="metric"
 						theme="purple"
@@ -378,7 +377,7 @@ watch([rawMatrix, numNodes, adjTarget], () => calculateProperties(), {
 
 					<PropertyRow
 						label="Medida"
-						tooltip="Número de aristas en el grafo complementario.<br><br><b>Fórmula:</b> <i>m<sub><span style='text-decoration: overline;'>G</span></sub></i> = <i>m<sub>max</sub></i> - <i>m<sub>G</sub></i>"
+						tooltip="Número de aristas del grafo complementario.<br><br><b>Fórmula:</b> <i>m<sub><span style='text-decoration: overline;'>G</span></sub></i> = <i>m<sub>max</sub></i> - <i>m<sub>G</sub></i>"
 						:value="analysis.compSize"
 						variant="metric"
 						theme="purple"
