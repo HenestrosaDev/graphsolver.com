@@ -19,7 +19,7 @@ const { t } = useI18n();
 				<div class="flex items-center gap-5">
 					<div class="flex items-center gap-3">
 						<a
-							href="https://github.com"
+							href="https://github.com/henestrosadev/graphsolver.com"
 							target="_blank"
 							class="text-slate-400 hover:text-slate-800 dark:text-slate-500 dark:hover:text-slate-100 transition"
 							:title="t('navbar.githubTitle')"
