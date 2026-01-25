@@ -12,7 +12,15 @@ const { getGraphData, nodes, rawMatrix, numNodes, clearHighlights } =
 const result = ref<MSTResult | null>(null);
 const solveMST = () => {
 	clearHighlights();
-	const { matrix } = getGraphData();
+	const { matrix, isSymmetric } = getGraphData();
+	if (!isSymmetric) {
+		result.value = {
+			cost: "No válido",
+			edges: "",
+			isUnique: "El algoritmo espera un grafo no dirigido",
+		};
+		return;
+	}
 	result.value = computeKruskal(matrix, nodes.value);
 };
 
