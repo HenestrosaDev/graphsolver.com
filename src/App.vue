@@ -1,13 +1,14 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import { useGraph } from './composables/useGraph';
-import { useToast } from './composables/useToast'; // Usamos tu sistema de notificaciones
+import { useToast } from './composables/useToast';
 
 // Componentes UI
 import Navbar from './components/common/Navbar.vue';
 import Footer from './components/common/Footer.vue';
 import MatrixInput from './components/sections/SectionMatrixInput.vue';
 import ToastNotification from './components/common/ToastNotification.vue';
+import SectionCard from './components/sections/SectionCard.vue'; // <--- NUEVO IMPORT
 
 // Always visible components
 import TabVisualizer from './components/sections/SectionVisualizer.vue';
@@ -310,116 +311,101 @@ const handleFileChange = (event: Event) => {
       <div class="lg:grid lg:grid-cols-2 max-lg:flex max-lg:flex-col gap-6 items-stretch">
         
         <div class="h-full">
-          <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden h-full flex flex-col">
-            <div class="bg-slate-50 px-6 py-4 border-b border-slate-200 shrink-0">
-              <h3 class="text-lg font-bold text-slate-700 flex items-center gap-2">
-                <svg 
-                  class="size-5 text-amber-600"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                >
-                  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-                  <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
-                  <path d="M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6" />
-                </svg>
-                Visualización
-              </h3>
-            </div>
-            <div class="p-6 flex-1 flex flex-col min-h-[400px]">
-              <TabVisualizer class="flex-1 w-full h-full" />
-            </div>
-          </div>
-        </div>
-
-        <!-- Right Column: Algorithm Selection and Results -->
-        <div class="space-y-6">
-          <div>
-            <!-- Algorithm Selector -->
-            <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-              <div class="bg-slate-50 px-6 py-4 border-b border-slate-200">
-                <h3 class="text-lg font-bold text-slate-700 flex items-center gap-2">
-                  <svg
-                    class="w-5 h-5 text-indigo-600"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"
-                    />
-                  </svg>
-                  Algoritmos
-                </h3>
-              </div>
-              <div class="p-6">
-                <div class="mb-4">
-                  <label
-                    for="algorithm-select"
-                    class="block text-xs uppercase font-bold text-slate-500 mb-3"
-                  >
-                    Algoritmo
-                  </label>
-                  <select
-                    id="algorithm-select"
-                    v-model="selectedAlgorithm"
-                    class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-slate-900"
-                  >
-                    <option v-for="algo in algorithms" :key="algo.id" :value="algo.id">
-                      {{ algo.label }}
-                    </option>
-                  </select>
-                </div>
-
-                <!-- Algorithm Results -->
-                <div class="mt-8">
-                  <KeepAlive>
-                    <component
-                      :is="algorithms.find((a) => a.id === selectedAlgorithm)?.component"
-                    />
-                  </KeepAlive>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="bg-white col-span-2 rounded-xl shadow-sm border border-slate-200">
-          <div class="bg-slate-50 px-6 py-4 border-b border-slate-200">
-            <h3 class="text-lg font-bold text-slate-700 flex items-center gap-2">
-              <svg
-                class="w-5 h-5 text-green-600"
+          <SectionCard 
+            title="Visualización" 
+            class="h-full flex flex-col"
+            body-class="flex-1 flex flex-col min-h-[400px]"
+          >
+            <template #icon>
+              <svg 
+                class="size-5 text-amber-600"
+                viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
-                viewBox="0 0 24 24"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
               >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
-                />
+                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+                <path d="M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6" />
               </svg>
-              Propiedades
-            </h3>
-          </div>
-          <div class="p-6">
-            <TabProperties />
+            </template>
+            <TabVisualizer class="flex-1 w-full h-full" />
+          </SectionCard>
+        </div>
+
+        <div class="space-y-6">
+          <div>
+            <SectionCard title="Algoritmos">
+              <template #icon>
+                <svg
+                  class="w-5 h-5 text-indigo-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"
+                  />
+                </svg>
+              </template>
+
+              <div class="mb-4">
+                <label
+                  for="algorithm-select"
+                  class="block text-xs uppercase font-bold text-slate-500 mb-3"
+                >
+                  Algoritmo
+                </label>
+                <select
+                  id="algorithm-select"
+                  v-model="selectedAlgorithm"
+                  class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-slate-900"
+                >
+                  <option v-for="algo in algorithms" :key="algo.id" :value="algo.id">
+                    {{ algo.label }}
+                  </option>
+                </select>
+              </div>
+
+              <div class="mt-8">
+                <KeepAlive>
+                  <component
+                    :is="algorithms.find((a) => a.id === selectedAlgorithm)?.component"
+                  />
+                </KeepAlive>
+              </div>
+            </SectionCard>
           </div>
         </div>
-      </div>
-    </main>
 
-    <!-- Overlay para cerrar menús al hacer clic fuera -->
+        <SectionCard title="Propiedades" class="col-span-2">
+          <template #icon>
+            <svg
+              class="w-5 h-5 text-green-600"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+              />
+            </svg>
+          </template>
+          <TabProperties />
+        </SectionCard>
+      </div>
+      </main>
+
     <div v-if="showExportMenu || showImportMenu" class="fixed inset-0 z-5" @click="showExportMenu = false; showImportMenu = false"></div>
 
-    <!-- Modal para pegar contenido -->
     <Transition name="modal">
       <div v-if="showPasteModal" class="fixed inset-0 z-20 flex items-center justify-center backdrop-blur-sm" @click.self="showPasteModal = false">
         <div class="bg-white p-6 rounded-lg shadow-lg w-96 max-w-full mx-4">
