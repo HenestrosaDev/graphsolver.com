@@ -1,7 +1,6 @@
 export default {
 	common: {
 		appName: "GraphSolver",
-		appNamePro: "GraphSolver Pro",
 		notification: "Notificación",
 		close: "Cerrar",
 		yes: "Sí",
@@ -16,7 +15,7 @@ export default {
 		help: "Ayuda",
 		github: "GitHub",
 		madeBy: "Hecho por",
-		madeWith: "Hecho con",
+		madeWith: "con",
 		love: "amor",
 		and: "y",
 		vue: "Vue 3",
