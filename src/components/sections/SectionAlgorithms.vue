@@ -22,8 +22,9 @@ const algorithmById = computed(() =>
 <template>
 	<div>
 		<div class="mb-4">
-			<label class="text-eyebrow"> {{ t("algorithmsSection.label") }} </label>
+			<label for="algorithm-selector" class="text-eyebrow"> {{ t("algorithmsSection.label") }} </label>
 			<select
+				id="algorithm-selector"
 				v-model="selectedAlgorithm"
 				class="w-full px-3 py-2 border border-slate-300 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 "
 			>
