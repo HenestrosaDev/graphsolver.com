@@ -12,9 +12,14 @@ const adjTarget = ref<string>("A");
 
 const calculateProperties = () => {
 	const { n, hasArc, isSymmetric } = getGraphData();
+	if (!Number.isFinite(n) || n <= 0) {
+		analysis.value = null;
+		return;
+	}
 
 	// Validate target
-	if (toIdx(adjTarget.value) >= n) adjTarget.value = nodes.value[0];
+	if (toIdx(adjTarget.value) >= n && nodes.value.length)
+		adjTarget.value = nodes.value[0];
 
 	let totalArcs = 0;
 	let degrees = new Array(n).fill(0);
