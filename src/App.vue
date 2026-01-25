@@ -66,6 +66,11 @@ const formats: Record<FormatKey, {
 };
 
 const formatOrder: FormatKey[] = ["JSON", "LaTeX", "Dot"];
+const extensionToFormat: Record<string, FormatKey> = Object.fromEntries(
+	Object.entries(formats).flatMap(([key, value]) =>
+		value.accept.split(",").map((ext) => [ext.replace(/^\./, "").toLowerCase(), key as FormatKey])
+	)
+);
 
 // Refs
 const selectedAlgorithm = ref<string>("dijkstra");
@@ -158,14 +163,8 @@ const handleFileChange = async (event: Event) => {
 	try {
 		const content = await readFileContent(file);
 
-		const extensionMap: Record<string, FormatKey> = {
-			json: "JSON",
-			tex: "LaTeX",
-			dot: "Dot",
-			gv: "Dot",
-		};
 		const extension = file.name.split(".").pop()?.toLowerCase();
-		const format = extension ? extensionMap[extension] : undefined;
+		const format = extension ? extensionToFormat[extension] : undefined;
 		if (!format) {
 			triggerToast({
 				title: "Formato de archivo no soportado",
