@@ -33,20 +33,54 @@ const { toJSON, toLaTeX, toDot, loadFromJSON, loadFromLaTeX, loadFromDot } =
 const { triggerToast } = useToast();
 const { downloadFile, copyToClipboard, readFileContent } = useGraphIO();
 
+type FormatKey = "JSON" | "LaTeX" | "Dot";
+
+const formats: Record<FormatKey, {
+	serialize: () => string;
+	parse: (value: string) => boolean;
+	mime: string;
+	ext: string;
+	accept: string;
+}> = {
+	JSON: {
+		serialize: toJSON,
+		parse: loadFromJSON,
+		mime: "application/json",
+		ext: "json",
+		accept: ".json",
+	},
+	LaTeX: {
+		serialize: toLaTeX,
+		parse: loadFromLaTeX,
+		mime: "text/plain",
+		ext: "tex",
+		accept: ".tex",
+	},
+	Dot: {
+		serialize: toDot,
+		parse: loadFromDot,
+		mime: "text/plain",
+		ext: "dot",
+		accept: ".dot,.gv",
+	},
+};
+
+const formatOrder: FormatKey[] = ["JSON", "LaTeX", "Dot"];
+
 // Refs
 const selectedAlgorithm = ref<string>("dijkstra");
 const fileInput = ref<HTMLInputElement | null>(null);
 const showExportMenu = ref(false);
 const showImportMenu = ref(false);
 const showPasteModal = ref(false);
-const selectedPasteFormat = ref("JSON");
+const selectedPasteFormat = ref<FormatKey>("JSON");
 const pasteContent = ref("");
 
 // Load saved format
 onMounted(() => {
 	const saved = localStorage.getItem("pasteFormat");
-	if (saved && ["JSON", "LaTeX", "Dot"].includes(saved)) {
-		selectedPasteFormat.value = saved;
+	if (saved && formatOrder.includes(saved as FormatKey)) {
+		selectedPasteFormat.value = saved as FormatKey;
 	}
 });
 
@@ -62,49 +96,16 @@ const handleExport = () => {
 	showImportMenu.value = false;
 };
 
-const exportInFormat = (format: string) => {
-	let content = "";
-	let mimeType = "";
-	let extension = "";
-	const filename = `grafo-${new Date().getTime()}`;
-
-	switch (format) {
-		case "JSON":
-			content = toJSON();
-			mimeType = "application/json";
-			extension = "json";
-			break;
-		case "LaTeX":
-			content = toLaTeX();
-			mimeType = "text/plain";
-			extension = "tex";
-			break;
-		case "Dot":
-			content = toDot();
-			mimeType = "text/plain";
-			extension = "dot";
-			break;
-	}
-
-	downloadFile(content, filename, extension, mimeType);
+const exportInFormat = (format: FormatKey) => {
+	const fmt = formats[format];
+	const filename = `grafo-${Date.now()}`;
+	downloadFile(fmt.serialize(), filename, fmt.ext, fmt.mime);
 	showExportMenu.value = false;
 };
 
-const copyInFormat = async (format: string) => {
-	let content = "";
-	switch (format) {
-		case "JSON":
-			content = toJSON();
-			break;
-		case "LaTeX":
-			content = toLaTeX();
-			break;
-		case "Dot":
-			content = toDot();
-			break;
-	}
-
-	await copyToClipboard(content, format);
+const copyInFormat = async (format: FormatKey) => {
+	const fmt = formats[format];
+	await copyToClipboard(fmt.serialize(), format);
 	showExportMenu.value = false;
 };
 
@@ -114,21 +115,10 @@ const triggerImport = () => {
 	showExportMenu.value = false;
 };
 
-const importInFormat = (format: string) => {
-	let accept = "";
-	switch (format) {
-		case "JSON":
-			accept = ".json";
-			break;
-		case "LaTeX":
-			accept = ".tex";
-			break;
-		case "Dot":
-			accept = ".dot,.gv";
-			break;
-	}
+const importInFormat = (format: FormatKey) => {
+	const fmt = formats[format];
 	if (fileInput.value) {
-		fileInput.value.accept = accept;
+		fileInput.value.accept = fmt.accept;
 		fileInput.value.click();
 	}
 	showImportMenu.value = false;
@@ -140,18 +130,8 @@ const pasteFromClipboard = () => {
 };
 
 const confirmPaste = () => {
-	let success = false;
-	switch (selectedPasteFormat.value) {
-		case "JSON":
-			success = loadFromJSON(pasteContent.value);
-			break;
-		case "LaTeX":
-			success = loadFromLaTeX(pasteContent.value);
-			break;
-		case "Dot":
-			success = loadFromDot(pasteContent.value);
-			break;
-	}
+	const fmt = formats[selectedPasteFormat.value];
+	const success = fmt.parse(pasteContent.value);
 	if (success) {
 		triggerToast({
 			title: "Contenido importado correctamente",
@@ -176,28 +156,23 @@ const handleFileChange = async (event: Event) => {
 	try {
 		const content = await readFileContent(file);
 
-		let success = false;
+		const extensionMap: Record<string, FormatKey> = {
+			json: "JSON",
+			tex: "LaTeX",
+			dot: "Dot",
+			gv: "Dot",
+		};
 		const extension = file.name.split(".").pop()?.toLowerCase();
-
-		switch (extension) {
-			case "json":
-				success = loadFromJSON(content);
-				break;
-			case "tex":
-				success = loadFromLaTeX(content);
-				break;
-			case "dot":
-			case "gv":
-				success = loadFromDot(content);
-				break;
-			default:
-				triggerToast({
-					title: "Formato de archivo no soportado",
-					severity: "error",
-				});
-				return;
+		const format = extension ? extensionMap[extension] : undefined;
+		if (!format) {
+			triggerToast({
+				title: "Formato de archivo no soportado",
+				severity: "error",
+			});
+			return;
 		}
 
+		const success = formats[format].parse(content);
 		if (success) {
 			triggerToast({ title: "Grafo importado con éxito", severity: "success" });
 		} else {
@@ -251,57 +226,28 @@ const handleFileChange = async (event: Event) => {
 									v-if="showExportMenu"
 									class="absolute top-full mt-1 w-40 bg-white border border-slate-200 rounded-lg shadow-lg z-10"
 								>
-									<div
-										class="px-4 py-2 text-xs font-bold text-slate-500 uppercase"
-									>
-										JSON
-									</div>
-									<button
-										@click="exportInFormat('JSON')"
-										class="block w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-100"
-									>
-										Descargar
-									</button>
-									<button
-										@click="copyInFormat('JSON')"
-										class="block w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-100"
-									>
-										Copiar
-									</button>
-									<div
-										class="px-4 py-2 text-xs font-bold text-slate-500 uppercase border-t border-slate-100"
-									>
-										LaTeX
-									</div>
-									<button
-										@click="exportInFormat('LaTeX')"
-										class="block w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-100"
-									>
-										Descargar
-									</button>
-									<button
-										@click="copyInFormat('LaTeX')"
-										class="block w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-100"
-									>
-										Copiar
-									</button>
-									<div
-										class="px-4 py-2 text-xs font-bold text-slate-500 uppercase border-t border-slate-100"
-									>
-										Dot
-									</div>
-									<button
-										@click="exportInFormat('Dot')"
-										class="block w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-100"
-									>
-										Descargar
-									</button>
-									<button
-										@click="copyInFormat('Dot')"
-										class="block w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-100"
-									>
-										Copiar
-									</button>
+										<template v-for="(formatKey, idx) in formatOrder" :key="formatKey">
+											<div
+												:class="[
+													'px-4 py-2 text-xs font-bold text-slate-500 uppercase',
+													{ 'border-t border-slate-100': idx > 0 },
+												]"
+											>
+												{{ formatKey }}
+											</div>
+											<button
+												@click="exportInFormat(formatKey)"
+												class="block w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-100"
+											>
+												Descargar
+											</button>
+											<button
+												@click="copyInFormat(formatKey)"
+												class="block w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-100"
+											>
+												Copiar
+											</button>
+										</template>
 								</div>
 							</Transition>
 						</div>
@@ -326,24 +272,14 @@ const handleFileChange = async (event: Event) => {
 									>
 										Archivo
 									</div>
-									<button
-										@click="importInFormat('JSON')"
-										class="block w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-100"
-									>
-										JSON
-									</button>
-									<button
-										@click="importInFormat('LaTeX')"
-										class="block w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-100"
-									>
-										LaTeX
-									</button>
-									<button
-										@click="importInFormat('Dot')"
-										class="block w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-100"
-									>
-										Dot
-									</button>
+										<button
+											v-for="formatKey in formatOrder"
+											:key="`file-` + formatKey"
+											@click="importInFormat(formatKey)"
+											class="block w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-100"
+										>
+											{{ formatKey }}
+										</button>
 									<div
 										class="px-4 py-2 text-xs font-bold text-slate-500 uppercase border-t border-slate-100"
 									>
@@ -461,9 +397,9 @@ const handleFileChange = async (event: Event) => {
 							v-model="selectedPasteFormat"
 							class="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-slate-900"
 						>
-							<option value="JSON">JSON</option>
-							<option value="LaTeX">LaTeX</option>
-							<option value="Dot">Dot</option>
+								<option v-for="formatKey in formatOrder" :key="formatKey" :value="formatKey">
+									{{ formatKey }}
+								</option>
 						</select>
 					</div>
 					<div class="mb-4">
