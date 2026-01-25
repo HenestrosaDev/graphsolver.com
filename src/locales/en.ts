@@ -128,8 +128,8 @@ export default {
 		invalidGraph: "Invalid",
 		requiresUndirected: "The algorithm expects an undirected graph",
 		notConnected: "Graph is not connected (no spanning tree)",
-		uniqueYes: "Yes (unique)",
-		uniqueNo: "No (alternate MSTs exist)",
+		uniqueYes: "Yes",
+		uniqueNo: "No",
 	},
 	visualizer: {
 		overlayTitle: "Interaction disabled",

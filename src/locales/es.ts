@@ -128,8 +128,8 @@ export default {
 		invalidGraph: "No válido",
 		requiresUndirected: "El algoritmo espera un grafo no dirigido",
 		notConnected: "Grafo no conexo (no existe árbol)",
-		uniqueYes: "Sí (único)",
-		uniqueNo: "No (existen variantes)",
+		uniqueYes: "Sí",
+		uniqueNo: "No",
 	},
 	visualizer: {
 		overlayTitle: "Interacción desactivada",
