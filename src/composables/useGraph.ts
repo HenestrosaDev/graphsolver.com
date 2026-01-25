@@ -307,6 +307,7 @@ export function useGraph() {
 
 			const nodesList = Array.from(nodeSet).sort();
 			const n = nodesList.length;
+			if (n === 0) return false;
 			const matrix: Matrix = Array(n)
 				.fill(0)
 				.map(() => Array(n).fill(""));
@@ -330,7 +331,10 @@ export function useGraph() {
 		}
 	};
 
-	const toIdx = (char: string): number => char.toUpperCase().charCodeAt(0) - 65;
+	const toIdx = (char: string | undefined | null): number => {
+		if (!char) return -1;
+		return char.toUpperCase().charCodeAt(0) - 65;
+	};
 	const toChar = (idx: number): string => String.fromCharCode(65 + idx);
 
 	return {
