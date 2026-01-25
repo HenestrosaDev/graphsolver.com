@@ -24,6 +24,7 @@ export const computeDijkstra = (
 	const n = matrix.length;
 	const startIdx = nodeLabels.indexOf(startLabel);
 	const endIdx = nodeLabels.indexOf(endLabel);
+
 	if (startIdx < 0 || endIdx < 0) {
 		return {
 			steps: [],
@@ -40,10 +41,14 @@ export const computeDijkstra = (
 
 	dist[startIdx] = 0;
 
+	// Track changes from the *previous* iteration to display in the *current* row
+	let previousChanges: number[] = [];
+
 	for (let i = 0; i < n; i++) {
 		let u = -1;
 		let minVal = Infinity;
 
+		// Select Pivot (u)
 		for (let v = 0; v < n; v++) {
 			if (!visited[v] && dist[v] < minVal) {
 				minVal = dist[v];
@@ -51,37 +56,33 @@ export const computeDijkstra = (
 			}
 		}
 
-		if (u === -1) {
-			steps.push({
-				step: i,
-				dists: dist.map((d) => (d === Infinity ? "∞" : d)),
-				pivot: "-",
-				changes: [],
-			});
-			break;
-		}
+		// Record the state (Snapshot BEFORE relaxation)
+		// Row 0 will show: Pivot A, Dists [0, ∞...], Changes []
+		steps.push({
+			step: i,
+			dists: dist.map((d) => (d === Infinity ? "∞" : d)),
+			pivot: u !== -1 ? nodeLabels[u] : "-",
+			changes: [...previousChanges], // Highlights the changes that led to THIS state
+		});
+
+		if (u === -1) break;
 
 		visited[u] = true;
-		const stepChanges: number[] = [];
+		previousChanges = []; // Reset for the calculations we are about to do
 
+		// Relax edges (update neighbors)
 		for (let v = 0; v < n; v++) {
 			if (!visited[v] && matrix[u][v] !== Infinity && dist[u] !== Infinity) {
 				if (dist[u] + matrix[u][v] < dist[v]) {
 					dist[v] = dist[u] + matrix[u][v];
 					parent[v] = u;
-					stepChanges.push(v);
+					previousChanges.push(v); // Mark this index as changed for the NEXT row
 				}
 			}
 		}
-
-		steps.push({
-			step: i,
-			dists: dist.map((d) => (d === Infinity ? "∞" : d)),
-			pivot: nodeLabels[u] ?? "-",
-			changes: stepChanges,
-		});
 	}
 
+	// --- Path Reconstruction ---
 	if (dist[endIdx] === Infinity) {
 		return {
 			steps,
