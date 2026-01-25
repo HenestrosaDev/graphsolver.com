@@ -2,7 +2,8 @@
 import { useI18n } from "vue-i18n";
 import LanguageSelector from "./LanguageSelector.vue";
 import ThemeToggle from "./ThemeToggle.vue";
-import { IconBrandGithub, IconChartDots } from "@tabler/icons-vue";
+import AppLogo from "./AppLogo.vue";
+import { IconBrandGithub } from "@tabler/icons-vue";
 
 const { t } = useI18n();
 </script>
@@ -13,16 +14,7 @@ const { t } = useI18n();
 	>
 		<div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
 			<div class="flex justify-between h-16">
-				<div class="flex items-center gap-3">
-					<div class="bg-blue-600 text-white p-1.5 rounded-lg shadow-sm">
-						<IconChartDots class="size-6" />
-					</div>
-					<span
-						class="text-xl font-bold text-slate-800 dark:text-slate-100 tracking-tight"
-					>
-						GraphSolver
-					</span>
-				</div>
+				<AppLogo logo-size="size-8" />
 
 				<div class="flex items-center gap-5">
 					<div class="flex items-center gap-3">
