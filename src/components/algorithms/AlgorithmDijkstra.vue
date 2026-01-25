@@ -1,20 +1,13 @@
 <script setup lang="ts">
-import { ref, watch, onUnmounted, onActivated } from "vue";
+import { ref, watch, onUnmounted, onActivated, computed } from "vue";
 import { useGraph } from "../../composables/useGraph";
+import { computeDijkstra, type DijkstraStep } from "../../composables/useDijkstra";
 import PropertiesCard from "../properties/PropertiesCard.vue";
 import PropertyRow from "../properties/PropertyRow.vue";
-
-interface DijkstraStep {
-	step: number;
-	dists: (number | string)[];
-	pivot: string;
-	changes: number[]; // Indices that changed in this step
-}
 
 const {
 	getGraphData,
 	nodes,
-	toIdx,
 	rawMatrix,
 	numNodes,
 	setHighlightPath,
@@ -27,101 +20,40 @@ const steps = ref<DijkstraStep[]>([]);
 const finalCost = ref<string | number>("-");
 const finalPath = ref<string>("-");
 const isSolved = ref(false);
+const lastPathArr = ref<string[]>([]);
+
+const safeStartNode = computed(() => {
+	const available = nodes.value;
+	if (!available.length) return startNode.value;
+	return available.includes(startNode.value) ? startNode.value : available[0];
+});
+
+const safeEndNode = computed(() => {
+	const available = nodes.value;
+	if (!available.length) return endNode.value;
+	return available.includes(endNode.value)
+		? endNode.value
+		: available[available.length - 1];
+});
 
 const solveDijkstra = () => {
-	// Initial synchronous cleanup
 	isSolved.value = false;
 	clearHighlights();
+	const { matrix } = getGraphData();
+	const result = computeDijkstra(
+		matrix,
+		nodes.value,
+		safeStartNode.value,
+		safeEndNode.value
+	);
 
-	const { n, matrix } = getGraphData();
+	steps.value = result.steps;
+	finalCost.value = result.cost;
+	finalPath.value = result.path;
+	lastPathArr.value = result.pathArr;
 
-	// Validations
-	if (toIdx(startNode.value) >= n) startNode.value = nodes.value[0];
-	if (toIdx(endNode.value) >= n)
-		endNode.value = nodes.value[n - 1] || nodes.value[0];
-
-	const sIdx = toIdx(startNode.value);
-	const eIdx = toIdx(endNode.value);
-
-	const dist = new Array(n).fill(Infinity);
-	const visited = new Array(n).fill(false);
-	const parent = new Array(n).fill(null);
-
-	dist[sIdx] = 0;
-	steps.value = [];
-
-	// --- Dijkstra logic (synchronous) ---
-	for (let i = 0; i < n; i++) {
-		let u = -1;
-		let minVal = Infinity;
-
-		// Find the node with the smallest distance that hasn't been visited
-		for (let v = 0; v < n; v++) {
-			if (!visited[v] && dist[v] < minVal) {
-				minVal = dist[v];
-				u = v;
-			}
-		}
-
-		// If no reachable node, we finish but save the state
-		if (u === -1) {
-			const currentDistDisplay = dist.map((d) => (d === Infinity ? "∞" : d));
-			steps.value.push({
-				step: i,
-				dists: currentDistDisplay,
-				pivot: "-",
-				changes: [],
-			});
-			break;
-		}
-
-		visited[u] = true;
-		const stepChanges: number[] = [];
-
-		// Relax edges
-		for (let v = 0; v < n; v++) {
-			if (!visited[v] && matrix[u][v] !== Infinity && dist[u] !== Infinity) {
-				if (dist[u] + matrix[u][v] < dist[v]) {
-					dist[v] = dist[u] + matrix[u][v];
-					parent[v] = u;
-					stepChanges.push(v); // Register changes for the UI
-				}
-			}
-		}
-
-		const currentDistDisplay = dist.map((d) => (d === Infinity ? "∞" : d));
-		const pivotChar = nodes.value[u];
-
-		steps.value.push({
-			step: i,
-			dists: currentDistDisplay,
-			pivot: pivotChar,
-			changes: stepChanges,
-		});
-	}
-
-	// --- Final result ---
-	if (dist[eIdx] === Infinity) {
-		finalCost.value = "Inalcanzable";
-		finalPath.value = "No existe camino";
-	} else {
-		finalCost.value = dist[eIdx];
-
-		// Reconstructing path
-		let curr: number | null = eIdx;
-		let pathArr: string[] = [];
-		while (curr !== null) {
-			pathArr.push(nodes.value[curr]);
-			curr = parent[curr];
-		}
-
-		// Invert to have order A -> B -> C
-		pathArr = pathArr.reverse();
-
-		finalPath.value = pathArr.join(" → ");
-
-		// Send the path to the visual graph
-		setHighlightPath(pathArr);
+	if (result.pathArr && result.pathArr.length >= 2) {
+		setHighlightPath(result.pathArr);
 	}
 
 	isSolved.value = true;
@@ -132,8 +64,19 @@ watch([rawMatrix, numNodes, startNode, endNode], () => solveDijkstra(), {
 	immediate: true,
 });
 
+watch(
+	nodes,
+	(newNodes) => {
+		if (!newNodes.length) return;
+		if (!newNodes.includes(startNode.value)) startNode.value = newNodes[0];
+		if (!newNodes.includes(endNode.value))
+			endNode.value = newNodes[newNodes.length - 1];
+	},
+	{ immediate: true }
+);
+
 onActivated(() => {
-	solveDijkstra();
+	if (lastPathArr.value.length >= 2) setHighlightPath(lastPathArr.value);
 });
 
 onUnmounted(() => {
