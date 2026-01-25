@@ -4,9 +4,12 @@ import en from "./locales/en";
 
 type MessageSchema = typeof es;
 
+// Detect user language
+const userLanguage = navigator.language.startsWith("es") ? "es" : "en";
+
 const i18n = createI18n<[MessageSchema], "es" | "en">({
 	legacy: false, // No Composition API
-	locale: "en",
+	locale: userLanguage,
 	fallbackLocale: "en",
 	globalInjection: true,
 	messages: {

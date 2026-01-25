@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, computed } from "vue";
 import { useI18n } from "vue-i18n";
+import { useHead } from "@unhead/vue";
 import { useGraphFormats } from "./composables/useGraphFormats";
 import { useToast } from "./composables/useToast";
 import { useGraphIO } from "./composables/useGraphIO";
@@ -21,7 +22,31 @@ import { IconEye, IconCpu, IconChartBar } from "@tabler/icons-vue";
 const { formats, getFormatByExtension } = useGraphFormats();
 const { triggerToast } = useToast();
 const { readFileContent } = useGraphIO();
-const { t } = useI18n();
+const { t, locale } = useI18n();
+
+// Dynamic head
+const headTitle = computed(() => t("head.title"));
+const headDescription = computed(() => t("head.description"));
+const headKeywords = computed(() => t("head.keywords"));
+const headOgImage = computed(() => t("head.ogImage"));
+
+useHead({
+	title: headTitle,
+	htmlAttrs: {
+		lang: locale,
+	},
+	meta: [
+		{ name: "description", content: headDescription },
+		{ name: "keywords", content: headKeywords },
+		{ property: "og:title", content: headTitle },
+		{ property: "og:description", content: headDescription },
+		{ property: "og:image", content: headOgImage },
+		{ name: "twitter:card", content: "summary_large_image" },
+		{ name: "twitter:title", content: headTitle },
+		{ name: "twitter:description", content: headDescription },
+		{ name: "twitter:image", content: headOgImage },
+	],
+});
 
 // State
 const fileInput = ref<HTMLInputElement | null>(null);
@@ -47,7 +72,10 @@ const handleFileChange = async (event: Event) => {
 
 		const success = formats[formatKey].parse(content);
 		if (success) {
-			triggerToast({ title: t("app.toast.importSuccess"), severity: "success" });
+			triggerToast({
+				title: t("app.toast.importSuccess"),
+				severity: "success",
+			});
 		} else {
 			throw new Error(t("app.toast.invalidContent"));
 		}
@@ -71,7 +99,7 @@ const handlePasteResult = (success: boolean) => {
 
 <template>
 	<div
-		class="min-h-screen bg-slate-50 dark:bg-slate-950 font-sans text-slate-800 dark:text-slate-100 flex flex-col "
+		class="min-h-screen bg-slate-50 dark:bg-slate-950 font-sans text-slate-800 dark:text-slate-100 flex flex-col"
 	>
 		<Navbar />
 

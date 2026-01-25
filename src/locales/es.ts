@@ -1,4 +1,10 @@
 export default {
+	head: {
+		title: "GraphSolver | Resolución interactiva de algoritmos de grafos",
+		description: "Herramienta interactiva para resolver algoritmos de grafos como Dijkstra, Floyd-Warshall y Kruskal. Visualiza y calcula rutas óptimas en grafos.",
+		keywords: "algoritmos de grafos, dijkstra, floyd-warshall, kruskal, ruta más corta, visualización de grafos, solucionador de grafos",
+		ogImage: "/og-image.png",
+	},
 	common: {
 		appName: "GraphSolver",
 		notification: "Notificación",

@@ -1,4 +1,10 @@
 export default {
+	head: {
+		title: "GraphSolver | Interactive graph algorithm solver",
+		description: "Interactive tool for solving graph algorithms like Dijkstra, Floyd-Warshall, and Kruskal. Visualize and compute optimal paths in graphs.",
+		keywords: "graph algorithms, dijkstra, floyd-warshall, kruskal, shortest path, graph visualization, graph solver",
+		ogImage: "/logo.svg",
+	},
 	common: {
 		appName: "GraphSolver",
 		notification: "Notification",
