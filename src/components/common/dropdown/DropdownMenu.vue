@@ -47,7 +47,7 @@ watch(
 			:class="{ 'bg-slate-50 dark:bg-slate-800': isOpen }"
 			:title="label"
 		>
-			<div class="text-slate-500 dark:text-slate-300 group-hover:text-blue-600 dark:group-hover:text-blue-300 transition-colors">
+			<div class="text-slate-500 dark:text-slate-300 group-hover:text-blue-600 dark:group-hover:text-blue-300 ">
 				<slot name="icon" />
 			</div>
 			<span v-if="label" class="hidden sm:inline">{{ label }}</span>

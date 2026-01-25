@@ -8,7 +8,7 @@ defineProps<{
 <template>
 	<button
 		type="button"
-		class="block w-full text-left px-4 py-2 text-sm transition-colors duration-150"
+		class="block w-full text-left px-4 py-2 text-sm  duration-150"
 		:class="[
 			danger
 				? 'text-red-600 dark:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/30'

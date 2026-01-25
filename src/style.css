@@ -9,7 +9,7 @@
 	}
 
 	body * {
-		@apply transition-colors duration-200;
+		@apply transition-colors duration-150;
 	}
 
 	.dark {
@@ -18,10 +18,6 @@
 
 	body {
 		@apply bg-slate-50 text-slate-800 dark:bg-slate-950 dark:text-slate-100 antialiased;
-	}
-
-	a {
-		@apply transition-colors;
 	}
 }
 
@@ -33,5 +29,9 @@
 	button,
 	select {
 		@apply cursor-pointer;
+	}
+
+	.dark .vis-network {
+		background-color: #0b1324;
 	}
 }

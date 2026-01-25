@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref, nextTick } from "vue";
+import { useI18n } from "vue-i18n";
 import { IconInfoCircle } from "@tabler/icons-vue";
 
 interface Props {
@@ -9,6 +10,7 @@ interface Props {
 const props = defineProps<Props>();
 const rootRef = ref<HTMLElement | null>(null);
 const tooltipRef = ref<HTMLElement | null>(null); // Referencia al contenido flotante
+const { t } = useI18n();
 
 const isHoverDevice = ref(true);
 const isOpen = ref(false);
@@ -121,8 +123,8 @@ const isVisible = computed(() => isOpen.value);
 	<div ref="rootRef" class="relative inline-flex items-center justify-center">
 		<button
 			type="button"
-			class="text-slate-400 cursor-help hover:text-slate-600 focus:outline-none transition-colors"
-			aria-label="Show help tooltip"
+			class="text-slate-400 cursor-help hover:text-slate-600 focus:outline-none "
+			:aria-label="t('common.showHelpTooltip')"
 			:aria-expanded="isVisible"
 			@focus="isHoverDevice && show()"
 			@blur="isHoverDevice && hide()"

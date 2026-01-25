@@ -34,16 +34,23 @@ export interface GraphAnalysis {
 	isRegular: boolean; // true if min == max
 	isTree: boolean; // true if connected & acyclic
 	isForest: boolean; // true if acyclic (multiple trees)
-	eulerianType: string; // 'No', 'Ciclo' or 'Camino'
+	eulerianType: "cycle" | "path" | "none";
 	isConnected: boolean; // cc == 1
 	hasCycles: boolean; // true si hay bucles
 	isBipartite: boolean; // true si admite 2-coloración
-	structureType: string; // Clasificación detallada
-	isHamiltonian: boolean | string; // true, false o "NP"
+	structureType:
+		| "tree"
+		| "forest"
+		| "connectedCyclic"
+		| "disconnectedCyclic"
+		| "weakConnectedCyclic"
+		| "weakConnectedAcyclic"
+		| "disconnected";
+	isHamiltonian: boolean | "npLimit"; // true, false o "NP"
 }
 
 export interface FloydStep {
-	title: string;
 	matrix: number[][];
 	pivot: number;
+	k?: number;
 }

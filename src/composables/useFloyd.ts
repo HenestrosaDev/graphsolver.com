@@ -30,9 +30,9 @@ export const computeFloyd = (
 
 	const steps: FloydStep[] = [
 		{
-			title: "Estado inicial",
 			matrix: cloneMatrix(dist),
 			pivot: -1,
+			k: 0,
 		},
 	];
 
@@ -46,11 +46,9 @@ export const computeFloyd = (
 			}
 		}
 		steps.push({
-			title: nodeLabels[k]
-				? `Iteración k=${k} (pivote ${nodeLabels[k]})`
-				: `Iteración k=${k}`,
 			matrix: cloneMatrix(dist),
 			pivot: k,
+			k,
 		});
 	}
 

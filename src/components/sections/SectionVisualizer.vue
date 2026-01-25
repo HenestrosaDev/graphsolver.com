@@ -10,13 +10,17 @@ import {
 	IconLockOpen,
 } from "@tabler/icons-vue";
 import { ref, onMounted, onUnmounted, watch, nextTick } from "vue";
+import { useI18n } from "vue-i18n";
 import { Network, type Data } from "vis-network";
 import { DataSet } from "vis-data";
 import { useGraph } from "../../composables/useGraph";
 import { useToast } from "../../composables/useToast";
+import { useTheme } from "../../composables/useTheme";
 
 const { getGraphData, nodes, highlightedPath } = useGraph();
 const { triggerToast } = useToast();
+const { isDark } = useTheme();
+const { t } = useI18n();
 
 const networkContainer = ref<HTMLElement | null>(null);
 const wrapperRef = ref<HTMLElement | null>(null);
@@ -49,8 +53,8 @@ const toggleLock = () => {
 	if (!isLocked.value) showOverlayHint.value = false;
 
 	const msg = isLocked.value
-		? "Modo scroll activado"
-		: "Modo interacción activado";
+		? t("visualizer.scrollMode")
+		: t("visualizer.interactionMode");
 	triggerToast({ title: msg, severity: "info" });
 };
 
@@ -83,11 +87,15 @@ const parseData = () => {
 		nodes.value.map((label, id) => ({
 			id,
 			label,
-			color: { background: "#EFF6FF", border: "#2563EB", highlight: "#BFDBFE" },
+			color: {
+				background: isDark.value ? "#1e293b" : "#EFF6FF",
+				border: isDark.value ? "#60a5fa" : "#2563EB",
+				highlight: isDark.value ? "#3b82f6" : "#BFDBFE"
+			},
 			font: {
 				size: 20,
 				face: "ui-sans-serif, system-ui",
-				color: "#1e293b",
+				color: isDark.value ? "#f1f5f9" : "#1e293b",
 				bold: true,
 			},
 			shape: "circle",
@@ -120,12 +128,12 @@ const parseData = () => {
 						: { to: { enabled: true, scaleFactor: 1 } },
 					color: isHighlighted
 						? { color: "#ef4444", highlight: "#ef4444" }
-						: { color: "#64748b", highlight: "#2563EB" },
+						: { color: isDark.value ? "#94a3b8" : "#64748b", highlight: isDark.value ? "#60a5fa" : "#2563EB" },
 					font: {
 						align: "middle",
-						color: "#000000",
+						color: isDark.value ? "#f1f5f9" : "#000000",
 						strokeWidth: 0,
-						background: "rgba(255,255,255,0.85)",
+						background: isDark.value ? "rgba(30,41,59,0.85)" : "rgba(255,255,255,0.85)",
 						size: 14,
 					},
 					width: isHighlighted ? 4 : 2,
@@ -227,7 +235,7 @@ const exportImage = () => {
 	// 4. Dibujar un fondo blanco detrás de todo (destination-over)
 	// Esto es necesario porque el canvas de vis-network es transparente por defecto.
 	ctx.globalCompositeOperation = "destination-over";
-	ctx.fillStyle = "#ffffff";
+	ctx.fillStyle = isDark.value ? "#0f172a" : "#ffffff";
 	// Usamos el ancho/alto interno del canvas para cubrirlo todo
 	ctx.fillRect(0, 0, canvas.width, canvas.height);
 
@@ -245,7 +253,7 @@ const exportImage = () => {
 	link.click();
 	document.body.removeChild(link);
 
-	triggerToast({ title: "Imagen descargada correctamente", severity: "info" });
+	triggerToast({ title: t("visualizer.imageDownloaded"), severity: "info" });
 };
 
 // --- Ciclo de Vida ---
@@ -274,6 +282,9 @@ onUnmounted(() => {
 watch([() => getGraphData(), highlightedPath], () => drawGraph(), {
 	deep: true,
 });
+
+// Watch for theme changes to redraw with new colors
+watch(isDark, () => drawGraph());
 </script>
 
 <template>
@@ -281,7 +292,7 @@ watch([() => getGraphData(), highlightedPath], () => drawGraph(), {
 		<Teleport to="body" :disabled="!isFullscreen">
 			<div
 				ref="wrapperRef"
-				class="border-gray-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 shadow-inner overflow-hidden flex flex-col transition-colors"
+				class="border-gray-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 shadow-inner overflow-hidden flex flex-col "
 				:class="[
 					isFullscreen
 						? 'fixed inset-0 z-[9999] w-screen h-screen rounded-none border-0' // z-9999 vence al Navbar
@@ -305,9 +316,9 @@ watch([() => getGraphData(), highlightedPath], () => drawGraph(), {
 							class="bg-slate-900/70 backdrop-blur-[2px] rounded-xl flex flex-col items-center justify-center text-white p-6 text-center select-none mx-6 shadow-2xl"
 						>
 							<IconLock class="size-10 mb-3 opacity-90" />
-							<p class="font-bold text-lg">Interacción desactivada</p>
+							<p class="font-bold text-lg">{{ t("visualizer.overlayTitle") }}</p>
 							<p class="text-sm text-slate-200 mt-1 leading-snug">
-								Pulsa el candado 🔒 de abajo para interactuar con el grafo.
+								{{ t("visualizer.overlayDescription") }}
 							</p>
 						</div>
 					</Transition>
@@ -319,7 +330,7 @@ watch([() => getGraphData(), highlightedPath], () => drawGraph(), {
 					<button
 						@click="zoomOut"
 						class="p-2 rounded-full text-gray-500 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-slate-800 transition"
-						title="Alejar"
+						:title="t('visualizer.zoomOut')"
 					>
 						<IconZoomOut class="size-5" />
 					</button>
@@ -327,7 +338,7 @@ watch([() => getGraphData(), highlightedPath], () => drawGraph(), {
 					<button
 						@click="zoomIn"
 						class="p-2 rounded-full text-gray-500 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-slate-800 transition"
-						title="Acercar"
+						:title="t('visualizer.zoomIn')"
 					>
 						<IconZoomIn class="size-5" />
 					</button>
@@ -335,7 +346,7 @@ watch([() => getGraphData(), highlightedPath], () => drawGraph(), {
 					<button
 						@click="fitGraph"
 						class="p-2 rounded-full text-gray-500 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-slate-800 transition"
-						title="Ajustar vista"
+						:title="t('visualizer.fitView')"
 					>
 						<IconKeyframeAlignCenter class="size-5" />
 					</button>
@@ -343,7 +354,7 @@ watch([() => getGraphData(), highlightedPath], () => drawGraph(), {
 					<button
 						@click="exportImage"
 						class="p-2 rounded-full text-gray-500 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-slate-800 transition"
-						title="Descargar como imagen PNG"
+						:title="t('visualizer.downloadPng')"
 					>
 						<IconCamera class="size-5" />
 					</button>
@@ -354,7 +365,7 @@ watch([() => getGraphData(), highlightedPath], () => drawGraph(), {
 						:class="{
 							'text-blue-600 bg-blue-50 ring-1 ring-blue-200 dark:text-blue-200 dark:bg-blue-900/40 dark:ring-blue-700': isFullscreen,
 						}"
-						title="Pantalla completa"
+						:title="t('visualizer.fullscreen')"
 					>
 						<IconArrowsMaximize v-if="!isFullscreen" class="size-5" />
 						<IconArrowsMinimize v-else class="size-5" />
@@ -382,7 +393,7 @@ watch([() => getGraphData(), highlightedPath], () => drawGraph(), {
 					v-if="isFullscreen"
 					class="absolute top-6 left-1/2 -translate-x-1/2 z-20 bg-white/90 dark:bg-slate-900/85 backdrop-blur px-4 py-1.5 rounded-full text-xs font-medium text-slate-500 dark:text-slate-200 shadow-sm pointer-events-none animate-fade-in border border-gray-100 dark:border-slate-700"
 				>
-					Pulsa ESC para salir
+					{{ t("visualizer.escHint") }}
 				</div>
 			</div>
 		</Teleport>

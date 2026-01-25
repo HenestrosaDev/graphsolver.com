@@ -33,7 +33,7 @@ const currentStyle = computed(() => styles[props.theme]);
 
 <template>
 	<div
-		class="rounded-lg shadow-sm border transition-colors text-slate-800 dark:text-slate-100"
+		class="rounded-lg shadow-sm border  text-slate-800 dark:text-slate-100"
 		:class="currentStyle.container"
 	>
 		<div class="rounded-t-lg" :class="currentStyle.header">

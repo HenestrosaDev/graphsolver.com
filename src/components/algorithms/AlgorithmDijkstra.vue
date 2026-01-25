@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, watch, onUnmounted, onActivated, computed } from "vue";
+import { useI18n } from "vue-i18n";
 import { useGraph } from "../../composables/useGraph";
 import { computeDijkstra, type DijkstraStep } from "../../composables/useDijkstra";
 import PropertiesCard from "../properties/PropertiesCard.vue";
@@ -17,10 +18,12 @@ const {
 const startNode = ref<string>("A");
 const endNode = ref<string>("B");
 const steps = ref<DijkstraStep[]>([]);
-const finalCost = ref<string | number>("-");
-const finalPath = ref<string>("-");
+const finalCost = ref<number | null>(null);
+const finalPath = ref<string | null>(null);
 const isSolved = ref(false);
 const lastPathArr = ref<string[]>([]);
+const resultStatus = ref<"ok" | "unreachable">("ok");
+const { t } = useI18n();
 
 const safeStartNode = computed(() => {
 	const available = nodes.value;
@@ -50,6 +53,7 @@ const solveDijkstra = () => {
 	steps.value = result.steps;
 	finalCost.value = result.cost;
 	finalPath.value = result.path;
+	resultStatus.value = result.status;
 	lastPathArr.value = result.pathArr;
 
 	if (result.pathArr && result.pathArr.length >= 2) {
@@ -63,6 +67,18 @@ watch([rawMatrix, numNodes, startNode, endNode], () => solveDijkstra(), {
 	deep: true,
 	immediate: true,
 });
+
+const costDisplay = computed(() =>
+	resultStatus.value === "ok"
+		? finalCost.value
+		: t("dijkstra.unreachableCost")
+);
+
+const pathDisplay = computed(() =>
+	resultStatus.value === "ok" && finalPath.value
+		? finalPath.value
+		: t("dijkstra.noPath")
+);
 
 watch(
 	nodes,
@@ -87,7 +103,7 @@ onUnmounted(() => {
 <template>
 	<div class="space-y-8">
 		<div>
-			<h3 class="text-eyebrow">Cálculo de ruta</h3>
+			<h3 class="text-eyebrow">{{ t("dijkstra.routeTitle") }}</h3>
 
 			<PropertiesCard>
 				<template #header>
@@ -97,12 +113,12 @@ onUnmounted(() => {
 								for="start-node"
 								class="text-xs font-bold uppercase tracking-wide"
 							>
-								Origen
+								{{ t("dijkstra.origin") }}
 							</label>
 							<select
 								id="start-node"
 								v-model="startNode"
-								class="bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-100 text-sm rounded-md px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-medium transition-colors"
+								class="bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-100 text-sm rounded-md px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-medium "
 							>
 								<option v-for="n in nodes" :key="n" :value="n">{{ n }}</option>
 							</select>
@@ -115,12 +131,12 @@ onUnmounted(() => {
 								for="end-node"
 								class="text-xs font-bold uppercase tracking-wide"
 							>
-								Destino
+								{{ t("dijkstra.destination") }}
 							</label>
 							<select
 								id="end-node"
 								v-model="endNode"
-								class="bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-100 text-sm rounded-md px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-medium transition-colors"
+								class="bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-100 text-sm rounded-md px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-medium "
 							>
 								<option v-for="n in nodes" :key="n" :value="n">{{ n }}</option>
 							</select>
@@ -130,29 +146,29 @@ onUnmounted(() => {
 
 				<template v-if="isSolved">
 					<PropertyRow
-						label="Coste mínimo"
-						:value="finalCost"
-						:variant="typeof finalCost === 'string' ? 'badge' : 'metric'"
+						:label="t('dijkstra.minCost')"
+						:value="costDisplay"
+						:variant="resultStatus === 'ok' ? 'metric' : 'badge'"
 					/>
 					<PropertyRow
-						label="Camino óptimo"
-						:value="finalPath"
-						:variant="typeof finalCost === 'string' ? 'badge' : 'metric'"
+						:label="t('dijkstra.optimalPath')"
+						:value="pathDisplay"
+						:variant="resultStatus === 'ok' ? 'metric' : 'badge'"
 					/>
 				</template>
 			</PropertiesCard>
 		</div>
 
 		<div v-if="isSolved">
-			<h3 class="text-eyebrow">Tabla de iteraciones</h3>
+			<h3 class="text-eyebrow">{{ t("dijkstra.iterationsTable") }}</h3>
 
 			<div
-				class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg overflow-x-auto shadow-sm transition-colors"
+				class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg overflow-x-auto shadow-sm "
 			>
 				<table class="w-full text-sm">
 					<thead class="bg-slate-50 dark:bg-slate-800 border-b border-slate-200 dark:border-slate-800">
 						<tr>
-							<th class="px-4 py-3 text-left">Iteración</th>
+							<th class="px-4 py-3 text-left">{{ t("dijkstra.iteration") }}</th>
 							<th
 								v-for="n in nodes"
 								:key="n"
@@ -160,7 +176,7 @@ onUnmounted(() => {
 							>
 								{{ n }}
 							</th>
-							<th class="px-4 py-3 text-center text-blue-600">Pivote</th>
+							<th class="px-4 py-3 text-center text-blue-600">{{ t("dijkstra.pivot") }}</th>
 						</tr>
 					</thead>
 
@@ -168,10 +184,10 @@ onUnmounted(() => {
 						<tr
 							v-for="row in steps"
 							:key="row.step"
-							class="hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
+							class="hover:bg-slate-50 dark:hover:bg-slate-800 "
 						>
 							<td class="px-4 py-3 font-medium text-slate-900 dark:text-slate-100">
-								Paso {{ row.step }}
+								{{ t("dijkstra.stepLabel", { step: row.step }) }}
 							</td>
 
 							<td

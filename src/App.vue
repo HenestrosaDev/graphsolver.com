@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref } from "vue";
+import { useI18n } from "vue-i18n";
 import { useGraphFormats } from "./composables/useGraphFormats";
 import { useToast } from "./composables/useToast";
 import { useGraphIO } from "./composables/useGraphIO";
@@ -20,6 +21,7 @@ import { IconEye, IconCpu, IconChartBar } from "@tabler/icons-vue";
 const { formats, getFormatByExtension } = useGraphFormats();
 const { triggerToast } = useToast();
 const { readFileContent } = useGraphIO();
+const { t } = useI18n();
 
 // State
 const fileInput = ref<HTMLInputElement | null>(null);
@@ -41,17 +43,17 @@ const handleFileChange = async (event: Event) => {
 		const content = await readFileContent(file);
 		const formatKey = getFormatByExtension(file.name);
 
-		if (!formatKey) throw new Error("Formato no soportado");
+		if (!formatKey) throw new Error(t("app.toast.unsupportedFormat"));
 
 		const success = formats[formatKey].parse(content);
 		if (success) {
-			triggerToast({ title: "Grafo importado con éxito", severity: "success" });
+			triggerToast({ title: t("app.toast.importSuccess"), severity: "success" });
 		} else {
-			throw new Error("El contenido del archivo no es válido");
+			throw new Error(t("app.toast.invalidContent"));
 		}
 	} catch (error: any) {
 		triggerToast({
-			title: error.message || "Error al leer archivo",
+			title: error.message || t("app.toast.readError"),
 			severity: "error",
 		});
 	} finally {
@@ -61,7 +63,7 @@ const handleFileChange = async (event: Event) => {
 
 const handlePasteResult = (success: boolean) => {
 	triggerToast({
-		title: success ? "Contenido importado" : "Error de formato",
+		title: success ? t("app.toast.pasteSuccess") : t("app.toast.pasteError"),
 		severity: success ? "success" : "error",
 	});
 };
@@ -69,7 +71,7 @@ const handlePasteResult = (success: boolean) => {
 
 <template>
 	<div
-		class="min-h-screen bg-slate-50 dark:bg-slate-950 font-sans text-slate-800 dark:text-slate-100 flex flex-col transition-colors"
+		class="min-h-screen bg-slate-50 dark:bg-slate-950 font-sans text-slate-800 dark:text-slate-100 flex flex-col "
 	>
 		<Navbar />
 
@@ -84,7 +86,7 @@ const handlePasteResult = (success: boolean) => {
 			<div>
 				<div class="flex justify-between items-center mb-6 gap-4">
 					<h2 class="text-2xl font-bold text-slate-700 dark:text-slate-100">
-						Matriz de adyacencia
+						{{ t("app.adjacencyTitle") }}
 					</h2>
 
 					<GraphIOControls
@@ -98,7 +100,7 @@ const handlePasteResult = (success: boolean) => {
 
 			<div class="mt-12">
 				<h2 class="text-2xl font-bold text-slate-700 dark:text-slate-100 mb-6">
-					Análisis del grafo
+					{{ t("app.analysisTitle") }}
 				</h2>
 
 				<div
@@ -106,7 +108,7 @@ const handlePasteResult = (success: boolean) => {
 				>
 					<div class="h-full">
 						<SectionCard
-							title="Visualización"
+							:title="t('app.visualizationTitle')"
 							class="h-full flex flex-col"
 							body-class="flex-1 flex flex-col min-h-[400px]"
 						>
@@ -118,7 +120,7 @@ const handlePasteResult = (success: boolean) => {
 					</div>
 
 					<div>
-						<SectionCard title="Algoritmos">
+						<SectionCard :title="t('app.algorithmsTitle')">
 							<template #icon>
 								<IconCpu class="size-5 text-indigo-600" />
 							</template>
@@ -126,7 +128,7 @@ const handlePasteResult = (success: boolean) => {
 						</SectionCard>
 					</div>
 
-					<SectionCard title="Propiedades" class="col-span-2">
+					<SectionCard :title="t('app.propertiesTitle')" class="col-span-2">
 						<template #icon>
 							<IconChartBar class="size-5 text-green-600" />
 						</template>

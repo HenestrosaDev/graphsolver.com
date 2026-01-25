@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import { IconChevronLeft, IconChevronRight } from "@tabler/icons-vue";
 import { ref, computed, watch, onMounted, onActivated, nextTick } from "vue";
+import { useI18n } from "vue-i18n";
 import { useGraph } from "../../composables/useGraph";
 import { computeFloyd } from "../../composables/useFloyd";
+import { useTheme } from "../../composables/useTheme";
 import PropertiesCard from "../properties/PropertiesCard.vue";
 import PropertyRow from "../properties/PropertyRow.vue";
 import type { FloydStep } from "../../types/graph";
@@ -21,6 +23,8 @@ const diameter = ref<number>(0);
 const hasInfPairs = ref<boolean>(false);
 const finalDist = ref<number[][]>([]);
 const finalNext = ref<(number | null)[][]>([]);
+const { t } = useI18n();
+const { isDark } = useTheme();
 
 // --- CARROUSEL STATE ---
 const currentStepIndex = ref(0);
@@ -57,7 +61,8 @@ const queryResult = computed(() => {
 		return null;
 
 	const d = finalDist.value[u][v];
-	if (d === Infinity) return { dist: "Inalcanzable", path: "No existe camino" };
+	if (d === Infinity)
+		return { status: "unreachable" as const, dist: null, path: null };
 
 	let pathArr: string[] = [nodes.value[u]];
 	let curr: number = u;
@@ -67,13 +72,31 @@ const queryResult = computed(() => {
 		curr = nextNode;
 		pathArr.push(nodes.value[curr]);
 	}
-	return { dist: d, path: pathArr.join(" → "), pathArr };
+	return { status: "ok" as const, dist: d, path: pathArr.join(" → "), pathArr };
 });
+
+const minCostValue = computed(() => {
+	if (!queryResult.value) return null;
+	return queryResult.value.status === "ok"
+		? queryResult.value.dist
+		: t("floyd.unreachableCost");
+});
+
+const pathValue = computed(() => {
+	if (!queryResult.value) return null;
+	return queryResult.value.status === "ok"
+		? queryResult.value.path
+		: t("floyd.noPath");
+});
+
+const resultVariant = computed(() =>
+	queryResult.value?.status === "ok" ? "metric" : "badge"
+);
 
 const applyHighlight = () => {
 	const result = queryResult.value;
 	clearHighlights();
-	if (!result || typeof result.dist === "string") return;
+	if (!result || result.status !== "ok") return;
 	if (result.pathArr && result.pathArr.length >= 2)
 		setHighlightPath(result.pathArr);
 };
@@ -128,23 +151,52 @@ const nextStep = () => {
 const prevStep = () => {
 	if (currentStepIndex.value > 0) currentStepIndex.value--;
 };
+
+const currentStepTitle = computed(() => {
+	const step = currentStep.value;
+	if (!step) return "";
+	if (step.pivot === -1) return t("floyd.initialTitle");
+	const pivotLabel = nodes.value[step.pivot] ?? step.pivot;
+	return t("floyd.stepTitle", { k: step.k ?? currentStepIndex.value, pivot: pivotLabel });
+});
+
+const footerDescription = computed(() => {
+	const step = currentStep.value;
+	if (!step) return "";
+	if (step.pivot === -1) return t("floyd.initialDescription");
+	const pivotLabel = nodes.value[step.pivot] ?? step.pivot;
+	return t("floyd.iterationDescription", { pivot: pivotLabel });
+});
+
+const progressPercentage = computed(() => {
+	if (steps.value.length <= 1) return 0;
+	return (currentStepIndex.value / (steps.value.length - 1)) * 100;
+});
+
+const rangeStyle = computed(() => {
+	const progressColor = isDark.value ? 'rgb(96 165 250)' : 'rgb(37 99 235)'; // blue-400 in dark, blue-600 in light
+	const remainingColor = isDark.value ? 'rgb(71 85 105)' : 'rgb(203 213 225)'; // slate-500 in dark, slate-200 in light
+	return {
+		background: `linear-gradient(to right, ${progressColor} 0%, ${progressColor} ${progressPercentage.value}%, ${remainingColor} ${progressPercentage.value}%, ${remainingColor} 100%)`
+	};
+});
 </script>
 
 <template>
 	<div class="space-y-8">
 		<div>
-			<h3 class="text-eyebrow">Cálculo de ruta</h3>
+			<h3 class="text-eyebrow">{{ t("floyd.routeTitle") }}</h3>
 
 			<PropertiesCard>
 				<template #header>
 					<div class="flex flex-wrap items-center justify-between gap-4 w-full">
 						<div class="flex items-center gap-2">
 							<label class="text-xs font-bold uppercase tracking-wide">
-								Origen
+								{{ t("floyd.origin") }}
 							</label>
 							<select
 								v-model="startNode"
-								class="bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-100 text-sm rounded-md px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-medium transition-colors"
+								class="bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-100 text-sm rounded-md px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-medium "
 							>
 								<option v-for="n in nodes" :key="n" :value="n">{{ n }}</option>
 							</select>
@@ -154,11 +206,11 @@ const prevStep = () => {
 
 						<div class="flex items-center gap-2">
 							<label class="text-xs font-bold uppercase tracking-wide">
-								Destino
+								{{ t("floyd.destination") }}
 							</label>
 							<select
 								v-model="endNode"
-								class="bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-100 text-sm rounded-md px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-medium transition-colors"
+								class="bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-100 text-sm rounded-md px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-medium "
 							>
 								<option v-for="n in nodes" :key="n" :value="n">{{ n }}</option>
 							</select>
@@ -167,19 +219,19 @@ const prevStep = () => {
 				</template>
 
 				<PropertyRow
-					label="Coste mínimo"
-					:value="queryResult.dist"
-					:variant="typeof queryResult.dist === 'string' ? 'badge' : 'metric'"
+					:label="t('floyd.minCost')"
+					:value="minCostValue"
+					:variant="resultVariant"
 				/>
 				<!-- <span v-if="hasInfPairs" class="text-xs text-red-500 ml-2">(pares inalcanzables)</span>-->
 				<PropertyRow
-					label="Camino óptimo"
-					:value="queryResult.path"
-					:variant="typeof queryResult.dist === 'string' ? 'badge' : 'metric'"
+					:label="t('floyd.optimalPath')"
+					:value="pathValue"
+					:variant="resultVariant"
 				/>
 				<PropertyRow
-					label="Diámetro del grafo"
-					tooltip="La mayor distancia mínima entre cualquier par de vértices conectados del grafo."
+					:label="t('floyd.diameter')"
+					:tooltip="t('floyd.diameterTooltip')"
 					:value="diameter"
 					:variant="typeof diameter === 'string' ? 'badge' : 'metric'"
 				/>
@@ -187,22 +239,24 @@ const prevStep = () => {
 		</div>
 
 		<div>
-			<h3 v-if="steps.length > 0" class="text-eyebrow">Tabla de iteraciones</h3>
+			<h3 v-if="steps.length > 0" class="text-eyebrow">
+				{{ t("floyd.iterationsTable") }}
+			</h3>
 
 			<div
 				v-if="steps.length > 0"
-				class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-sm overflow-hidden transition-colors"
+				class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-sm overflow-hidden "
 			>
 				<div class="bg-slate-50 dark:bg-slate-800 border-b border-slate-200 dark:border-slate-800 p-4">
 					<div class="flex flex-col items-center">
 						<span
 							class="inline-block bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-200 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider"
 						>
-							Paso {{ currentStepIndex + 1 }} de {{ steps.length }}
+							{{ t("floyd.stepCounter", { current: currentStepIndex + 1, total: steps.length }) }}
 						</span>
 
 						<h3 class="font-bold text-slate-800 dark:text-slate-100 text-lg mt-3">
-							{{ currentStep.title }}
+							{{ currentStepTitle }}
 						</h3>
 
 						<div
@@ -212,7 +266,7 @@ const prevStep = () => {
 								@click="prevStep"
 								:disabled="currentStepIndex === 0"
 								class="p-1.5 rounded-full hover:bg-white dark:hover:bg-slate-900 hover:shadow-sm border border-transparent hover:border-slate-200 dark:hover:border-slate-700 text-slate-500 dark:text-slate-300 disabled:opacity-30 disabled:hover:shadow-none disabled:hover:border-transparent transition-all"
-								title="Anterior"
+								:title="t('floyd.previous')"
 							>
 								<IconChevronLeft class="size-6" />
 							</button>
@@ -223,7 +277,8 @@ const prevStep = () => {
 									min="0"
 									:max="steps.length - 1"
 									v-model.number="currentStepIndex"
-									class="w-full h-2 bg-slate-200 dark:bg-slate-800 rounded-lg appearance-none cursor-pointer accent-blue-600 hover:accent-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30"
+									:style="rangeStyle"
+									class="w-full h-2 rounded-lg appearance-none cursor-pointer accent-blue-600 hover:accent-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30"
 								/>
 							</div>
 
@@ -231,7 +286,7 @@ const prevStep = () => {
 								@click="nextStep"
 								:disabled="currentStepIndex === steps.length - 1"
 								class="p-1.5 rounded-full hover:bg-white dark:hover:bg-slate-900 hover:shadow-sm border border-transparent hover:border-slate-200 dark:hover:border-slate-700 text-slate-500 dark:text-slate-300 disabled:opacity-30 disabled:hover:shadow-none disabled:hover:border-transparent transition-all"
-								title="Siguiente"
+								:title="t('floyd.next')"
 							>
 								<IconChevronRight class="size-6" />
 							</button>
@@ -268,7 +323,7 @@ const prevStep = () => {
 								<td
 									v-for="(val, j) in row"
 									:key="j"
-									class="p-3 border border-slate-100 dark:border-slate-800 text-center text-sm w-12 h-12 transition-colors duration-200"
+									class="p-3 border border-slate-100 dark:border-slate-800 text-center text-sm w-12 h-12  duration-200"
 									:class="{
 										'bg-blue-50 dark:bg-blue-900/30 font-bold text-blue-700 dark:text-blue-200 ring-1 ring-inset ring-blue-200 dark:ring-blue-800':
 											i === currentStep.pivot || j === currentStep.pivot,
@@ -286,15 +341,7 @@ const prevStep = () => {
 				<div
 					class="bg-slate-50 dark:bg-slate-800 p-3 text-xs text-slate-500 dark:text-slate-300 text-center border-t border-slate-200 dark:border-slate-800"
 				>
-					<span v-if="currentStep.pivot === -1">
-						Matriz de adyacencia inicial. Los nodos no conectados directamente
-						son ∞.
-					</span>
-					<span v-else>
-						Calculando rutas pasando por el nodo intermedio
-						<strong>{{ nodes[currentStep.pivot] }}</strong
-						>. Las filas y columnas resaltadas no cambian en esta iteración.
-					</span>
+					<span>{{ footerDescription }}</span>
 				</div>
 			</div>
 		</div>

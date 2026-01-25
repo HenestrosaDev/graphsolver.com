@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from "vue";
+import { useI18n } from "vue-i18n";
 import { useToast } from "../../composables/useToast";
 import {
 	IconCircleCheck,
@@ -9,6 +10,7 @@ import {
 	IconX,
 } from "@tabler/icons-vue";
 
+const { t } = useI18n();
 const { show, message, title, severity, close } = useToast();
 
 const variants = {
@@ -69,7 +71,7 @@ const currentVariant = computed(() => variants[severity?.value || "info"]);
 				:class="[message ? 'self-start' : 'self-center']"
 			>
 				<span v-if="title">{{ title }}</span>
-				<span v-else class="sr-only">Notification</span>
+				<span v-else class="sr-only">{{ t('common.notification') }}</span>
 			</div>
 
 			<button
@@ -77,9 +79,9 @@ const currentVariant = computed(() => variants[severity?.value || "info"]);
 				class="-mx-1.5 -my-1 rounded-lg focus:ring-2 p-1.5 inline-flex items-center justify-center size-8 ml-auto"
 				:class="currentVariant.button"
 				@click="close"
-				aria-label="Close"
+				:aria-label="t('common.close')"
 			>
-				<span class="sr-only">Close</span>
+				<span class="sr-only">{{ t('common.close') }}</span>
 				<IconX class="size-3" />
 			</button>
 

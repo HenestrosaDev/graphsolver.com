@@ -7,7 +7,7 @@ type MessageSchema = typeof es;
 
 const i18n = createI18n<[MessageSchema], "es" | "en">({
 	legacy: false, // No Composition API
-	locale: "es",
+	locale: "en",
 	fallbackLocale: "en",
 	globalInjection: true,
 	messages: {

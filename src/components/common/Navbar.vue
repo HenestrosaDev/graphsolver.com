@@ -1,7 +1,10 @@
 <script setup lang="ts">
+import { useI18n } from "vue-i18n";
 import LanguageSelector from "./LanguageSelector.vue";
 import ThemeToggle from "./ThemeToggle.vue";
 import { IconBrandGithub, IconChartDots } from "@tabler/icons-vue";
+
+const { t } = useI18n();
 </script>
 
 <template>
@@ -14,28 +17,29 @@ import { IconBrandGithub, IconChartDots } from "@tabler/icons-vue";
 					<div class="bg-blue-600 text-white p-1.5 rounded-lg shadow-sm">
 						<IconChartDots class="size-6" />
 					</div>
-					<span class="text-xl font-bold text-slate-800 dark:text-slate-100 tracking-tight">
+					<span
+						class="text-xl font-bold text-slate-800 dark:text-slate-100 tracking-tight"
+					>
 						GraphSolver
 					</span>
 				</div>
 
-				<div class="flex items-center gap-4">
-					<a
-						href="https://github.com"
-						target="_blank"
-						class="text-slate-400 hover:text-slate-800 dark:text-slate-500 dark:hover:text-slate-100 transition hidden sm:block"
-						title="Ver código en GitHub"
-					>
-						<IconBrandGithub class="size-6" />
-					</a>
+				<div class="flex items-center gap-5">
+					<div class="flex items-center gap-3">
+						<a
+							href="https://github.com"
+							target="_blank"
+							class="text-slate-400 hover:text-slate-800 dark:text-slate-500 dark:hover:text-slate-100 transition hidden sm:block"
+							:title="t('navbar.githubTitle')"
+						>
+							<IconBrandGithub class="size-6" />
+						</a>
+						<ThemeToggle />
+					</div>
 
-					<div class="h-6 w-px bg-slate-200 dark:bg-slate-800 hidden sm:block" />
-
-					<ThemeToggle />
-
-					<div class="h-6 w-px bg-slate-200 dark:bg-slate-800 hidden sm:block" />
-
-					<LanguageSelector />
+					<div>
+						<LanguageSelector />
+					</div>
 				</div>
 			</div>
 		</div>

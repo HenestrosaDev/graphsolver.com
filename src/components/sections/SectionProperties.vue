@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import { ref, watch, computed } from "vue";
+import { useI18n } from "vue-i18n";
 import { useGraph } from "../../composables/useGraph";
 import type { GraphAnalysis } from "../../types/graph";
 import PropertiesCard from "../properties/PropertiesCard.vue";
 import PropertyRow from "../properties/PropertyRow.vue";
 
 const { getGraphData, nodes, toIdx, rawMatrix, numNodes } = useGraph();
+const { t } = useI18n();
 
 const analysis = ref<GraphAnalysis | null>(null);
 const adjTarget = ref<string>("A");
@@ -102,29 +104,29 @@ const calculateProperties = () => {
 	const isTree = isSymmetric && cc === 1 && measure === n - 1;
 
 	// 9. Eulerian logic
-	let eulerianType = "No";
+	let eulerianType: GraphAnalysis["eulerianType"] = "none";
 	if (isSymmetric && measure > 0) {
 		const oddDegreeCount = degrees.filter((d) => d % 2 !== 0).length;
-		if (oddDegreeCount === 0) eulerianType = "Ciclo";
-		else if (oddDegreeCount === 2) eulerianType = "Camino";
+		if (oddDegreeCount === 0) eulerianType = "cycle";
+		else if (oddDegreeCount === 2) eulerianType = "path";
 	}
 
 	// 10. Extended Structure Analysis
 	const isConnected = cc === 1;
 	const hasCycles = measure >= n - cc + 1;
 
-	let structureType = "Desconocido";
+	let structureType: GraphAnalysis["structureType"] = "disconnected";
 	if (isSymmetric) {
-		if (!hasCycles && isConnected) structureType = "Árbol";
-		else if (!hasCycles && !isConnected) structureType = "Bosque";
-		else if (hasCycles && isConnected) structureType = "Cíclico conexo";
-		else structureType = "Disconexo con ciclos";
+		if (!hasCycles && isConnected) structureType = "tree";
+		else if (!hasCycles && !isConnected) structureType = "forest";
+		else if (hasCycles && isConnected) structureType = "connectedCyclic";
+		else structureType = "disconnectedCyclic";
 	} else {
 		if (isConnected)
 			structureType = hasCycles
-				? "Conexo (débil) con ciclos"
-				: "DAG Conexo (Débil)";
-		else structureType = "Disconexo";
+				? "weakConnectedCyclic"
+				: "weakConnectedAcyclic";
+		else structureType = "disconnected";
 	}
 
 	// 11. Bipartite check (2-coloring over undirected view)
@@ -157,9 +159,9 @@ const calculateProperties = () => {
 	})();
 
 	// 12. Hamiltonian Cycle (Backtracking)
-	let isHamiltonian: boolean | string = false;
+	let isHamiltonian: boolean | "npLimit" = false;
 	if (n < 3) isHamiltonian = false;
-	else if (n > 12) isHamiltonian = "NP-Limit (>12)";
+	else if (n > 12) isHamiltonian = "npLimit";
 	else if (!isConnected) isHamiltonian = false;
 	else {
 		const visited = new Array(n).fill(false);
@@ -209,34 +211,44 @@ const calculateProperties = () => {
 	};
 };
 
-const hamiltonianStatus = computed(() => {
-	const value = analysis.value!.isHamiltonian;
+const maxMeasureTooltip = computed(() => {
+	if (!analysis.value) return "";
+	const typeLabel = analysis.value.isSymmetric
+		? t("properties.values.undirected")
+		: t("properties.values.directed");
+	const formula = analysis.value.isSymmetric
+		? "<i>n(n-1)</i> / <i>2</i>"
+		: "<i>n(n-1)</i>";
+	return t("properties.tooltips.maxMeasure", { type: typeLabel, formula });
+});
 
-	// Case 1: Error/Warning (string)
-	if (typeof value === "string") {
+const hamiltonianStatus = computed(() => {
+	if (!analysis.value)
+		return { text: "", classes: "", title: undefined as string | undefined };
+	const value = analysis.value.isHamiltonian;
+
+	if (value === "npLimit") {
 		return {
-			text: value,
-			// Slate color with cursor-help for the warning tooltip
+			text: t("properties.values.hamiltonian.npLimit"),
 			classes:
 				"bg-slate-100 text-slate-500 border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700 cursor-help",
-			title: value,
+			title: t("properties.values.hamiltonian.npLimit"),
 		};
 	}
 
-	// Case 2: Boolean True
 	if (value) {
 		return {
-			text: "Sí",
+			text: t("properties.values.hamiltonian.yes"),
 			classes:
 				"bg-green-100 text-green-700 border-green-200 dark:bg-green-900/30 dark:text-green-200 dark:border-green-700",
 			title: undefined,
 		};
 	}
 
-	// Case 3: Boolean False
 	return {
-		text: "No",
-		classes: "bg-red-50 text-red-600 border-red-200 dark:bg-red-900/30 dark:text-red-200 dark:border-red-800",
+		text: t("properties.values.hamiltonian.no"),
+		classes:
+			"bg-red-50 text-red-600 border-red-200 dark:bg-red-900/30 dark:text-red-200 dark:border-red-800",
 		title: undefined,
 	};
 });
@@ -251,69 +263,73 @@ watch([rawMatrix, numNodes, adjTarget], () => calculateProperties(), {
 	<div v-if="analysis" class="animate-fade-in">
 		<div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
 			<div class="space-y-4">
-				<PropertiesCard title="Propiedades básicas">
+				<PropertiesCard :title="t('properties.cardTitles.basic')">
 					<PropertyRow
-						label="Tipo de grafo"
+						:label="t('properties.labels.graphType')"
 						:value="
 							analysis.isSymmetric
-								? 'No dirigido (simétrico)'
-								: 'Dirigido (asimétrico)'
+								? t('properties.values.undirected')
+								: t('properties.values.directed')
 						"
 					/>
 
 					<PropertyRow
-						label="Orden"
+						:label="t('properties.labels.order')"
 						:value="analysis.orden"
-						tooltip="Número de vértices del grafo. Se denota como <i>n</i>."
+						:tooltip="t('properties.tooltips.order')"
 						variant="metric"
 					/>
 
 					<PropertyRow
-						label="Medida"
+						:label="t('properties.labels.measure')"
 						:value="analysis.medida"
-						tooltip="Número de aristas del grafo. Se denota como <i>m</i>.<br><br><b>Nota</b>: En grafos no dirigidos, cada arista se cuenta una sola vez."
+						:tooltip="t('properties.tooltips.measure')"
 						variant="metric"
 					/>
 
 					<PropertyRow
-						label="Medida máxima"
+						:label="t('properties.labels.maxMeasure')"
 						:value="analysis.maxEdges"
-						:tooltip="`Número máximo de aristas (<i>m<sub>max</sub></i>) posibles para este grafo ${analysis.isSymmetric ? 'no dirigido' : 'dirigido'}.<br><br><b>Fórmula</b>: ${analysis.isSymmetric ? '<i>n(n-1)</i> / <i>2</i>' : '<i>n(n-1)</i>'}`"
+						:tooltip="maxMeasureTooltip"
 						variant="metric"
 					/>
 
 					<PropertyRow
-						label="Densidad"
+						:label="t('properties.labels.density')"
 						:value="(analysis.density * 100).toFixed(0) + '%'"
-						tooltip="Proporción de aristas existentes (<i>m</i>) frente al máximo posible (<i>m<sub>max</sub></i>). Un 100% indica un <b>grafo completo</b> (<i>K<sub>n</sub></i>).<br><br><b>Fórmula</b>: <i>m</i> / <i>m<sub>max</sub></i>"
+						:tooltip="t('properties.tooltips.density')"
 						variant="metric"
 					/>
 				</PropertiesCard>
 
-				<PropertiesCard title="Grados">
+				<PropertiesCard :title="t('properties.cardTitles.degrees')">
 					<PropertyRow
-						label="Secuencia de grados"
+						:label="t('properties.labels.degreeSequence')"
 						:value="analysis.seq"
-						tooltip="Lista de grados de cada vértice en orden.<br><br><b>Definición</b>: El grado de un vértice es el número de aristas que inciden en él."
+						:tooltip="t('properties.tooltips.degreeSequence')"
 						variant="metric"
 					/>
 
 					<PropertyRow
-						label="Grado mínimo (δ)"
+						:label="t('properties.labels.minDegree')"
 						:value="analysis.minDegree"
 						variant="metric"
 					/>
 
 					<PropertyRow
-						label="Grado máximo (Δ)"
+						:label="t('properties.labels.maxDegree')"
 						:value="analysis.maxDegree"
 						variant="metric"
 					/>
 
 					<PropertyRow
-						label="Regularidad"
-						:value="`${analysis.isRegular ? analysis.maxDegree + '-Regular' : 'No regular'}`"
-						tooltip="Un grafo es <b>regular</b> si todos sus vértices tienen el mismo grado. En ese caso, se denomina <i>k-Regular</i>, siendo <i>k</i> el grado común."
+						:label="t('properties.labels.regularity')"
+						:value="
+							analysis.isRegular
+								? t('properties.values.regular', { degree: analysis.maxDegree })
+								: t('properties.values.notRegular')
+						"
+						:tooltip="t('properties.tooltips.regularity')"
 						variant="badge"
 						:badge-class="`${analysis.isRegular ? 'bg-indigo-100 text-indigo-700 border-indigo-200' : 'bg-slate-50 text-slate-900 border-slate-200'}`"
 					/>
@@ -321,12 +337,12 @@ watch([rawMatrix, numNodes, adjTarget], () => calculateProperties(), {
 			</div>
 
 			<div class="space-y-4">
-				<PropertiesCard title="Vértices">
+				<PropertiesCard :title="t('properties.cardTitles.vertices')">
 					<PropertyRow 
-						label="Adyacentes a"
-						:value="analysis.adjList || '∅'" 
+						:label="t('properties.labels.adjacentsTo')"
+						:value="analysis.adjList || t('common.emptySet')" 
 						variant="metric"
-						tooltip="Muestra los vértices conectados directamente al vértice seleccionado."
+						:tooltip="t('properties.tooltips.adjacencyList')"
 					>
 						<template #label>
 							<select
@@ -342,23 +358,23 @@ watch([rawMatrix, numNodes, adjTarget], () => calculateProperties(), {
 					</PropertyRow>
 
 					<PropertyRow
-						label="Componentes conexas"
+						:label="t('properties.labels.connectedComponents')"
 						:value="analysis.cc"
-						tooltip="Número de componentes conexas dentro del grafo. Se calcula mediante algoritmos de búsqueda en profundidad (DFS) o búsqueda en anchura (BFS).<br><br><b>Definición</b>: Una componente conexa es un subgrafo en el que cualquier par de vértices están conectados entre sí por caminos, y que no está conectado a ningún vértice fuera del subgrafo."
+						:tooltip="t('properties.tooltips.connectedComponents')"
 						variant="metric"
 					/>
 
 					<PropertyRow
-						label="Vértices aislados"
+						:label="t('properties.labels.isolatedVertices')"
 						:value="analysis.isolated"
-						tooltip="Número de vértices que no están conectados a ningún otro vértice dentro del grafo."
+						:tooltip="t('properties.tooltips.isolatedVertices')"
 						variant="metric"
 					/>
 
 					<PropertyRow
-						label="Conexo"
-						:value="analysis.isConnected ? 'Sí' : 'No'"
-						tooltip="Indica si existe un camino entre cualquier par de vértices."
+						:label="t('properties.labels.connected')"
+						:value="analysis.isConnected ? t('properties.values.yes') : t('properties.values.no')"
+						:tooltip="t('properties.tooltips.connected')"
 						variant="badge"
 						:badge-class="
 							analysis.isConnected
@@ -368,17 +384,17 @@ watch([rawMatrix, numNodes, adjTarget], () => calculateProperties(), {
 					/>
 				</PropertiesCard>
 
-				<PropertiesCard title="Topología">
+				<PropertiesCard :title="t('properties.cardTitles.topology')">
 					<PropertyRow
-						label="Clasificación estructural"
-						:value="analysis.structureType"
-						tooltip="Descripción del tipo de grafo según su estructura y propiedades básicas."
+						:label="t('properties.labels.structure')"
+						:value="t(`properties.values.structure.${analysis.structureType}`)"
+						:tooltip="t('properties.tooltips.structure')"
 					/>
 
 					<PropertyRow
-						label="Bipartito"
-						:value="analysis.isBipartite ? 'Sí' : 'No'"
-						tooltip="Un grafo es bipartito si sus vértices pueden dividirse en dos conjuntos disjuntos y cada arista conecta vértices de conjuntos distintos. Se comprueba con 2-coloración BFS sobre la versión no dirigida; los bucles o conflictos de color lo invalidan."
+						:label="t('properties.labels.bipartite')"
+						:value="analysis.isBipartite ? t('properties.values.yes') : t('properties.values.no')"
+						:tooltip="t('properties.tooltips.bipartite')"
 						variant="badge"
 						:badge-class="
 							analysis.isBipartite
@@ -388,49 +404,49 @@ watch([rawMatrix, numNodes, adjTarget], () => calculateProperties(), {
 					/>
 
 					<PropertyRow
-						label="Euleriano"
-						:value="analysis.eulerianType"
-						tooltip="Un grafo es <b>euleriano</b> si contiene un ciclo que recorre todas las aristas exactamente una vez.<br><br><b>Dificultad computacional:</b> Determinar si un grafo es euleriano es un problema polinomialmente resoluble (P). <br><br><b>Tipos:</b><br>• <b>Ciclo</b>: Todos los vértices tienen grado par.<br>• <b>Camino</b>: Exactamente dos vértices tienen grado impar.<br>• <b>No</b>: No cumple las condiciones anteriores."
+						:label="t('properties.labels.eulerian')"
+						:value="t(`properties.values.eulerian.${analysis.eulerianType}`)"
+						:tooltip="t('properties.tooltips.eulerian')"
 						variant="badge"
 						:badge-class="
-							analysis.eulerianType !== 'No'
+							analysis.eulerianType !== 'none'
 								? 'bg-green-100 text-green-700 border-green-200 dark:bg-green-900/30 dark:text-green-200 dark:border-green-700'
 								: 'bg-red-50 text-red-600 border-red-200 dark:bg-red-900/30 dark:text-red-200 dark:border-red-800'
 						"
 					/>
 
 					<PropertyRow
-						label="Hamiltoniano"
+						:label="t('properties.labels.hamiltonian')"
 						:value="hamiltonianStatus.text"
-						tooltip=" Un grafo es <b>hamiltoniano</b> si contiene un ciclo que visita cada vértice exactamente una vez.<br><br><b>Dificultad computacional:</b> Determinar si un grafo es hamiltoniano es un problema NP-completo. <br><br><b>Nota</b>: No se realizará el análisis para grafos con más de 12 vértices debido a limitaciones computacionales."
+						:tooltip="t('properties.tooltips.hamiltonian')"
 						:badge-class="hamiltonianStatus.classes"
 					/>
 				</PropertiesCard>
 
 				<PropertiesCard
-					title="Grafo complementario"
-					tooltip='El grafo complementario <span style="text-decoration: overline;">G</span> tiene los mismos vértices que el original, pero sus aristas son exactamente los pares de vértices que no son adyacentes (no tienen arista directa) en el grafo base. Es como el "negativo" del grafo base: donde ahora hay camino, desaparece, y donde no lo hay, aparece.'
+					:title="t('properties.cardTitles.complementary')"
+					:tooltip="t('properties.cardTooltips.complementary')"
 					theme="purple"
 				>
 					<PropertyRow
-						label="Orden"
-						tooltip="Número de aristas del grafo complementario. Tiene el mismo orden que el grafo original."
+						:label="t('properties.labels.complementaryOrder')"
+						:tooltip="t('properties.tooltips.complementaryOrder')"
 						:value="analysis.orden"
 						variant="metric"
 						theme="purple"
 					/>
 
 					<PropertyRow
-						label="Medida"
-						tooltip="Número de aristas del grafo complementario.<br><br><b>Fórmula:</b> <i>m<sub><span style='text-decoration: overline;'>G</span></sub></i> = <i>m<sub>max</sub></i> - <i>m<sub>G</sub></i>"
+						:label="t('properties.labels.complementaryMeasure')"
+						:tooltip="t('properties.tooltips.complementaryMeasure')"
 						:value="analysis.compSize"
 						variant="metric"
 						theme="purple"
 					/>
 
 					<PropertyRow
-						label="Componentes conexas"
-						tooltip="Las componentes conexas de <i><span style='text-decoration: overline;'>G</span></i> son los subgrafos independientes que se forman al trazar las aristas que faltaban en el original. Si en el grafo original dos grupos estaban totalmente aislados, en el complementario esos grupos se fusionan."
+						:label="t('properties.labels.complementaryConnectedComponents')"
+						:tooltip="t('properties.tooltips.complementaryConnectedComponents')"
 						:value="analysis.compCc"
 						variant="metric"
 						theme="purple"

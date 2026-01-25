@@ -7,9 +7,10 @@ export interface DijkstraStep {
 
 export interface DijkstraResult {
 	steps: DijkstraStep[];
-	cost: number | string;
-	path: string;
+	cost: number | null;
+	path: string | null;
 	pathArr: string[];
+	status: "ok" | "unreachable";
 }
 
 const formatPath = (indices: number[], labels: string[]): string[] =>
@@ -28,9 +29,10 @@ export const computeDijkstra = (
 	if (startIdx < 0 || endIdx < 0) {
 		return {
 			steps: [],
-			cost: "Inalcanzable",
-			path: "No existe camino",
+			cost: null,
+			path: null,
 			pathArr: [],
+			status: "unreachable",
 		};
 	}
 
@@ -86,9 +88,10 @@ export const computeDijkstra = (
 	if (dist[endIdx] === Infinity) {
 		return {
 			steps,
-			cost: "Inalcanzable",
-			path: "No existe camino",
+			cost: null,
+			path: null,
 			pathArr: [],
+			status: "unreachable",
 		};
 	}
 
@@ -107,5 +110,6 @@ export const computeDijkstra = (
 		cost: dist[endIdx],
 		path: pathArr.join(" → "),
 		pathArr,
+		status: "ok",
 	};
 };

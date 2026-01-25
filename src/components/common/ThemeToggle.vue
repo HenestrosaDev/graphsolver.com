@@ -1,17 +1,19 @@
 <script setup lang="ts">
+import { useI18n } from "vue-i18n";
 import { useTheme } from "../../composables/useTheme";
 import { IconSun, IconMoon } from "@tabler/icons-vue";
 
 const { isDark, toggleTheme } = useTheme();
+const { t } = useI18n();
 </script>
 
 <template>
 	<button
 		@click="toggleTheme"
-		class="p-2 rounded-lg text-slate-400 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-100 transition-colors duration-200"
-		:title="isDark ? 'Cambiar a tema claro' : 'Cambiar a tema oscuro'"
+		class="p-2 rounded-lg text-slate-400 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-100  duration-200"
+		:title="isDark ? t('theme.toLight') : t('theme.toDark')"
 	>
-		<IconSun v-if="isDark" class="size-5" />
-		<IconMoon v-else class="size-5" />
+		<IconSun v-if="isDark" class="size-6" />
+		<IconMoon v-else class="size-6" />
 	</button>
 </template>

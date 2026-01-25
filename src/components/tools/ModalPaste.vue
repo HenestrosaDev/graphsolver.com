@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, watch } from "vue";
+import { useI18n } from "vue-i18n";
 import {
 	type FormatKey,
 	useGraphFormats,
@@ -12,6 +13,7 @@ const props = defineProps<{
 const emit = defineEmits(["close", "import"]);
 
 const { formats, formatOrder } = useGraphFormats();
+const { t } = useI18n();
 
 const content = ref("");
 const selectedFormat = ref<FormatKey>("JSON");
@@ -81,17 +83,17 @@ const handleImport = () => {
 			@click.self="$emit('close')"
 		>
 			<div
-				class="bg-white dark:bg-slate-950 rounded-xl shadow-2xl w-full max-w-lg overflow-hidden flex flex-col max-h-[90vh] border border-slate-200 dark:border-slate-800 transition-colors"
+				class="bg-white dark:bg-slate-950 rounded-xl shadow-2xl w-full max-w-lg overflow-hidden flex flex-col max-h-[90vh] border border-slate-200 dark:border-slate-800 "
 			>
 				<div
 					class="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-slate-50 dark:bg-slate-900"
 				>
 					<h3 class="text-lg font-bold text-slate-800 dark:text-slate-100">
-						Pegar contenido
+						{{ t("modalPaste.title") }}
 					</h3>
 					<button
 						@click="$emit('close')"
-						class="text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300 transition-colors"
+						class="text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300 "
 					>
 						✕
 					</button>
@@ -99,7 +101,7 @@ const handleImport = () => {
 
 				<div class="p-6 space-y-4">
 					<div>
-						<label class="text-eyebrow"> Formato </label>
+						<label class="text-eyebrow"> {{ t("modalPaste.formatLabel") }} </label>
 						<select
 							v-model="selectedFormat"
 							class="w-full px-3 py-2 border border-slate-300 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-100 outline-none transition-all"
@@ -111,11 +113,11 @@ const handleImport = () => {
 					</div>
 
 					<div class="flex-1">
-						<label class="text-eyebrow"> Contenido </label>
+						<label class="text-eyebrow"> {{ t("modalPaste.contentLabel") }} </label>
 						<textarea
 							v-model="content"
 							class="w-full h-48 px-3 py-2 border border-slate-300 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm font-mono resize-none outline-none transition-all bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-600"
-							placeholder='Ej: {"nodes": [], "edges": []}...'
+							:placeholder="t('modalPaste.placeholder')"
 							spellcheck="false"
 						></textarea>
 					</div>
@@ -126,16 +128,16 @@ const handleImport = () => {
 				>
 					<button
 						@click="$emit('close')"
-						class="px-4 py-2 text-sm font-medium text-slate-700 dark:text-slate-100 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
+						class="px-4 py-2 text-sm font-medium text-slate-700 dark:text-slate-100 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 "
 					>
-						Cancelar
+						{{ t("modalPaste.cancel") }}
 					</button>
 					<button
 						@click="handleImport"
 						:disabled="!content.trim()"
-						class="px-4 py-2 text-sm font-medium text-white bg-blue-600 dark:bg-blue-700 rounded-lg hover:bg-blue-700 dark:hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm"
+						class="px-4 py-2 text-sm font-medium text-white bg-blue-600 dark:bg-blue-700 rounded-lg hover:bg-blue-700 dark:hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed  shadow-sm"
 					>
-						Importar
+						{{ t("modalPaste.import") }}
 					</button>
 				</div>
 			</div>

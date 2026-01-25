@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref } from "vue";
+import { useI18n } from "vue-i18n";
 import { IconDownload, IconUpload } from "@tabler/icons-vue";
 import {
 	type FormatKey,
@@ -15,6 +16,7 @@ const emit = defineEmits(["trigger-file-input", "open-paste-modal"]);
 
 const { formats, formatOrder } = useGraphFormats();
 const { downloadFile, copyToClipboard } = useGraphIO();
+const { t } = useI18n();
 
 // Estado: Controlamos qué menú está abierto mediante un string
 const activeMenu = ref<"export" | "import" | null>(null);
@@ -53,7 +55,7 @@ const handlePaste = () => {
 <template>
 	<div class="flex gap-2">
 		<DropdownMenu
-			label="Exportar"
+			:label="t('graphIO.export')"
 			:is-open="activeMenu === 'export'"
 			@toggle="toggleMenu('export')"
 			@close="closeMenu"
@@ -67,15 +69,15 @@ const handlePaste = () => {
 
 				<DropdownHeader>{{ formatKey }}</DropdownHeader>
 				<DropdownItem @click="handleExport(formatKey)">
-					Descargar
+					{{ t("graphIO.download") }}
 				</DropdownItem>
 
-				<DropdownItem @click="handleCopy(formatKey)"> Copiar </DropdownItem>
+				<DropdownItem @click="handleCopy(formatKey)"> {{ t("graphIO.copy") }} </DropdownItem>
 			</template>
 		</DropdownMenu>
 
 		<DropdownMenu
-			label="Importar"
+			:label="t('graphIO.import')"
 			:is-open="activeMenu === 'import'"
 			@toggle="toggleMenu('import')"
 			@close="closeMenu"
@@ -84,7 +86,7 @@ const handlePaste = () => {
 				<IconUpload class="size-4" />
 			</template>
 
-			<DropdownHeader>Archivo</DropdownHeader>
+			<DropdownHeader>{{ t("graphIO.file") }}</DropdownHeader>
 			<DropdownItem
 				v-for="formatKey in formatOrder"
 				:key="formatKey"
@@ -95,8 +97,8 @@ const handlePaste = () => {
 
 			<DropdownDivider />
 
-			<DropdownHeader>Texto</DropdownHeader>
-			<DropdownItem @click="handlePaste">Pegar</DropdownItem>
+			<DropdownHeader>{{ t("graphIO.text") }}</DropdownHeader>
+			<DropdownItem @click="handlePaste">{{ t("graphIO.paste") }}</DropdownItem>
 		</DropdownMenu>
 	</div>
 </template>

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { onMounted, computed } from "vue";
+import { useI18n } from "vue-i18n";
 import { useGraph } from "../../composables/useGraph";
 import { IconDice6, IconTrash } from "@tabler/icons-vue";
 
@@ -11,6 +12,8 @@ const {
 	createGrid,
 	clearMatrix,
 } = useGraph();
+
+const { t } = useI18n();
 
 // Validación de nodos
 const numNodes = computed({
@@ -31,7 +34,7 @@ onMounted(() => {
 
 <template>
 	<div
-		class="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden mb-6 transition-colors"
+		class="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden mb-6 "
 	>
 		<div
 			class="bg-slate-50 dark:bg-slate-800 px-4 py-3 border-b border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row justify-between items-center gap-4"
@@ -41,7 +44,7 @@ onMounted(() => {
 					<span
 						class="text-xs font-bold text-slate-500 dark:text-slate-300 uppercase tracking-wide select-none"
 					>
-						Vértices
+						{{ t("matrixInput.vertices") }}
 					</span>
 					<div class="flex items-center shadow-sm rounded-md overflow-hidden">
 						<button
@@ -72,19 +75,19 @@ onMounted(() => {
 					<button
 						@click="generateRandomGraph"
 						class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-100 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-indigo-600 dark:hover:text-indigo-300 hover:border-indigo-300 dark:hover:border-indigo-500 transition-all active:scale-95"
-						title="Generar valores aleatorios"
+						:title="t('matrixInput.randomTitle')"
 					>
 						<IconDice6 class="size-4" />
-						<span class="hidden sm:inline">Aleatorio</span>
+						<span class="hidden sm:inline">{{ t("matrixInput.random") }}</span>
 					</button>
 
 					<button
 						@click="clearMatrix"
 						class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium border border-red-200 dark:border-red-900 bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-300 hover:bg-red-100 dark:hover:bg-red-900/40 hover:border-red-300 dark:hover:border-red-800 transition active:scale-95"
-						title="Vaciar todos los valores"
+						:title="t('matrixInput.clearTitle')"
 					>
 						<IconTrash class="h-4 w-4" />
-						<span class="hidden sm:inline">Vaciar</span>
+						<span class="hidden sm:inline">{{ t("matrixInput.clear") }}</span>
 					</button>
 				</div>
 			</div>
@@ -142,7 +145,7 @@ onMounted(() => {
 									type="number"
 									v-model.number="rawMatrix[i][j]"
 									placeholder="∞"
-									class="w-full h-full text-center text-sm focus:ring-2 focus:ring-inset focus:ring-blue-500 outline-none transition-colors font-medium bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-100 placeholder-slate-300 dark:placeholder-slate-600"
+									class="w-full h-full text-center text-sm focus:ring-2 focus:ring-inset focus:ring-blue-500 outline-none  font-medium bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-100 placeholder-slate-300 dark:placeholder-slate-600"
 								/>
 							</td>
 						</tr>
