@@ -172,10 +172,8 @@ export function useGraph() {
 		for (let i = 0; i < nodesInPath.length - 1; i++) {
 			const u = nodesInPath[i];
 			const v = nodesInPath[i + 1];
-			// We save both directions to ensure vis-network detects it
-			// regardless of how the edge is defined internally
-			highlightedPath.value.push(u + v); // Ex: "AB"
-			highlightedPath.value.push(v + u); // Ex: "BA"
+			// Only highlight the directed edge in the path direction
+			highlightedPath.value.push(u + v);
 		}
 	};
 
