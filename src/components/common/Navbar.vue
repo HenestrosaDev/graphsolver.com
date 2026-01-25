@@ -29,7 +29,7 @@ const { t } = useI18n();
 						<a
 							href="https://github.com"
 							target="_blank"
-							class="text-slate-400 hover:text-slate-800 dark:text-slate-500 dark:hover:text-slate-100 transition hidden sm:block"
+							class="text-slate-400 hover:text-slate-800 dark:text-slate-500 dark:hover:text-slate-100 transition"
 							:title="t('navbar.githubTitle')"
 						>
 							<IconBrandGithub class="size-6" />
