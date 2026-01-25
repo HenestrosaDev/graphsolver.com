@@ -56,7 +56,7 @@ watch(
 		<Transition name="menu">
 			<div
 				v-if="isOpen"
-				class="absolute top-full mt-1 bg-white border border-slate-200 rounded-lg shadow-lg overflow-hidden z-20"
+				class="absolute top-full mt-1 bg-white border border-slate-200 rounded-lg shadow-lg overflow-hidden z-30"
 				:class="[
 					menuClass || 'w-40',
 					calculatedAlign === 'right'
@@ -70,7 +70,7 @@ watch(
 
 		<div
 			v-if="isOpen"
-			class="fixed inset-0 z-40 bg-transparent cursor-default"
+			class="fixed inset-0 z-20 bg-transparent cursor-default"
 			@click="$emit('close')"
 		/>
 	</div>
