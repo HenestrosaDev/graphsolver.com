@@ -99,7 +99,7 @@ const handleImport = () => {
 					</button>
 				</div>
 
-				<div class="p-6 space-y-4">
+				<div class="p-6 space-y-8">
 					<div>
 						<label class="text-eyebrow"> {{ t("modalPaste.formatLabel") }} </label>
 						<select
