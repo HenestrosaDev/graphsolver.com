@@ -70,8 +70,8 @@ const formatOrder: FormatKey[] = ["JSON", "LaTeX", "Dot"];
 // Refs
 const selectedAlgorithm = ref<string>("dijkstra");
 const fileInput = ref<HTMLInputElement | null>(null);
-const showExportMenu = ref(false);
-const showImportMenu = ref(false);
+type MenuOpen = "export" | "import" | null;
+const menuOpen = ref<MenuOpen>(null);
 const showPasteModal = ref(false);
 const selectedPasteFormat = ref<FormatKey>("JSON");
 const pasteContent = ref("");
@@ -96,27 +96,25 @@ const algorithmById = computed(() =>
 
 // --- Export logic ---
 const handleExport = () => {
-	showExportMenu.value = !showExportMenu.value;
-	showImportMenu.value = false;
+	menuOpen.value = menuOpen.value === "export" ? null : "export";
 };
 
 const exportInFormat = (format: FormatKey) => {
 	const fmt = formats[format];
 	const filename = `grafo-${Date.now()}`;
 	downloadFile(fmt.serialize(), filename, fmt.ext, fmt.mime);
-	showExportMenu.value = false;
+	menuOpen.value = null;
 };
 
 const copyInFormat = async (format: FormatKey) => {
 	const fmt = formats[format];
 	await copyToClipboard(fmt.serialize(), format);
-	showExportMenu.value = false;
+	menuOpen.value = null;
 };
 
 // --- Import logic ---
 const triggerImport = () => {
-	showImportMenu.value = !showImportMenu.value;
-	showExportMenu.value = false;
+	menuOpen.value = menuOpen.value === "import" ? null : "import";
 };
 
 const importInFormat = (format: FormatKey) => {
@@ -125,12 +123,12 @@ const importInFormat = (format: FormatKey) => {
 		fileInput.value.accept = fmt.accept;
 		fileInput.value.click();
 	}
-	showImportMenu.value = false;
+	menuOpen.value = null;
 };
 
 const pasteFromClipboard = () => {
 	showPasteModal.value = true;
-	showImportMenu.value = false;
+	menuOpen.value = null;
 };
 
 const confirmPaste = () => {
@@ -227,7 +225,7 @@ const handleFileChange = async (event: Event) => {
 
 							<Transition name="menu">
 								<div
-									v-if="showExportMenu"
+									v-if="menuOpen === 'export'"
 									class="absolute top-full mt-1 w-40 bg-white border border-slate-200 rounded-lg shadow-lg z-10"
 								>
 										<template v-for="(formatKey, idx) in formatOrder" :key="formatKey">
@@ -268,7 +266,7 @@ const handleFileChange = async (event: Event) => {
 
 							<Transition name="menu">
 								<div
-									v-if="showImportMenu"
+									v-if="menuOpen === 'import'"
 									class="absolute top-full mt-1 w-32 bg-white border border-slate-200 rounded-lg shadow-lg z-10"
 								>
 									<div
@@ -374,13 +372,10 @@ const handleFileChange = async (event: Event) => {
 		</main>
 
 		<div
-			v-if="showExportMenu || showImportMenu"
+			v-if="menuOpen"
 			class="fixed inset-0 z-5"
-			@click="
-				showExportMenu = false;
-				showImportMenu = false;
-			"
-		></div>
+			@click="menuOpen = null"
+		/>
 
 		<Transition name="modal">
 			<div
