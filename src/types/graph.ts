@@ -13,7 +13,7 @@ export interface GraphData {
 export interface MSTResult {
 	cost: number;
 	edges: string;
-	isUnique: boolean | string;
+	isUniqueKey: 'uniqueYes' | 'uniqueNo' | 'notConnected' | 'requiresUndirected';
 }
 
 export interface GraphAnalysis {

@@ -76,10 +76,10 @@ export const computeKruskal = (
 		if (uf.find(i) === root) connectedCount++;
 	}
 
-	let uniqueStatus: string | boolean = "SÍ";
+	let uniqueStatus: 'uniqueYes' | 'uniqueNo' | 'notConnected' = 'uniqueYes';
 
 	if (connectedCount < n) {
-		uniqueStatus = "Grafo no conexo (no existe árbol)";
+		uniqueStatus = 'notConnected';
 	} else {
 		let isUnique = true;
 		for (const edgeToRemove of mstEdges) {
@@ -98,8 +98,8 @@ export const computeKruskal = (
 				break;
 			}
 		}
-		uniqueStatus = isUnique ? "Sí (único)" : "No (existen variantes)";
+		uniqueStatus = isUnique ? 'uniqueYes' : 'uniqueNo';
 	}
 
-	return { cost: mstCost, edges: edgeString, isUnique: uniqueStatus };
+	return { cost: mstCost, edges: edgeString, isUniqueKey: uniqueStatus };
 };

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, watch } from "vue";
+import { useI18n } from "vue-i18n";
 import { useGraph } from "../../composables/useGraph";
 import { computeKruskal } from "../../composables/useKruskal";
 import PropertiesCard from "../properties/PropertiesCard.vue";
@@ -8,6 +9,7 @@ import type { MSTResult } from "../../types/graph";
 
 const { getGraphData, nodes, rawMatrix, numNodes, clearHighlights } =
 	useGraph();
+const { t } = useI18n();
 
 const result = ref<MSTResult | null>(null);
 const solveMST = () => {
@@ -15,9 +17,9 @@ const solveMST = () => {
 	const { matrix, isSymmetric } = getGraphData();
 	if (!isSymmetric) {
 		result.value = {
-			cost: "No válido",
+			cost: t('kruskal.invalidGraph'),
 			edges: "",
-			isUnique: "El algoritmo espera un grafo no dirigido",
+			isUniqueKey: 'requiresUndirected',
 		};
 		return;
 	}
@@ -28,25 +30,25 @@ watch([rawMatrix, numNodes], solveMST, { deep: true, immediate: true });
 </script>
 
 <template>
-	<PropertiesCard v-if="result" title="Resultado">
+	<PropertiesCard v-if="result" :title="t('kruskal.resultTitle')">
 		<PropertyRow
-			label="Coste mínimo"
-			tooltip="Coste mínimo para conectar todos los vértices del grafo.<br><br>Cálculo: Tras ejecutar el algoritmo de Kruskal, se ignoran las aristas que formarían ciclos y se suman los pesos de las aristas restantes que conforman el Árbol Generador Mínimo."
+			:label="t('kruskal.minCost')"
+			:tooltip="t('kruskal.minCostTooltip')"
 			:value="result.cost"
 			:variant="typeof result.cost === 'string' ? 'badge' : 'metric'"
 		/>
 
 		<PropertyRow
-			label="Aristas seleccionadas"
-			tooltip="Lista de aristas que forman el Árbol Generador Mínimo, ordenadas por peso y lexicográficamente."
+			:label="t('kruskal.edgesSelected')"
+			:tooltip="t('kruskal.edgesTooltip')"
 			:value="result.edges ? result.edges : '-'"
 			variant="metric"
 		/>
 
 		<PropertyRow
-			label="Solución única"
-			tooltip="Determina si existe otro conjunto de aristas que forme un Árbol Generador Mínimo válido con el mismo coste total."
-			:value="result.isUnique"
+			:label="t('kruskal.uniqueSolution')"
+			:tooltip="t('kruskal.uniqueTooltip')"
+			:value="t(`kruskal.${result.isUniqueKey}`)"
 			variant="badge"
 		/>
 	</PropertiesCard>
