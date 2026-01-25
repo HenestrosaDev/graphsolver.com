@@ -1,6 +1,13 @@
 <script setup lang="ts">
 import { computed } from "vue";
 import { useToast } from "../../composables/useToast";
+import {
+	IconCircleCheck,
+	IconCircleX,
+	IconAlertTriangle,
+	IconInfoCircle,
+	IconX,
+} from "@tabler/icons-vue";
 
 const { show, message, title, severity, close } = useToast();
 
@@ -39,58 +46,22 @@ const currentVariant = computed(() => variants[severity?.value || "info"]);
 			role="alert"
 		>
 			<div class="flex items-center justify-center h-5 mt-0.5 shrink-0">
-				<svg
+				<IconCircleCheck
 					v-if="severity === 'success'"
 					class="w-5 h-5"
 					:class="currentVariant.icon"
-					aria-hidden="true"
-					xmlns="http://www.w3.org/2000/svg"
-					fill="currentColor"
-					viewBox="0 0 20 20"
-				>
-					<path
-						d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5Zm3.707 8.207-4 4a1 1 0 0 1-1.414 0l-2-2a1 1 0 0 1 1.414-1.414L9 10.586l3.293-3.293a1 1 0 0 1 1.414 1.414Z"
-					/>
-				</svg>
-				<svg
+				/>
+				<IconCircleX
 					v-else-if="severity === 'error'"
-					class="w-5 h-5"
+					class="size-5"
 					:class="currentVariant.icon"
-					aria-hidden="true"
-					xmlns="http://www.w3.org/2000/svg"
-					fill="currentColor"
-					viewBox="0 0 20 20"
-				>
-					<path
-						d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5Zm3.707 11.793a1 1 0 1 1-1.414 1.414L10 11.414l-2.293 2.293a1 1 0 0 1-1.414-1.414L8.586 10 6.293 7.707a1 1 0 0 1 1.414-1.414L10 8.586l2.293-2.293a1 1 0 0 1 1.414 1.414L11.414 10l2.293 2.293Z"
-					/>
-				</svg>
-				<svg
+				/>
+				<IconAlertTriangle
 					v-else-if="severity === 'warning'"
-					class="w-5 h-5"
+					class="size-5"
 					:class="currentVariant.icon"
-					aria-hidden="true"
-					xmlns="http://www.w3.org/2000/svg"
-					fill="currentColor"
-					viewBox="0 0 20 20"
-				>
-					<path
-						d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM10 15a1 1 0 1 1 0-2 1 1 0 0 1 0 2Zm1-4a1 1 0 0 1-2 0V6a1 1 0 0 1 2 0v5Z"
-					/>
-				</svg>
-				<svg
-					v-else
-					class="w-5 h-5"
-					:class="currentVariant.icon"
-					aria-hidden="true"
-					xmlns="http://www.w3.org/2000/svg"
-					fill="currentColor"
-					viewBox="0 0 20 20"
-				>
-					<path
-						d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z"
-					/>
-				</svg>
+				/>
+				<IconInfoCircle v-else class="size-5" :class="currentVariant.icon" />
 			</div>
 
 			<div
@@ -109,21 +80,7 @@ const currentVariant = computed(() => variants[severity?.value || "info"]);
 				aria-label="Close"
 			>
 				<span class="sr-only">Close</span>
-				<svg
-					class="size-3"
-					aria-hidden="true"
-					xmlns="http://www.w3.org/2000/svg"
-					fill="none"
-					viewBox="0 0 14 14"
-				>
-					<path
-						stroke="currentColor"
-						stroke-linecap="round"
-						stroke-linejoin="round"
-						stroke-width="2"
-						d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"
-					/>
-				</svg>
+				<IconX class="size-3" />
 			</button>
 
 			<div

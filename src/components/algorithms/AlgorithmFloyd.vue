@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { IconChevronLeft, IconChevronRight } from '@tabler/icons-vue';
 import { ref, computed, watch, onMounted, onActivated, nextTick } from "vue";
 import { useGraph } from "../../composables/useGraph";
 import PropertiesCard from "../properties/PropertiesCard.vue";
@@ -243,19 +244,7 @@ const prevStep = () => {
 							class="p-1.5 rounded-full hover:bg-white hover:shadow-sm border border-transparent hover:border-slate-200 text-slate-500 disabled:opacity-30 disabled:hover:shadow-none disabled:hover:border-transparent transition-all"
 							title="Anterior"
 						>
-							<svg
-								class="w-6 h-6"
-								fill="none"
-								stroke="currentColor"
-								viewBox="0 0 24 24"
-							>
-								<path
-									stroke-linecap="round"
-									stroke-linejoin="round"
-									stroke-width="2"
-									d="M15 19l-7-7 7-7"
-								/>
-							</svg>
+							<IconChevronLeft class="size-6" />
 						</button>
 
 						<div class="flex-1 mx-2 relative flex items-center">
@@ -274,19 +263,7 @@ const prevStep = () => {
 							class="p-1.5 rounded-full hover:bg-white hover:shadow-sm border border-transparent hover:border-slate-200 text-slate-500 disabled:opacity-30 disabled:hover:shadow-none disabled:hover:border-transparent transition-all"
 							title="Siguiente"
 						>
-							<svg
-								class="w-6 h-6"
-								fill="none"
-								stroke="currentColor"
-								viewBox="0 0 24 24"
-							>
-								<path
-									stroke-linecap="round"
-									stroke-linejoin="round"
-									stroke-width="2"
-									d="M9 5l7 7-7 7"
-								/>
-							</svg>
+							<IconChevronRight class="size-6" />
 						</button>
 					</div>
 				</div>

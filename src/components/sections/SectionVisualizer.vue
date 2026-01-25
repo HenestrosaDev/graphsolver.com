@@ -1,4 +1,14 @@
 <script setup lang="ts">
+import { 
+	IconZoomOut,
+	IconZoomIn,
+	IconKeyframeAlignCenter,
+	IconCamera,
+	IconArrowsMaximize,
+	IconArrowsMinimize,
+	IconLock,
+	IconLockOpen
+} from '@tabler/icons-vue';
 import { ref, onMounted, onUnmounted, watch, nextTick } from "vue";
 import { Network, type Data } from "vis-network";
 import { DataSet } from "vis-data";
@@ -294,20 +304,7 @@ watch([() => getGraphData(), highlightedPath], () => drawGraph(), {
 							v-if="showOverlayHint"
 							class="bg-slate-900/70 backdrop-blur-[2px] rounded-xl flex flex-col items-center justify-center text-white p-6 text-center select-none mx-6 shadow-2xl"
 						>
-							<svg
-								xmlns="http://www.w3.org/2000/svg"
-								class="h-10 w-10 mb-3 opacity-90"
-								fill="none"
-								viewBox="0 0 24 24"
-								stroke="currentColor"
-								stroke-width="2"
-							>
-								<path
-									stroke-linecap="round"
-									stroke-linejoin="round"
-									d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
-								/>
-							</svg>
+							<IconLock class="size-10 mb-3 opacity-90" />
 							<p class="font-bold text-lg">Interacción desactivada</p>
 							<p class="text-sm text-slate-200 mt-1 leading-snug">
 								Pulsa el candado 🔒 de abajo para interactuar con el grafo.
@@ -324,20 +321,7 @@ watch([() => getGraphData(), highlightedPath], () => drawGraph(), {
 						class="p-2 rounded-full text-gray-500 hover:text-blue-600 hover:bg-blue-50 transition"
 						title="Alejar"
 					>
-						<svg
-							viewBox="0 0 24 24"
-							fill="none"
-							stroke="currentColor"
-							stroke-width="2"
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							class="size-5"
-						>
-							<path stroke="none" d="M0 0h24v24H0z" fill="none" />
-							<path d="M3 10a7 7 0 1 0 14 0a7 7 0 1 0 -14 0" />
-							<path d="M7 10l6 0" />
-							<path d="M21 21l-6 -6" />
-						</svg>
+						<IconZoomOut class="size-5" />
 					</button>
 
 					<button
@@ -345,21 +329,7 @@ watch([() => getGraphData(), highlightedPath], () => drawGraph(), {
 						class="p-2 rounded-full text-gray-500 hover:text-blue-600 hover:bg-blue-50 transition"
 						title="Acercar"
 					>
-						<svg
-							viewBox="0 0 24 24"
-							fill="none"
-							stroke="currentColor"
-							stroke-width="2"
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							class="size-5"
-						>
-							<path stroke="none" d="M0 0h24v24H0z" fill="none" />
-							<path d="M3 10a7 7 0 1 0 14 0a7 7 0 1 0 -14 0" />
-							<path d="M7 10l6 0" />
-							<path d="M10 7l0 6" />
-							<path d="M21 21l-6 -6" />
-						</svg>
+						<IconZoomIn class="size-5" />
 					</button>
 
 					<button
@@ -367,24 +337,7 @@ watch([() => getGraphData(), highlightedPath], () => drawGraph(), {
 						class="p-2 rounded-full text-gray-500 hover:text-blue-600 hover:bg-blue-50 transition"
 						title="Ajustar vista"
 					>
-						<svg
-							viewBox="0 0 24 24"
-							fill="none"
-							stroke="currentColor"
-							stroke-width="2"
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							class="size-5"
-						>
-							<path stroke="none" d="M0 0h24v24H0z" fill="none" />
-							<path d="M12 20v2" />
-							<path
-								d="M12.816 16.58c-.207 .267 -.504 .42 -.816 .42c-.312 0 -.61 -.153 -.816 -.42l-2.908 -3.748a1.39 1.39 0 0 1 0 -1.664l2.908 -3.748c.207 -.267 .504 -.42 .816 -.42c.312 0 .61 .153 .816 .42l2.908 3.748a1.39 1.39 0 0 1 0 1.664l-2.908 3.748"
-							/>
-							<path d="M12 2v2" />
-							<path d="M3 12h2" />
-							<path d="M19 12h2" />
-						</svg>
+						<IconKeyframeAlignCenter class="size-5" />
 					</button>
 
 					<button
@@ -392,25 +345,7 @@ watch([() => getGraphData(), highlightedPath], () => drawGraph(), {
 						class="p-2 rounded-full text-gray-500 hover:text-blue-600 hover:bg-blue-50 transition"
 						title="Descargar como imagen PNG"
 					>
-						<svg
-							xmlns="http://www.w3.org/2000/svg"
-							class="size-5"
-							fill="none"
-							viewBox="0 0 24 24"
-							stroke="currentColor"
-							stroke-width="2"
-						>
-							<path
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"
-							/>
-							<path
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"
-							/>
-						</svg>
+						<IconCamera class="size-5" />
 					</button>
 
 					<button
@@ -421,41 +356,8 @@ watch([() => getGraphData(), highlightedPath], () => drawGraph(), {
 						}"
 						title="Pantalla completa"
 					>
-						<svg
-							v-if="!isFullscreen"
-							viewBox="0 0 24 24"
-							fill="none"
-							stroke="currentColor"
-							stroke-width="2"
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							class="size-5"
-						>
-							<path stroke="none" d="M0 0h24v24H0z" fill="none" />
-							<path d="M16 4l4 0l0 4" />
-							<path d="M14 10l6 -6" />
-							<path d="M8 20l-4 0l0 -4" />
-							<path d="M4 20l6 -6" />
-							<path d="M16 20l4 0l0 -4" />
-							<path d="M14 14l6 6" />
-							<path d="M8 4l-4 0l0 4" />
-							<path d="M4 4l6 6" />
-						</svg>
-
-						<svg
-							v-else
-							viewBox="0 0 24 24"
-							fill="none"
-							stroke="currentColor"
-							stroke-width="2"
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							class="size-5"
-						>
-							<path stroke="none" d="M0 0h24v24H0z" fill="none" />
-							<path d="M18 6l-12 12" />
-							<path d="M6 6l12 12" />
-						</svg>
+						<IconArrowsMaximize v-if="!isFullscreen" class="size-5" />
+						<IconArrowsMinimize v-else class="size-5" />
 					</button>
 
 					<button
@@ -471,37 +373,8 @@ watch([() => getGraphData(), highlightedPath], () => drawGraph(), {
 							v-if="showOverlayHint"
 							class="absolute inset-0 -z-10 inline-flex h-full w-full rounded-full bg-blue-400 opacity-75 animate-ping"
 						/>
-
-						<svg
-							v-if="isLocked"
-							xmlns="http://www.w3.org/2000/svg"
-							class="h-5 w-5"
-							fill="none"
-							viewBox="0 0 24 24"
-							stroke="currentColor"
-						>
-							<path
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								stroke-width="2"
-								d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
-							/>
-						</svg>
-						<svg
-							v-else
-							xmlns="http://www.w3.org/2000/svg"
-							class="h-5 w-5"
-							fill="none"
-							viewBox="0 0 24 24"
-							stroke="currentColor"
-						>
-							<path
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								stroke-width="2"
-								d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z"
-							/>
-						</svg>
+						<IconLock v-if="isLocked" class="size-5" />
+						<IconLockOpen v-else class="size-5" />
 					</button>
 				</div>
 

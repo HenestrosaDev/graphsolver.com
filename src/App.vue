@@ -10,6 +10,13 @@ import Footer from './components/common/Footer.vue';
 import MatrixInput from './components/sections/SectionMatrixInput.vue';
 import ToastNotification from './components/common/ToastNotification.vue';
 import SectionCard from './components/sections/SectionCard.vue';
+import { 
+  IconDownload,
+  IconUpload,
+  IconEye,
+  IconCpu,
+  IconChartBar
+} from '@tabler/icons-vue';
 
 // Always visible components
 import TabVisualizer from './components/sections/SectionVisualizer.vue';
@@ -193,9 +200,7 @@ const handleFileChange = async (event: Event) => {
           <div class="flex gap-2">
             <div class="relative">
               <button @click="handleExport" class="text-sm bg-white text-slate-600 border border-slate-200 font-medium py-2 px-3 rounded-lg shadow-sm hover:bg-slate-50 hover:text-green-600 transition-all active:scale-95 flex items-center gap-2" title="Seleccionar formato para exportar">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                </svg>
+                <IconDownload class="size-4" />
                 <span class="hidden sm:inline">Exportar</span>
               </button>
 
@@ -216,9 +221,7 @@ const handleFileChange = async (event: Event) => {
 
             <div class="relative">
               <button @click="triggerImport" class="text-sm bg-white text-slate-600 border border-slate-200 font-medium py-2 px-3 rounded-lg shadow-sm hover:bg-slate-50 hover:text-blue-600 transition-all active:scale-95 flex items-center gap-2" title="Seleccionar formato para importar">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
-                </svg>
+                <IconUpload class="size-4" />
                 <span class="hidden sm:inline">Importar</span>
               </button>
 
@@ -252,11 +255,7 @@ const handleFileChange = async (event: Event) => {
             body-class="flex-1 flex flex-col min-h-[400px]"
           >
             <template #icon>
-              <svg class="size-5 text-amber-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-                <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
-                <path d="M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6" />
-              </svg>
+              <IconEye class="size-5 text-amber-600" />
             </template>
             <TabVisualizer class="flex-1 w-full h-full" />
           </SectionCard>
@@ -266,9 +265,7 @@ const handleFileChange = async (event: Event) => {
           <div>
             <SectionCard title="Algoritmos">
               <template #icon>
-                <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
-                </svg>
+                <IconCpu class="size-5 text-indigo-600" />
               </template>
               <div class="mb-4">
                 <label for="algorithm-select" class="block text-xs uppercase font-bold text-slate-500 mb-3">Algoritmo</label>
@@ -287,9 +284,7 @@ const handleFileChange = async (event: Event) => {
 
         <SectionCard title="Propiedades" class="col-span-2">
           <template #icon>
-            <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-            </svg>
+            <IconChartBar class="size-5 text-green-600" />
           </template>
           <TabProperties />
         </SectionCard>
