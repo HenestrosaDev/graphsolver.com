@@ -1,0 +1,56 @@
+import { useGraph } from "./useGraph";
+
+export type FormatKey = "JSON" | "LaTeX" | "Dot";
+
+export interface GraphFormat {
+	serialize: () => string;
+	parse: (value: string) => boolean;
+	mime: string;
+	ext: string;
+	accept: string;
+}
+
+export const useGraphFormats = () => {
+	const { toJSON, toLaTeX, toDot, loadFromJSON, loadFromLaTeX, loadFromDot } =
+		useGraph();
+
+	const formats: Record<FormatKey, GraphFormat> = {
+		JSON: {
+			serialize: toJSON,
+			parse: loadFromJSON,
+			mime: "application/json",
+			ext: "json",
+			accept: ".json",
+		},
+		LaTeX: {
+			serialize: toLaTeX,
+			parse: loadFromLaTeX,
+			mime: "text/plain",
+			ext: "tex",
+			accept: ".tex",
+		},
+		Dot: {
+			serialize: toDot,
+			parse: loadFromDot,
+			mime: "text/plain",
+			ext: "dot",
+			accept: ".dot,.gv",
+		},
+	};
+
+	const formatOrder: FormatKey[] = ["JSON", "LaTeX", "Dot"];
+
+	const getFormatByExtension = (filename: string): FormatKey | undefined => {
+		const ext = filename.split(".").pop()?.toLowerCase();
+		if (!ext) return undefined;
+
+		return Object.entries(formats).find(([_, config]) =>
+			config.accept
+				.split(",")
+				.map((e) => e.replace(".", ""))
+				.includes(ext)
+		)?.[0] as FormatKey;
+	};
+
+	return { formats, formatOrder, getFormatByExtension };
+};
