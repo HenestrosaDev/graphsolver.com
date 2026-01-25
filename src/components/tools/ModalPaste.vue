@@ -55,15 +55,21 @@ const handleImport = () => {
 	// Get the selected format
 	const fmt = formats[selectedFormat.value];
 
-	// Try to parse
-	const success = fmt.parse(content.value);
+	// Try to parse safely
+	let success = false;
+	try {
+		success = fmt.parse(content.value);
+	} catch (e) {
+		success = false;
+		console.error("Error parsing pasted content", e);
+	}
 
 	// Save the format preference for next time
 	localStorage.setItem("pasteFormat", selectedFormat.value);
 
 	// Emit the result to the parent (App.vue) to show the Toast
 	emit("import", success);
-	emit("close");
+	if (success) emit("close");
 };
 </script>
 
