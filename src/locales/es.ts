@@ -81,8 +81,8 @@ export default {
 	},
 	dijkstra: {
 		routeTitle: "Cálculo de ruta",
-		origin: "Origen",
-		destination: "Destino",
+		origin: "Desde",
+		destination: "Hasta",
 		minCost: "Coste mínimo",
 		optimalPath: "Camino óptimo",
 		iterationsTable: "Tabla de iteraciones",
@@ -94,8 +94,8 @@ export default {
 	},
 	floyd: {
 		routeTitle: "Cálculo de ruta",
-		origin: "Origen",
-		destination: "Destino",
+		origin: "Desde",
+		destination: "Hasta",
 		minCost: "Coste mínimo",
 		optimalPath: "Camino óptimo",
 		diameter: "Diámetro del grafo",
