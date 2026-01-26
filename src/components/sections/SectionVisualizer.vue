@@ -16,10 +16,12 @@ import { DataSet } from "vis-data";
 import { useGraph } from "../../composables/useGraph";
 import { useToast } from "../../composables/useToast";
 import { useTheme } from "../../composables/useTheme";
+import { useTouch } from "../../composables/useTouch";
 
 const { getGraphData, nodes, highlightedPath } = useGraph();
 const { triggerToast } = useToast();
 const { isDark } = useTheme();
+const { hasTouch } = useTouch();
 const { t } = useI18n();
 
 const networkContainer = ref<HTMLElement | null>(null);
@@ -44,25 +46,7 @@ const handleTouchStart = () => {
 const handleTouchEnd = () => {
 	overlayTimeout = window.setTimeout(() => {
 		showOverlayHint.value = false;
-	}, 1500);
-};
-
-// When wheel event occurs while locked
-const handleWheelHint = () => {
-	if (overlayTimeout) clearTimeout(overlayTimeout);
-	showOverlayHint.value = true;
-	overlayTimeout = window.setTimeout(() => {
-		showOverlayHint.value = false;
-	}, 1500);
-};
-
-// When click occurs while locked
-const handleClickHint = () => {
-	if (overlayTimeout) clearTimeout(overlayTimeout);
-	showOverlayHint.value = true;
-	overlayTimeout = window.setTimeout(() => {
-		showOverlayHint.value = false;
-	}, 1500);
+	}, 300);
 };
 
 // --- Lock / Unlock ---
@@ -74,8 +58,9 @@ const toggleLock = () => {
 		networkInstance.setOptions({
 			interaction: {
 				zoomView: !isLocked.value,
-				zoomSpeed: 0.1,
-			},
+				dragView: true,
+				dragNodes: !isLocked.value,
+			}
 		});
 	}
 
@@ -147,7 +132,6 @@ const parseData = () => {
 				const isHighlighted = highlightedPath.value.includes(edgeId);
 
 				visEdgesArray.push({
-					id: `${i}-${j}`,
 					from: i,
 					to: j,
 					label: String(weight),
@@ -201,10 +185,9 @@ const drawGraph = () => {
 		},
 		interaction: {
 			hover: true,
-			zoomView: !isLocked.value,
+			zoomView: false,
 			dragView: true,
 			dragNodes: true,
-			zoomSpeed: 0.1,
 		},
 		layout: { randomSeed: 10 },
 	};
@@ -219,9 +202,7 @@ const drawGraph = () => {
 	// Once the graph calculates its initial position, we disable physics.
 	// This makes the nodes stay "frozen" in place.
 	networkInstance.on("stabilizationIterationsDone", () => {
-		if (networkInstance) {
-			networkInstance.setOptions({ physics: { enabled: false } });
-		}
+		networkInstance.setOptions({ physics: { enabled: false } });
 	});
 
 	// Optional: If you want to reactivate physics while dragging (only for that node)
@@ -232,26 +213,6 @@ const drawGraph = () => {
 
 	// Fit the graph to view
 	networkInstance.fit();
-
-	// Custom wheel zoom for better control
-	if (networkContainer.value) {
-		networkContainer.value.addEventListener('wheel', (e) => {
-			if (!isLocked.value && networkInstance) {
-				e.preventDefault();
-				const currentScale = networkInstance.getScale();
-				// Differentiate between mouse wheel and touchpad pinch
-				const isTouchpadPinch = e.ctrlKey; // Touchpad pinch often has ctrlKey
-				const zoomFactor = e.deltaY > 0 
-					? (isTouchpadPinch ? 0.98 : 0.9)  // Slower for touchpad, faster for mouse
-					: (isTouchpadPinch ? 1.02 : 1.1);
-				const newScale = currentScale * zoomFactor;
-				networkInstance.moveTo({
-					scale: Math.max(0.1, Math.min(2, newScale)), // Limit zoom range
-					animation: false,
-				});
-			}
-		}, { passive: false });
-	}
 };
 
 // --- Controls ---
@@ -304,10 +265,10 @@ const exportImage = () => {
 	link.click();
 	document.body.removeChild(link);
 
-	triggerToast({ title: t("visualizer.imageDownloaded"), severity: "info" });
+	triggerToast({ title: t("visualizer.imageDownloaded"), severity: "success" });
 };
 
-// --- Ciclo de Vida ---
+// --- Lifecycle ---
 onMounted(() => {
 	drawGraph();
 	window.addEventListener("keydown", handleKeydown);
@@ -353,15 +314,14 @@ watch(isDark, () => drawGraph());
 				<div
 					ref="networkContainer"
 					class="absolute inset-0 w-full h-full cursor-grab active:cursor-grabbing"
+					:class="{ 'touch-manipulation': isLocked && hasTouch, 'touch-none': !isLocked && hasTouch }"
 				/>
 
 				<div
 					v-if="isLocked && !isFullscreen"
-					class="absolute inset-0 z-10 touch-pan-y flex items-center justify-center pb-32"
+					class="absolute inset-0 z-10 lg:hidden touch-pan-y flex items-center justify-center pb-32"
 					@touchstart="handleTouchStart"
 					@touchend="handleTouchEnd"
-					@wheel="handleWheelHint"
-					@click="handleClickHint"
 				>
 					<Transition name="fade">
 						<div
@@ -382,6 +342,7 @@ watch(isDark, () => drawGraph());
 					:class="isFullscreen ? 'max-sm:!bottom-16' : ''"
 				>
 					<button
+						v-if="hasTouch"
 						@click="toggleLock"
 						class="relative p-2 rounded-full text-gray-500 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-slate-800 transition-all duration-300"
 						:class="{
@@ -455,6 +416,14 @@ watch(isDark, () => drawGraph());
 </template>
 
 <style scoped>
+.touch-manipulation {
+	touch-action: manipulation;
+}
+
+.touch-none {
+	touch-action: none;
+}
+
 /* Soft animation for the overlay */
 .fade-enter-active,
 .fade-leave-active {
