@@ -295,10 +295,10 @@ const rangeStyle = computed(() => {
 				</div>
 
 				<div
-					class="p-6 overflow-x-auto flex justify-center min-h-[300px] items-center bg-white dark:bg-slate-900 transition-all duration-300"
+					class="p-6 overflow-x-auto min-h-[300px] w-full bg-white dark:bg-slate-900 transition-all duration-300"
 				>
 					<table
-						class="text-sm border-collapse shadow-sm rounded-lg overflow-hidden"
+						class="text-sm border-collapse mx-auto shadow-sm rounded-lg overflow-hidden"
 					>
 						<thead>
 							<tr>
