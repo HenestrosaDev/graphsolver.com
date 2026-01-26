@@ -302,11 +302,11 @@ const rangeStyle = computed(() => {
 					>
 						<thead>
 							<tr>
-								<th class="p-3 bg-slate-50 dark:bg-slate-800 border-b border-slate-200 dark:border-slate-800"></th>
+								<th class="p-3 bg-slate-50 dark:bg-slate-800/50 border-b border-r border-slate-200 dark:border-slate-800"></th>
 								<th
 									v-for="n in nodes"
 									:key="n"
-									class="p-3 bg-slate-50 dark:bg-slate-800 border-b border-slate-200 dark:border-slate-800 font-bold text-slate-500 dark:text-slate-300 text-xs w-10 text-center"
+									class="p-3 bg-slate-50 dark:bg-slate-800/50 border-b border-r border-slate-200 dark:border-slate-800 font-bold text-slate-500 dark:text-slate-300 text-xs w-10 text-center"
 								>
 									{{ n }}
 								</th>
@@ -315,7 +315,7 @@ const rangeStyle = computed(() => {
 						<tbody>
 							<tr v-for="(row, i) in currentStep.matrix" :key="i">
 								<th
-									class="p-3 bg-slate-50 dark:bg-slate-800 border-r border-slate-200 dark:border-slate-800 font-bold text-slate-500 dark:text-slate-300 text-xs w-10 text-center"
+									class="p-3 bg-slate-50 dark:bg-slate-800/50 border-r border-b border-slate-200 dark:border-slate-800 font-bold text-slate-500 dark:text-slate-300 text-xs w-10 text-center"
 								>
 									{{ nodes[i] }}
 								</th>

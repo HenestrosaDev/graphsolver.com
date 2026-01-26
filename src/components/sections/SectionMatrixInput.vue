@@ -59,7 +59,7 @@ onMounted(() => {
 							v-model.number="numNodes"
 							@blur="numNodes < 2 ? (numNodes = 2) : null"
 							min="2"
-							class="w-10 h-8 text-center text-sm font-bold text-slate-700 dark:text-slate-100 focus:outline-none focus:bg-white dark:focus:bg-slate-900 bg-slate-50 dark:bg-slate-900"
+							class="w-10 h-8 text-center text-sm font-bold text-slate-700 dark:text-slate-100 focus:outline-none focus:bg-white dark:focus:bg-slate-900 bg-slate-50 dark:bg-slate-900/20"
 						/>
 
 						<button
@@ -102,13 +102,13 @@ onMounted(() => {
 					<thead>
 						<tr>
 							<th
-								class="p-2 bg-slate-50 dark:bg-slate-800 border-r border-b border-slate-200 dark:border-slate-800 w-10 sm:w-12"
+								class="p-2 bg-slate-50 dark:bg-slate-800/50 border-r border-b border-slate-200 dark:border-slate-800 w-10 sm:w-12"
 							></th>
 
 							<th
 								v-for="node in nodes"
 								:key="'head-' + node"
-								class="animate-fade-in p-2 bg-slate-50 dark:bg-slate-800 font-bold text-slate-600 dark:text-slate-200 text-xs sm:text-sm text-center select-none w-14 sm:w-16 border-b border-r border-slate-200 dark:border-slate-800 last:border-r-0"
+								class="animate-fade-in p-2 bg-slate-50 dark:bg-slate-800/50 font-bold text-slate-600 dark:text-slate-200 text-xs sm:text-sm text-center select-none w-14 sm:w-16 border-b border-r border-slate-200 dark:border-slate-800 last:border-r-0"
 							>
 								{{ node }}
 							</th>
@@ -121,7 +121,7 @@ onMounted(() => {
 							class="last:border-b-0 tabular-nums"
 						>
 							<td
-								class="p-2 bg-slate-50 dark:bg-slate-800 border-r border-slate-200 dark:border-slate-800 font-bold text-center text-slate-600 dark:text-slate-200 text-xs sm:text-sm select-none"
+								class="p-2 bg-slate-50 dark:bg-slate-800/50 border-r border-slate-200 dark:border-slate-800 font-bold text-center text-slate-600 dark:text-slate-200 text-xs sm:text-sm select-none"
 								:class="{ 'border-b': i !== rawMatrix.length - 1 }"
 							>
 								{{ nodes[i] }}
