@@ -379,6 +379,7 @@ watch(isDark, () => drawGraph());
 
 				<div
 					class="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1 p-1.5 bg-white/90 dark:bg-slate-900/85 backdrop-blur shadow-lg border border-gray-200/80 dark:border-slate-700/70 rounded-full animate-fade-in transition-all duration-300 hover:shadow-xl hover:scale-102"
+					:class="isFullscreen ? 'max-sm:!bottom-16' : ''"
 				>
 					<button
 						@click="toggleLock"
