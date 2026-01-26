@@ -136,6 +136,7 @@ const toGML = () => {
 	const n = numNodes.value;
 
 	let gml = 'graph [\n';
+	gml += `  directed ${isSymmetric ? 0 : 1}\n`;
 
 	// Add nodes
 	for (let i = 0; i < n; i++) {
@@ -411,11 +412,16 @@ const loadFromGML = (gmlString: string): boolean => {
 	const { numNodes, rawMatrix } = useGraph();
 	try {
 		// Simple GML parser - extract nodes and edges
+		const directedRegex = /directed\s+(\d+)/;
 		const nodeRegex = /node\s*\[\s*id\s+(\d+)\s+label\s+"([^"]+)"\s*\]/g;
-		const edgeRegex = /edge\s*\[\s*source\s+(\d+)\s+target\s+(\d+)\s+weight\s+([^\s\]]+)/g;
+		const edgeRegex = /edge\s*\[\s*(?:id\s+\d+\s+)?source\s+(\d+)\s+target\s+(\d+)\s+weight\s+([^\s\]]+)/g;
 
 		const nodes = new Map<number, string>();
 		const edges: Array<{source: number, target: number, weight: string}> = [];
+
+		// Check if graph is directed
+		const directedMatch = gmlString.match(directedRegex);
+		const isDirected = directedMatch ? parseInt(directedMatch[1]) === 1 : false; // Default to undirected
 
 		// Parse nodes
 		let nodeMatch;
@@ -454,12 +460,8 @@ const loadFromGML = (gmlString: string): boolean => {
 			if (sourceIdx !== -1 && targetIdx !== -1) {
 				rawMatrix.value[sourceIdx][targetIdx] = edge.weight;
 
-				// Check if this is an undirected graph by looking for reverse edge
-				// If no reverse edge exists, assume directed
-				const hasReverse = edges.some(e =>
-					e.source === edge.target && e.target === edge.source
-				);
-				if (hasReverse) {
+				// For undirected graphs, set both directions
+				if (!isDirected) {
 					rawMatrix.value[targetIdx][sourceIdx] = edge.weight;
 				}
 			}
