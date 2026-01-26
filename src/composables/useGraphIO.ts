@@ -1,4 +1,5 @@
 import { useToast } from "./useToast";
+import { useI18n } from "vue-i18n";
 
 /**
  * Composable that provides common I/O utilities for graph data: downloading files,
@@ -26,6 +27,7 @@ import { useToast } from "./useToast";
  */
 export function useGraphIO() {
 	const { triggerToast } = useToast();
+	const { t } = useI18n();
 
 	// Export (file) option
 	const downloadFile = (
@@ -53,7 +55,7 @@ export function useGraphIO() {
 
 		// Notify user
 		triggerToast({
-			title: `Archivo .${extension} exportado`,
+			title: t('graphIO.exportToast', { ext: extension }),
 			severity: "success",
 		});
 	};
@@ -63,11 +65,11 @@ export function useGraphIO() {
 		try {
 			await navigator.clipboard.writeText(content);
 			triggerToast({
-				title: `${formatName} copiado al portapapeles`,
+				title: t('graphIO.copyToast', { format: formatName }),
 				severity: "success",
 			});
 		} catch (err) {
-			triggerToast({ title: "Error al copiar", severity: "error" });
+			triggerToast({ title: t('graphIO.copyError'), severity: "error" });
 		}
 	};
 
