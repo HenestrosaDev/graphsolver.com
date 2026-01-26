@@ -15,24 +15,24 @@ const { show, message, title, severity, close } = useToast();
 
 const variants = {
 	success: {
-		container: "bg-green-50 border-green-200 text-green-800",
-		icon: "text-green-500",
-		button: "text-green-500 hover:bg-green-100 focus:ring-green-500",
+		container: "bg-green-50 border-green-200 text-green-800 dark:bg-green-900 dark:border-green-700 dark:text-green-200",
+		icon: "text-green-500 dark:text-green-400",
+		button: "text-green-500 hover:bg-green-100 focus:ring-green-500 dark:text-green-400 dark:hover:bg-green-800 dark:focus:ring-green-400",
 	},
 	error: {
-		container: "bg-red-50 border-red-200 text-red-800",
-		icon: "text-red-500",
-		button: "text-red-500 hover:bg-red-100 focus:ring-red-500",
+		container: "bg-red-50 border-red-200 text-red-800 dark:bg-red-900 dark:border-red-700 dark:text-red-200",
+		icon: "text-red-500 dark:text-red-400",
+		button: "text-red-500 hover:bg-red-100 focus:ring-red-500 dark:text-red-400 dark:hover:bg-red-800 dark:focus:ring-red-400",
 	},
 	warning: {
-		container: "bg-yellow-50 border-yellow-200 text-yellow-800",
-		icon: "text-yellow-500",
-		button: "text-yellow-500 hover:bg-yellow-100 focus:ring-yellow-500",
+		container: "bg-yellow-50 border-yellow-200 text-yellow-800 dark:bg-yellow-900 dark:border-yellow-700 dark:text-yellow-200",
+		icon: "text-yellow-500 dark:text-yellow-400",
+		button: "text-yellow-500 hover:bg-yellow-100 focus:ring-yellow-500 dark:text-yellow-400 dark:hover:bg-yellow-800 dark:focus:ring-yellow-400",
 	},
 	info: {
-		container: "bg-blue-50 border-blue-200 text-blue-800",
-		icon: "text-blue-500",
-		button: "text-blue-500 hover:bg-blue-100 focus:ring-blue-500",
+		container: "bg-blue-50 border-blue-200 text-blue-800 dark:bg-blue-900 dark:border-blue-700 dark:text-blue-200",
+		icon: "text-blue-500 dark:text-blue-400",
+		button: "text-blue-500 hover:bg-blue-100 focus:ring-blue-500 dark:text-blue-400 dark:hover:bg-blue-800 dark:focus:ring-blue-400",
 	},
 };
 
