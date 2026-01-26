@@ -232,9 +232,6 @@ const updateHighlights = () => {
 		};
 	});
 	networkInstance.body.data.edges.update(updatedEdges);
-
-	// Fit the view when highlights change (algorithm change)
-	networkInstance.fit({ animation: true });
 };
 
 // --- Controls ---
