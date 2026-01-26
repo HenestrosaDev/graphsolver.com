@@ -65,7 +65,7 @@ export default {
 		title: "Pegar contenido",
 		formatLabel: "Formato",
 		contentLabel: "Contenido",
-		placeholder: 'Ej: {"nodes": [], "edges": []}...',
+		placeholder: 'Pega tus datos de grafo aquí (ej. formato JSON)',
 		cancel: "Cancelar",
 		import: "Importar",
 	},

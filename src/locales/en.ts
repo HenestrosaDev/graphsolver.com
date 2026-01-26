@@ -65,7 +65,7 @@ export default {
 		title: "Paste content",
 		formatLabel: "Format",
 		contentLabel: "Content",
-		placeholder: 'E.g. {"nodes": [], "edges": []}...',
+		placeholder: 'Paste your graph data here (e.g. JSON format)',
 		cancel: "Cancel",
 		import: "Import",
 	},
