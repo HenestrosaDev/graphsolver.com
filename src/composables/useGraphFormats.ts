@@ -105,6 +105,7 @@ const toGraphML = () => {
 		}
 	}
 
+	graphml += "</graph>\n";
 	graphml += "</graphml>";
 	return graphml;
 };
@@ -347,6 +348,11 @@ const loadFromGraphML = (graphmlString: string): boolean => {
 				}
 			}
 		});
+
+		// Ensure diagonal is 0
+		for (let i = 0; i < n; i++) {
+			rawMatrix.value[i][i] = "0";
+		}
 
 		return true;
 	} catch (e) {

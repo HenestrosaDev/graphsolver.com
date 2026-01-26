@@ -19,7 +19,7 @@ describe("useGraphFormats", () => {
 	it("should include all supported formats", () => {
 		const { formats, formatOrder } = useGraphFormats();
 		const expectedFormats: Array<"JSON" | "LaTeX" | "Dot" | "GraphML" | "CSV" | "GML"> =
-			["JSON", "LaTeX", "Dot", "GraphML", "CSV", "GML"];
+			["CSV", "Dot", "GML", "GraphML", "JSON", "LaTeX"];
 
 		expect(formatOrder).toEqual(expectedFormats);
 
@@ -127,6 +127,8 @@ describe("useGraphFormats", () => {
 		expect(graphmlString).toContain("<node id=\"n0\"/>");
 		expect(graphmlString).toContain("<edge");
 		expect(graphmlString).toContain("<data key=\"weight\">1</data>");
+		expect(graphmlString).toContain("</graph>");
+		expect(graphmlString).toContain("</graphml>");
 	});
 
 	it("should parse GraphML correctly", () => {
