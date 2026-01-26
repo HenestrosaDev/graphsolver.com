@@ -79,11 +79,11 @@ const handleImport = () => {
 	<Transition name="modal">
 		<div
 			v-if="isOpen"
-			class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm"
+			class="fixed inset-0 z-50 p-4 bg-slate-900/60 backdrop-blur-sm"
 			@click.self="$emit('close')"
 		>
 			<div
-				class="bg-white dark:bg-slate-950 rounded-xl shadow-2xl w-full max-w-lg overflow-hidden flex flex-col max-h-[90vh] border border-slate-200 dark:border-slate-800 "
+				class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white dark:bg-slate-950 rounded-xl shadow-2xl w-full overflow-hidden flex flex-col max-h-[90vh] border border-slate-200 dark:border-slate-800 max-w-[90vw] sm:max-w-lg"
 			>
 				<div
 					class="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-slate-50 dark:bg-slate-900"
