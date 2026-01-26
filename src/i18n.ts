@@ -4,8 +4,9 @@ import en from "./locales/en";
 
 type MessageSchema = typeof es;
 
-// Detect user language
-const userLanguage = navigator.language.startsWith("es") ? "es" : "en";
+// Detect user language, with localStorage persistence
+const savedLanguage = localStorage.getItem("locale");
+const userLanguage = savedLanguage || (navigator.language.startsWith("es") ? "es" : "en");
 
 const i18n = createI18n<[MessageSchema], "es" | "en">({
 	legacy: false, // No Composition API
