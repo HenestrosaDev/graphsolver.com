@@ -1,7 +1,7 @@
 import { useGraph } from "./useGraph";
 import type { Matrix } from "../types/graph";
 
-export type FormatKey = "JSON" | "LaTeX" | "Dot" | "GraphML" | "CSV";
+export type FormatKey = "JSON" | "LaTeX" | "Dot" | "GraphML" | "CSV" | "GML";
 
 export interface GraphFormat {
 	serialize: () => string;
@@ -128,6 +128,54 @@ const toCSV = () => {
 	}
 
 	return rows.join('\n');
+};
+
+const toGML = () => {
+	const { numNodes, rawMatrix, getGraphData } = useGraph();
+	const { hasArc, isSymmetric } = getGraphData();
+	const n = numNodes.value;
+
+	let gml = 'graph [\n';
+
+	// Add nodes
+	for (let i = 0; i < n; i++) {
+		gml += '  node [\n';
+		gml += `    id ${i}\n`;
+		gml += `    label "${String.fromCharCode(65 + i)}"\n`;
+		gml += '  ]\n';
+	}
+
+	// Add edges
+	let edgeId = 0;
+	for (let i = 0; i < n; i++) {
+		for (let j = 0; j < n; j++) {
+			if (hasArc[i][j]) {
+				const weight = rawMatrix.value[i][j];
+				if (isSymmetric && i < j) {
+					// For undirected graphs, only add edge once
+					gml += '  edge [\n';
+					gml += `    id ${edgeId}\n`;
+					gml += `    source ${i}\n`;
+					gml += `    target ${j}\n`;
+					gml += `    weight ${weight}\n`;
+					gml += '  ]\n';
+					edgeId++;
+				} else if (!isSymmetric) {
+					// For directed graphs, add all edges
+					gml += '  edge [\n';
+					gml += `    id ${edgeId}\n`;
+					gml += `    source ${i}\n`;
+					gml += `    target ${j}\n`;
+					gml += `    weight ${weight}\n`;
+					gml += '  ]\n';
+					edgeId++;
+				}
+			}
+		}
+	}
+
+	gml += ']';
+	return gml;
 };
 
 // Import functions moved from useGraph
@@ -359,6 +407,76 @@ const loadFromCSV = (csvString: string): boolean => {
 	}
 };
 
+const loadFromGML = (gmlString: string): boolean => {
+	const { numNodes, rawMatrix } = useGraph();
+	try {
+		// Simple GML parser - extract nodes and edges
+		const nodeRegex = /node\s*\[\s*id\s+(\d+)\s+label\s+"([^"]+)"\s*\]/g;
+		const edgeRegex = /edge\s*\[\s*source\s+(\d+)\s+target\s+(\d+)\s+weight\s+([^\s\]]+)/g;
+
+		const nodes = new Map<number, string>();
+		const edges: Array<{source: number, target: number, weight: string}> = [];
+
+		// Parse nodes
+		let nodeMatch;
+		while ((nodeMatch = nodeRegex.exec(gmlString)) !== null) {
+			const id = parseInt(nodeMatch[1]);
+			const label = nodeMatch[2];
+			nodes.set(id, label);
+		}
+
+		// Parse edges
+		let edgeMatch;
+		while ((edgeMatch = edgeRegex.exec(gmlString)) !== null) {
+			const source = parseInt(edgeMatch[1]);
+			const target = parseInt(edgeMatch[2]);
+			const weight = edgeMatch[3];
+			edges.push({ source, target, weight });
+		}
+
+		if (nodes.size === 0) throw new Error("No nodes found in GML");
+
+		// Create node mapping (sort by ID to ensure consistent ordering)
+		const sortedNodeIds = Array.from(nodes.keys()).sort((a, b) => a - b);
+		const n = sortedNodeIds.length;
+
+		// Initialize matrix
+		const matrix: Matrix = Array(n).fill(0).map(() => Array(n).fill(""));
+
+		numNodes.value = n;
+		rawMatrix.value = matrix;
+
+		// Fill matrix with edges
+		edges.forEach(edge => {
+			const sourceIdx = sortedNodeIds.indexOf(edge.source);
+			const targetIdx = sortedNodeIds.indexOf(edge.target);
+
+			if (sourceIdx !== -1 && targetIdx !== -1) {
+				rawMatrix.value[sourceIdx][targetIdx] = edge.weight;
+
+				// Check if this is an undirected graph by looking for reverse edge
+				// If no reverse edge exists, assume directed
+				const hasReverse = edges.some(e =>
+					e.source === edge.target && e.target === edge.source
+				);
+				if (hasReverse) {
+					rawMatrix.value[targetIdx][sourceIdx] = edge.weight;
+				}
+			}
+		});
+
+		// Ensure diagonal is 0
+		for (let i = 0; i < n; i++) {
+			rawMatrix.value[i][i] = "0";
+		}
+
+		return true;
+	} catch (e) {
+		console.error("Error importing GML:", e);
+		return false;
+	}
+};
+
 export const useGraphFormats = () => {
 	const formats: Record<FormatKey, GraphFormat> = {
 		JSON: {
@@ -396,9 +514,16 @@ export const useGraphFormats = () => {
 			ext: "csv",
 			accept: ".csv",
 		},
+		GML: {
+			serialize: toGML,
+			parse: loadFromGML,
+			mime: "text/plain",
+			ext: "gml",
+			accept: ".gml",
+		},
 	};
 
-	const formatOrder: FormatKey[] = ["JSON", "LaTeX", "Dot", "GraphML", "CSV"];
+	const formatOrder: FormatKey[] = ["JSON", "LaTeX", "Dot", "GraphML", "CSV", "GML"];
 
 	const getFormatByExtension = (filename: string): FormatKey | undefined => {
 		const ext = filename.split(".").pop()?.toLowerCase();
