@@ -1,7 +1,7 @@
 import { useGraph } from "./useGraph";
 import type { Matrix } from "../types/graph";
 
-export type FormatKey = "JSON" | "LaTeX" | "Dot" | "GraphML";
+export type FormatKey = "JSON" | "LaTeX" | "Dot" | "GraphML" | "CSV";
 
 export interface GraphFormat {
 	serialize: () => string;
@@ -101,9 +101,33 @@ const toGraphML = () => {
 		}
 	}
 
-	graphml += '  </graph>\n';
 	graphml += '</graphml>';
 	return graphml;
+};
+
+const toCSV = () => {
+	const { numNodes, rawMatrix } = useGraph();
+	const n = numNodes.value;
+
+	// Create header row with node labels (A, B, C, ...)
+	const headers = [''];
+	for (let i = 0; i < n; i++) {
+		headers.push(String.fromCharCode(65 + i));
+	}
+
+	const rows = [headers.join(',')];
+
+	// Add data rows
+	for (let i = 0; i < n; i++) {
+		const row = [String.fromCharCode(65 + i)]; // Row header
+		for (let j = 0; j < n; j++) {
+			const val = rawMatrix.value[i][j];
+			row.push(val === "" ? "0" : val.toString());
+		}
+		rows.push(row.join(','));
+	}
+
+	return rows.join('\n');
 };
 
 // Import functions moved from useGraph
@@ -287,6 +311,54 @@ const loadFromGraphML = (graphmlString: string): boolean => {
 	}
 };
 
+const loadFromCSV = (csvString: string): boolean => {
+	const { numNodes, rawMatrix } = useGraph();
+	try {
+		// Split into lines and filter out empty lines
+		const lines = csvString.split('\n').map(line => line.trim()).filter(line => line.length > 0);
+		if (lines.length === 0) throw new Error("Empty CSV");
+
+		// Parse CSV rows
+		const rows = lines.map(line => line.split(',').map(cell => cell.trim()));
+
+		// Check if we have a square matrix (including headers)
+		const n = rows.length - 1; // Subtract 1 for header row
+		if (n === 0) throw new Error("No data rows");
+		if (rows[0].length - 1 !== n) throw new Error("Non-square matrix");
+
+		// Validate all rows have the same number of columns
+		for (let i = 1; i < rows.length; i++) {
+			if (rows[i].length !== n + 1) throw new Error("Inconsistent row lengths");
+		}
+
+		// Initialize matrix
+		const matrix: Matrix = Array(n).fill(0).map(() => Array(n).fill(""));
+
+		numNodes.value = n;
+		rawMatrix.value = matrix;
+
+		// Fill matrix (skip header row and column)
+		for (let i = 0; i < n; i++) {
+			for (let j = 0; j < n; j++) {
+				const cellValue = rows[i + 1][j + 1];
+				const numValue = parseFloat(cellValue);
+				if (isNaN(numValue)) throw new Error(`Invalid number at row ${i + 1}, column ${j + 1}`);
+				rawMatrix.value[i][j] = numValue === 0 ? "" : numValue.toString();
+			}
+		}
+
+		// Ensure diagonal is 0
+		for (let i = 0; i < n; i++) {
+			rawMatrix.value[i][i] = "0";
+		}
+
+		return true;
+	} catch (e) {
+		console.error("Error importing CSV:", e);
+		return false;
+	}
+};
+
 export const useGraphFormats = () => {
 	const formats: Record<FormatKey, GraphFormat> = {
 		JSON: {
@@ -317,9 +389,16 @@ export const useGraphFormats = () => {
 			ext: "graphml",
 			accept: ".graphml,.xml",
 		},
+		CSV: {
+			serialize: toCSV,
+			parse: loadFromCSV,
+			mime: "text/csv",
+			ext: "csv",
+			accept: ".csv",
+		},
 	};
 
-	const formatOrder: FormatKey[] = ["JSON", "LaTeX", "Dot", "GraphML"];
+	const formatOrder: FormatKey[] = ["JSON", "LaTeX", "Dot", "GraphML", "CSV"];
 
 	const getFormatByExtension = (filename: string): FormatKey | undefined => {
 		const ext = filename.split(".").pop()?.toLowerCase();
