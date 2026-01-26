@@ -101,6 +101,10 @@ const parseData = () => {
 				background: isDark.value ? "#1e293b" : "#EFF6FF",
 				border: isDark.value ? "#60a5fa" : "#2563EB",
 				highlight: isDark.value ? "#3b82f6" : "#BFDBFE",
+				hover: {
+					background: isDark.value ? "#0f172a" : "#BFDBFE",
+					border: isDark.value ? "#60a5fa" : "#2563EB",
+				},
 			},
 			font: {
 				size: 20,
