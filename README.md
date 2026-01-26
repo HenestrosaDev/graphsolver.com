@@ -132,7 +132,7 @@
   - **Kruskal's Algorithm**: Minimum spanning tree
 - **Flexible Input Methods**:
   - Matrix input interface
-  - File import/export (JSON, CSV, GraphML)
+  - File import/export (JSON, LaTeX, Dot, GraphML)
   - Copy/paste functionality
 - **Graph Analysis**:
   - Graph properties (connectedness, diameter, etc.)
@@ -185,7 +185,7 @@ npm run preview
 
 1. **Input Your Graph**:
    - Use the matrix input section to define your adjacency matrix
-   - Or import from a file (JSON, CSV, GraphML formats supported)
+   - Or import from a file (JSON, LaTeX, Dot, GraphML formats supported)
 
 2. **Select Algorithm**:
    - Choose from Dijkstra, Floyd-Warshall, or Kruskal algorithms
@@ -201,8 +201,9 @@ npm run preview
 
 ### Supported File Formats
 
-- **JSON**: Standard graph representation
-- **CSV**: Adjacency matrix format
+- **JSON**: Standard graph representation with metadata
+- **LaTeX**: Matrix format for academic documents
+- **Dot**: GraphViz DOT language format
 - **GraphML**: XML-based graph format
 
 ## Testing
