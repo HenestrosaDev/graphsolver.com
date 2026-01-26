@@ -134,6 +134,7 @@ const parseData = () => {
 				const isHighlighted = highlightedPath.value.includes(edgeId);
 
 				visEdgesArray.push({
+					id: edgeId,
 					from: i,
 					to: j,
 					label: String(weight),
@@ -214,6 +215,28 @@ const drawGraph = () => {
 	networkInstance.fit();
 };
 
+const updateHighlights = () => {
+	if (!networkInstance) return;
+
+	const edges = networkInstance.body.data.edges.get();
+	const updatedEdges = edges.map(edge => {
+		const isHighlighted = highlightedPath.value.includes(edge.id);
+		return {
+			id: edge.id,
+			color: isHighlighted
+				? { color: "#ef4444", highlight: "#ef4444" }
+				: {
+					color: isDark.value ? "#94a3b8" : "#64748b",
+					highlight: isDark.value ? "#60a5fa" : "#2563EB",
+				},
+		};
+	});
+	networkInstance.body.data.edges.update(updatedEdges);
+
+	// Fit the view when highlights change (algorithm change)
+	networkInstance.fit({ animation: true });
+};
+
 // --- Controls ---
 const zoomIn = () =>
 	networkInstance?.moveTo({
@@ -290,9 +313,10 @@ onUnmounted(() => {
 	if (resizeObserver) resizeObserver.disconnect();
 });
 
-watch([() => getGraphData(), highlightedPath], () => drawGraph(), {
-	deep: true,
-});
+watch(() => getGraphData(), () => drawGraph(), { deep: true });
+
+// Watch for highlighted path changes to update only edge colors
+watch(highlightedPath, () => updateHighlights(), { deep: true });
 
 // Watch for theme changes to redraw with new colors
 watch(isDark, () => drawGraph());
