@@ -44,13 +44,40 @@ const handleTouchStart = () => {
 const handleTouchEnd = () => {
 	overlayTimeout = window.setTimeout(() => {
 		showOverlayHint.value = false;
-	}, 300);
+	}, 1500);
+};
+
+// When wheel event occurs while locked
+const handleWheelHint = () => {
+	if (overlayTimeout) clearTimeout(overlayTimeout);
+	showOverlayHint.value = true;
+	overlayTimeout = window.setTimeout(() => {
+		showOverlayHint.value = false;
+	}, 1500);
+};
+
+// When click occurs while locked
+const handleClickHint = () => {
+	if (overlayTimeout) clearTimeout(overlayTimeout);
+	showOverlayHint.value = true;
+	overlayTimeout = window.setTimeout(() => {
+		showOverlayHint.value = false;
+	}, 1500);
 };
 
 // --- Lock / Unlock ---
 const toggleLock = () => {
 	isLocked.value = !isLocked.value;
 	if (!isLocked.value) showOverlayHint.value = false;
+
+	if (networkInstance) {
+		networkInstance.setOptions({
+			interaction: {
+				zoomView: !isLocked.value,
+				zoomSpeed: 0.1,
+			},
+		});
+	}
 
 	const msg = isLocked.value
 		? t("visualizer.scrollMode")
@@ -120,6 +147,7 @@ const parseData = () => {
 				const isHighlighted = highlightedPath.value.includes(edgeId);
 
 				visEdgesArray.push({
+					id: `${i}-${j}`,
 					from: i,
 					to: j,
 					label: String(weight),
@@ -173,9 +201,10 @@ const drawGraph = () => {
 		},
 		interaction: {
 			hover: true,
-			zoomView: false,
+			zoomView: !isLocked.value,
 			dragView: true,
 			dragNodes: true,
+			zoomSpeed: 0.1,
 		},
 		layout: { randomSeed: 10 },
 	};
@@ -190,7 +219,9 @@ const drawGraph = () => {
 	// Once the graph calculates its initial position, we disable physics.
 	// This makes the nodes stay "frozen" in place.
 	networkInstance.on("stabilizationIterationsDone", () => {
-		networkInstance.setOptions({ physics: { enabled: false } });
+		if (networkInstance) {
+			networkInstance.setOptions({ physics: { enabled: false } });
+		}
 	});
 
 	// Optional: If you want to reactivate physics while dragging (only for that node)
@@ -201,6 +232,26 @@ const drawGraph = () => {
 
 	// Fit the graph to view
 	networkInstance.fit();
+
+	// Custom wheel zoom for better control
+	if (networkContainer.value) {
+		networkContainer.value.addEventListener('wheel', (e) => {
+			if (!isLocked.value && networkInstance) {
+				e.preventDefault();
+				const currentScale = networkInstance.getScale();
+				// Differentiate between mouse wheel and touchpad pinch
+				const isTouchpadPinch = e.ctrlKey; // Touchpad pinch often has ctrlKey
+				const zoomFactor = e.deltaY > 0 
+					? (isTouchpadPinch ? 0.98 : 0.9)  // Slower for touchpad, faster for mouse
+					: (isTouchpadPinch ? 1.02 : 1.1);
+				const newScale = currentScale * zoomFactor;
+				networkInstance.moveTo({
+					scale: Math.max(0.1, Math.min(2, newScale)), // Limit zoom range
+					animation: false,
+				});
+			}
+		}, { passive: false });
+	}
 };
 
 // --- Controls ---
@@ -306,9 +357,11 @@ watch(isDark, () => drawGraph());
 
 				<div
 					v-if="isLocked && !isFullscreen"
-					class="absolute inset-0 z-10 lg:hidden touch-pan-y flex items-center justify-center pb-32"
+					class="absolute inset-0 z-10 touch-pan-y flex items-center justify-center pb-32"
 					@touchstart="handleTouchStart"
 					@touchend="handleTouchEnd"
+					@wheel="handleWheelHint"
+					@click="handleClickHint"
 				>
 					<Transition name="fade">
 						<div
@@ -373,7 +426,7 @@ watch(isDark, () => drawGraph());
 
 					<button
 						@click="toggleLock"
-						class="relative lg:hidden p-2 rounded-full text-gray-500 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-slate-800 transition-all duration-300"
+						class="relative p-2 rounded-full text-gray-500 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-slate-800 transition-all duration-300"
 						:class="{
 							'text-blue-600 bg-blue-50 ring-1 ring-blue-200 dark:text-blue-200 dark:bg-blue-900/30 dark:ring-blue-700': !isLocked,
 							'scale-110 bg-white dark:bg-slate-900 ring-2 ring-blue-400 dark:ring-blue-700 shadow-xl z-50':
