@@ -15,7 +15,7 @@ import SectionAlgorithms from "./components/sections/SectionAlgorithms.vue";
 import SectionVisualizer from "./components/sections/SectionVisualizer.vue";
 import SectionProperties from "./components/sections/SectionProperties.vue";
 import GraphIOControls from "./components/tools/GraphIOControls.vue";
-import ModalPaste from "./components/tools/ModalPaste.vue";
+import ModalIO, { type ModalIOMode } from "./components/modal/ModalIO.vue";
 import { IconEye, IconCpu, IconChartBar } from "@tabler/icons-vue";
 
 // Composables
@@ -50,7 +50,13 @@ useHead({
 
 // State
 const fileInput = ref<HTMLInputElement | null>(null);
-const isPasteModalOpen = ref(false);
+const modalState = ref<{
+	isOpen: boolean;
+	mode: ModalIOMode;
+}>({
+	isOpen: false,
+	mode: "import",
+});
 
 const prepareFileInput = (accept: string) => {
 	if (fileInput.value) {
@@ -95,6 +101,11 @@ const handlePasteResult = (success: boolean) => {
 		severity: success ? "success" : "error",
 	});
 };
+
+const openModal = (mode: ModalIOMode) => {
+	modalState.value.isOpen = true;
+	modalState.value.mode = mode;
+};
 </script>
 
 <template>
@@ -119,7 +130,7 @@ const handlePasteResult = (success: boolean) => {
 
 					<GraphIOControls
 						@trigger-file-input="prepareFileInput"
-						@open-paste-modal="isPasteModalOpen = true"
+						@open-modal="openModal"
 					/>
 				</div>
 
@@ -168,9 +179,10 @@ const handlePasteResult = (success: boolean) => {
 
 		<Footer />
 
-		<ModalPaste
-			:is-open="isPasteModalOpen"
-			@close="isPasteModalOpen = false"
+		<ModalIO
+			:is-open="modalState.isOpen"
+			:mode="modalState.mode"
+			@close="modalState.isOpen = false"
 			@import="handlePasteResult"
 		/>
 		<ToastNotification />

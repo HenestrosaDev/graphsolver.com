@@ -69,6 +69,14 @@ export default {
 		cancel: "Cancel",
 		import: "Import",
 	},
+	modalExport: {
+		title: "Export {format}",
+		formatLabel: "Format",
+		contentLabel: "Generated code",
+		placeholder: "Select a format to see the generated code",
+		copy: "Copy",
+		download: "Download",
+	},
 	matrixInput: {
 		vertices: "Vertices",
 		random: "Random",

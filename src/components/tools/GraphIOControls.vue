@@ -6,22 +6,20 @@ import {
 	type FormatKey,
 	useGraphFormats,
 } from "../../composables/useGraphFormats";
-import { useGraphIO } from "../../composables/useGraphIO";
 import DropdownDivider from "../common/dropdown/DropdownDivider.vue";
 import DropdownHeader from "../common/dropdown/DropdownHeader.vue";
 import DropdownItem from "../common/dropdown/DropdownItem.vue";
 import DropdownMenu from "../common/dropdown/DropdownMenu.vue";
 
-const emit = defineEmits(["trigger-file-input", "open-paste-modal"]);
+const emit = defineEmits(["trigger-file-input", "open-modal"]);
 
 const { formats, formatOrder } = useGraphFormats();
-const { downloadFile, copyToClipboard } = useGraphIO();
 const { t } = useI18n();
 
 // State: We control which menu is open via a string
-const activeMenu = ref<"export" | "import" | null>(null);
+const activeMenu = ref<"import" | null>(null);
 
-const toggleMenu = (menu: "export" | "import") => {
+const toggleMenu = (menu: "import") => {
 	activeMenu.value = activeMenu.value === menu ? null : menu;
 };
 
@@ -30,14 +28,12 @@ const closeMenu = () => {
 };
 
 // --- Business Actions ---
-const handleExport = (format: FormatKey) => {
-	const fmt = formats[format];
-	downloadFile(fmt.serialize(), `grafo-${Date.now()}`, fmt.ext, fmt.mime);
-	closeMenu();
+const handleExportModal = () => {
+	emit("open-modal", "export");
 };
 
-const handleCopy = async (format: FormatKey) => {
-	await copyToClipboard(formats[format].serialize(), format);
+const handleImportModal = () => {
+	emit("open-modal", "import");
 	closeMenu();
 };
 
@@ -45,36 +41,20 @@ const handleImportFile = (format: FormatKey) => {
 	emit("trigger-file-input", formats[format].accept);
 	closeMenu();
 };
-
-const handlePaste = () => {
-	emit("open-paste-modal");
-	closeMenu();
-};
 </script>
 
 <template>
 	<div class="flex gap-2">
-		<DropdownMenu
-			:label="t('graphIO.export')"
-			:is-open="activeMenu === 'export'"
-			@toggle="toggleMenu('export')"
-			@close="closeMenu"
+		<button
+			@click="handleExportModal"
+			class="text-sm bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-200 border border-slate-200 dark:border-slate-700 font-medium py-2 px-3 rounded-lg shadow-sm hover:bg-slate-50 dark:hover:bg-slate-800 transition-all active:scale-95 flex items-center gap-2 group relative"
+			:title="t('graphIO.export')"
 		>
-			<template #icon>
+			<div class="text-slate-500 dark:text-slate-300 group-hover:text-blue-600 dark:group-hover:text-blue-300">
 				<IconDownload class="size-4" />
-			</template>
-
-			<template v-for="(formatKey, idx) in formatOrder" :key="formatKey">
-				<DropdownDivider v-if="idx > 0" />
-
-				<DropdownHeader>{{ formatKey }}</DropdownHeader>
-				<DropdownItem @click="handleExport(formatKey)">
-					{{ t("graphIO.download") }}
-				</DropdownItem>
-
-				<DropdownItem @click="handleCopy(formatKey)"> {{ t("graphIO.copy") }} </DropdownItem>
-			</template>
-		</DropdownMenu>
+			</div>
+			<span class="hidden sm:inline">{{ t("graphIO.export") }}</span>
+		</button>
 
 		<DropdownMenu
 			:label="t('graphIO.import')"
@@ -98,7 +78,7 @@ const handlePaste = () => {
 			<DropdownDivider />
 
 			<DropdownHeader>{{ t("graphIO.text") }}</DropdownHeader>
-			<DropdownItem @click="handlePaste">{{ t("graphIO.paste") }}</DropdownItem>
+			<DropdownItem @click="handleImportModal">{{ t("graphIO.paste") }}</DropdownItem>
 		</DropdownMenu>
 	</div>
 </template>
