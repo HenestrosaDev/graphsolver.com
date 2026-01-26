@@ -17,10 +17,10 @@ const isOpen = ref(false);
 
 // State for dynamic position
 const placement = ref({
-	isTop: true,  // Is it shown above or below?
-	xOffset: 0,   // Horizontal offset (in px) so it doesn't go out
-	top: 0,       // Absolute top position
-	left: 0,      // Absolute left position
+	isTop: true, // Is it shown above or below?
+	xOffset: 0, // Horizontal offset (in px) so it doesn't go out
+	top: 0, // Absolute top position
+	left: 0, // Absolute left position
 });
 
 const updateDeviceType = () => {
@@ -108,20 +108,12 @@ onMounted(() => {
 	hoverMediaQuery.addEventListener("change", updateDeviceType);
 	document.addEventListener("click", handleClickOutside);
 	// Listen to scroll and resize to readjust if open
-	window.addEventListener(
-		"scroll",
-		() => isOpen.value && recalculatePosition(),
-		true
-	);
-	window.addEventListener(
-		"resize",
-		() => isOpen.value && recalculatePosition()
-	);
+	window.addEventListener("scroll", () => isOpen.value && recalculatePosition(), true);
+	window.addEventListener("resize", () => isOpen.value && recalculatePosition());
 });
 
 onBeforeUnmount(() => {
-	if (hoverMediaQuery)
-		hoverMediaQuery.removeEventListener("change", updateDeviceType);
+	if (hoverMediaQuery) hoverMediaQuery.removeEventListener("change", updateDeviceType);
 	document.removeEventListener("click", handleClickOutside);
 });
 
@@ -129,10 +121,13 @@ const isVisible = computed(() => isOpen.value);
 </script>
 
 <template>
-	<div ref="rootRef" class="relative inline-flex items-center justify-center">
+	<div
+		ref="rootRef"
+		class="relative inline-flex items-center justify-center"
+	>
 		<button
 			type="button"
-			class="text-slate-400 cursor-help hover:text-slate-600 focus:outline-none "
+			class="cursor-help text-slate-400 hover:text-slate-600 focus:outline-none"
 			:aria-label="t('common.showHelpTooltip')"
 			:aria-expanded="isVisible"
 			@focus="isHoverDevice && show()"
@@ -146,18 +141,15 @@ const isVisible = computed(() => isOpen.value);
 
 		<div
 			ref="tooltipRef"
-			class="fixed w-48 z-50 transition-opacity duration-200 ease-in-out pointer-events-none"
-			:class="[
-				isVisible ? 'visible opacity-100' : 'invisible opacity-0',
-			]"
+			class="pointer-events-none fixed z-50 w-48 transition-opacity duration-200 ease-in-out"
+			:class="[isVisible ? 'visible opacity-100' : 'invisible opacity-0']"
 			:style="{
 				top: `${placement.top}px`,
 				left: `${placement.left}px`,
 			}"
 		>
-			<div
-				class="bg-slate-800 text-white text-xs rounded py-2 px-3 shadow-xl text-center leading-relaxed relative"
-			>
+			<div class="relative rounded bg-slate-800 px-3 py-2 text-center text-xs leading-relaxed text-white shadow-xl">
+				<!-- eslint-disable-next-line vue/no-v-html -->
 				<span v-html="props.text" />
 
 				<div
@@ -165,9 +157,7 @@ const isVisible = computed(() => isOpen.value);
 					:class="[
 						// If the tooltip is above, the arrow goes down (border-t-slate-800)
 						// If the tooltip is below, the arrow goes up (border-b-slate-800)
-						placement.isTop
-							? 'top-full border-t-slate-800'
-							: 'bottom-full border-b-slate-800',
+						placement.isTop ? 'top-full border-t-slate-800' : 'bottom-full border-b-slate-800',
 					]"
 					:style="{
 						// The arrow must move to point to the center of the trigger

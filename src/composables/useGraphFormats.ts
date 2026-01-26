@@ -21,8 +21,8 @@ const toJSON = () => {
 			timestamp: new Date().toISOString(), // Useful metadata
 		},
 		null,
-		2
-	); // Pretty indented
+		2,
+	);
 };
 
 const toLaTeX = () => {
@@ -68,10 +68,14 @@ const toGraphML = () => {
 	const { numNodes, rawMatrix, getGraphData } = useGraph();
 	const { hasArc, isSymmetric } = getGraphData();
 	const n = numNodes.value;
-	let graphml = '<?xml version="1.0" encoding="UTF-8"?>\n';
-	graphml += '<graphml xmlns="http://graphml.graphdrawing.org/xmlns" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd">\n';
-	graphml += '  <key id="weight" for="edge" attr.name="weight" attr.type="double"/>\n';
-	graphml += `  <graph id="G" edgedefault="${isSymmetric ? 'undirected' : 'directed'}">\n`;
+	let graphml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
+	graphml +=
+		"<graphml xmlns=\"http://graphml.graphdrawing.org/xmlns\" " +
+		"xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" " +
+		"xsi:schemaLocation=\"http://graphml.graphdrawing.org/xmlns " +
+		"http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd\">\n";
+	graphml += "  <key id=\"weight\" for=\"edge\" attr.name=\"weight\" attr.type=\"double\"/>\n";
+	graphml += `  <graph id="G" edgedefault="${isSymmetric ? "undirected" : "directed"}">\n`;
 
 	// Add nodes
 	for (let i = 0; i < n; i++) {
@@ -88,20 +92,20 @@ const toGraphML = () => {
 					// For undirected graphs, only add edge once
 					graphml += `    <edge id="e${edgeId}" source="n${i}" target="n${j}">\n`;
 					graphml += `      <data key="weight">${weight}</data>\n`;
-					graphml += '    </edge>\n';
+					graphml += "    </edge>\n";
 					edgeId++;
 				} else if (!isSymmetric) {
 					// For directed graphs, add all edges
 					graphml += `    <edge id="e${edgeId}" source="n${i}" target="n${j}">\n`;
 					graphml += `      <data key="weight">${weight}</data>\n`;
-					graphml += '    </edge>\n';
+					graphml += "    </edge>\n";
 					edgeId++;
 				}
 			}
 		}
 	}
 
-	graphml += '</graphml>';
+	graphml += "</graphml>";
 	return graphml;
 };
 
@@ -110,12 +114,12 @@ const toCSV = () => {
 	const n = numNodes.value;
 
 	// Create header row with node labels (A, B, C, ...)
-	const headers = [''];
+	const headers = [""];
 	for (let i = 0; i < n; i++) {
 		headers.push(String.fromCharCode(65 + i));
 	}
 
-	const rows = [headers.join(',')];
+	const rows = [headers.join(",")];
 
 	// Add data rows
 	for (let i = 0; i < n; i++) {
@@ -124,10 +128,10 @@ const toCSV = () => {
 			const val = rawMatrix.value[i][j];
 			row.push(val === "" ? "0" : val.toString());
 		}
-		rows.push(row.join(','));
+		rows.push(row.join(","));
 	}
 
-	return rows.join('\n');
+	return rows.join("\n");
 };
 
 const toGML = () => {
@@ -135,15 +139,15 @@ const toGML = () => {
 	const { hasArc, isSymmetric } = getGraphData();
 	const n = numNodes.value;
 
-	let gml = 'graph [\n';
+	let gml = "graph [\n";
 	gml += `  directed ${isSymmetric ? 0 : 1}\n`;
 
 	// Add nodes
 	for (let i = 0; i < n; i++) {
-		gml += '  node [\n';
+		gml += "  node [\n";
 		gml += `    id ${i}\n`;
 		gml += `    label "${String.fromCharCode(65 + i)}"\n`;
-		gml += '  ]\n';
+		gml += "  ]\n";
 	}
 
 	// Add edges
@@ -154,28 +158,28 @@ const toGML = () => {
 				const weight = rawMatrix.value[i][j];
 				if (isSymmetric && i < j) {
 					// For undirected graphs, only add edge once
-					gml += '  edge [\n';
+					gml += "  edge [\n";
 					gml += `    id ${edgeId}\n`;
 					gml += `    source ${i}\n`;
 					gml += `    target ${j}\n`;
 					gml += `    weight ${weight}\n`;
-					gml += '  ]\n';
+					gml += "  ]\n";
 					edgeId++;
 				} else if (!isSymmetric) {
 					// For directed graphs, add all edges
-					gml += '  edge [\n';
+					gml += "  edge [\n";
 					gml += `    id ${edgeId}\n`;
 					gml += `    source ${i}\n`;
 					gml += `    target ${j}\n`;
 					gml += `    weight ${weight}\n`;
-					gml += '  ]\n';
+					gml += "  ]\n";
 					edgeId++;
 				}
 			}
 		}
 	}
 
-	gml += ']';
+	gml += "]";
 	return gml;
 };
 
@@ -186,10 +190,8 @@ const loadFromJSON = (jsonString: string): boolean => {
 		const parsed = JSON.parse(jsonString);
 
 		// Basic validations to not break the app
-		if (!parsed.rawMatrix || !Array.isArray(parsed.rawMatrix))
-			throw new Error("Invalid format");
-		if (typeof parsed.numNodes !== "number")
-			throw new Error("Missing number of nodes");
+		if (!parsed.rawMatrix || !Array.isArray(parsed.rawMatrix)) throw new Error("Invalid format");
+		if (typeof parsed.numNodes !== "number") throw new Error("Missing number of nodes");
 
 		// Apply data
 		numNodes.value = parsed.numNodes;
@@ -206,27 +208,20 @@ const loadFromLaTeX = (latexString: string): boolean => {
 	const { numNodes, rawMatrix } = useGraph();
 	try {
 		// Simple parser for LaTeX matrix like \begin{pmatrix} a & b \\ c & d \end{pmatrix}
-		const matrixMatch = latexString.match(
-			/\\begin\{pmatrix\}\s*(.*?)\s*\\end\{pmatrix\}/s
-		);
+		const matrixMatch = latexString.match(/\\begin\{pmatrix\}\s*(.*?)\s*\\end\{pmatrix\}/s);
 		if (!matrixMatch) throw new Error("Invalid LaTeX format");
 
 		const rows = matrixMatch[1]
 			.split("\\\\")
 			.map((r) => r.trim())
 			.filter((r) => r.length > 0);
-		const matrix = rows.map((row) =>
-			row.split("&").map((cell) => cell.trim())
-		);
+		const matrix = rows.map((row) => row.split("&").map((cell) => cell.trim()));
 
 		const n = matrix.length;
-		if (n === 0 || matrix[0].length !== n)
-			throw new Error("Non-square matrix");
+		if (n === 0 || matrix[0].length !== n) throw new Error("Non-square matrix");
 
 		numNodes.value = n;
-		rawMatrix.value = matrix.map((row) =>
-			row.map((cell) => (cell === "-" || cell === "0" ? "" : cell))
-		);
+		rawMatrix.value = matrix.map((row) => row.map((cell) => (cell === "-" || cell === "0" ? "" : cell)));
 
 		// Ensure diagonal is 0
 		for (let i = 0; i < n; i++) {
@@ -364,11 +359,14 @@ const loadFromCSV = (csvString: string): boolean => {
 	const { numNodes, rawMatrix } = useGraph();
 	try {
 		// Split into lines and filter out empty lines
-		const lines = csvString.split('\n').map(line => line.trim()).filter(line => line.length > 0);
+		const lines = csvString
+			.split("\n")
+			.map((line) => line.trim())
+			.filter((line) => line.length > 0);
 		if (lines.length === 0) throw new Error("Empty CSV");
 
 		// Parse CSV rows
-		const rows = lines.map(line => line.split(',').map(cell => cell.trim()));
+		const rows = lines.map((line) => line.split(",").map((cell) => cell.trim()));
 
 		// Check if we have a square matrix (including headers)
 		const n = rows.length - 1; // Subtract 1 for header row
@@ -381,7 +379,9 @@ const loadFromCSV = (csvString: string): boolean => {
 		}
 
 		// Initialize matrix
-		const matrix: Matrix = Array(n).fill(0).map(() => Array(n).fill(""));
+		const matrix: Matrix = Array(n)
+			.fill(0)
+			.map(() => Array(n).fill(""));
 
 		numNodes.value = n;
 		rawMatrix.value = matrix;
@@ -389,8 +389,7 @@ const loadFromCSV = (csvString: string): boolean => {
 		// Fill matrix (skip header row and column)
 		for (let i = 0; i < n; i++) {
 			for (let j = 0; j < n; j++) {
-				const cellValue = rows[i + 1][j + 1];
-				const numValue = parseFloat(cellValue);
+				const numValue = parseFloat(rows[i + 1][j + 1]);
 				if (isNaN(numValue)) throw new Error(`Invalid number at row ${i + 1}, column ${j + 1}`);
 				rawMatrix.value[i][j] = numValue === 0 ? "" : numValue.toString();
 			}
@@ -417,7 +416,11 @@ const loadFromGML = (gmlString: string): boolean => {
 		const edgeRegex = /edge\s*\[\s*(?:id\s+\d+\s+)?source\s+(\d+)\s+target\s+(\d+)\s+weight\s+([^\s\]]+)/g;
 
 		const nodes = new Map<number, string>();
-		const edges: Array<{source: number, target: number, weight: string}> = [];
+		const edges: Array<{
+			source: number;
+			target: number;
+			weight: string;
+		}> = [];
 
 		// Check if graph is directed
 		const directedMatch = gmlString.match(directedRegex);
@@ -447,13 +450,15 @@ const loadFromGML = (gmlString: string): boolean => {
 		const n = sortedNodeIds.length;
 
 		// Initialize matrix
-		const matrix: Matrix = Array(n).fill(0).map(() => Array(n).fill(""));
+		const matrix: Matrix = Array(n)
+			.fill(0)
+			.map(() => Array(n).fill(""));
 
 		numNodes.value = n;
 		rawMatrix.value = matrix;
 
 		// Fill matrix with edges
-		edges.forEach(edge => {
+		edges.forEach((edge) => {
 			const sourceIdx = sortedNodeIds.indexOf(edge.source);
 			const targetIdx = sortedNodeIds.indexOf(edge.target);
 
@@ -525,17 +530,17 @@ export const useGraphFormats = () => {
 		},
 	};
 
-	const formatOrder: FormatKey[] = ["JSON", "LaTeX", "Dot", "GraphML", "CSV", "GML"];
+	const formatOrder: FormatKey[] = ["CSV", "Dot", "GML", "GraphML", "JSON", "LaTeX"];
 
 	const getFormatByExtension = (filename: string): FormatKey | undefined => {
 		const ext = filename.split(".").pop()?.toLowerCase();
 		if (!ext) return undefined;
 
-		return Object.entries(formats).find(([_, config]) =>
+		return Object.entries(formats).find(([, config]) =>
 			config.accept
 				.split(",")
 				.map((e) => e.replace(".", ""))
-				.includes(ext)
+				.includes(ext),
 		)?.[0] as FormatKey;
 	};
 

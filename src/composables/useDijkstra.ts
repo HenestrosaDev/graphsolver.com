@@ -13,14 +13,13 @@ export interface DijkstraResult {
 	status: "ok" | "unreachable";
 }
 
-const formatPath = (indices: number[], labels: string[]): string[] =>
-	indices.map((idx) => labels[idx]);
+const formatPath = (indices: number[], labels: string[]): string[] => indices.map((idx) => labels[idx]);
 
 export const computeDijkstra = (
 	matrix: number[][],
 	nodeLabels: string[],
 	startLabel: string,
-	endLabel: string
+	endLabel: string,
 ): DijkstraResult => {
 	const n = matrix.length;
 	const startIdx = nodeLabels.indexOf(startLabel);

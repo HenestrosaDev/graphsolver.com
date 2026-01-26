@@ -30,12 +30,7 @@ export function useGraphIO() {
 	const { t } = useI18n();
 
 	// Export (file) option
-	const downloadFile = (
-		content: string,
-		filename: string,
-		extension: string,
-		mimeType: string
-	) => {
+	const downloadFile = (content: string, filename: string, extension: string, mimeType: string) => {
 		// Create a temporary link to trigger the download
 		const blob = new Blob([content], { type: mimeType });
 		const url = URL.createObjectURL(blob);
@@ -55,7 +50,7 @@ export function useGraphIO() {
 
 		// Notify user
 		triggerToast({
-			title: t('graphIO.exportToast', { ext: extension }),
+			title: t("graphIO.exportToast", { ext: extension }),
 			severity: "success",
 		});
 	};
@@ -65,11 +60,11 @@ export function useGraphIO() {
 		try {
 			await navigator.clipboard.writeText(content);
 			triggerToast({
-				title: t('graphIO.copyToast', { format: formatName }),
+				title: t("graphIO.copyToast", { format: formatName }),
 				severity: "success",
 			});
-		} catch (err) {
-			triggerToast({ title: t('graphIO.copyError'), severity: "error" });
+		} catch {
+			triggerToast({ title: t("graphIO.copyError"), severity: "error" });
 		}
 	};
 

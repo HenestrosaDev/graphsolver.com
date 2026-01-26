@@ -1,8 +1,12 @@
 export default {
 	head: {
 		title: "GraphSolver | Resolución interactiva de algoritmos de grafos",
-		description: "Herramienta interactiva para resolver algoritmos de grafos como Dijkstra, Floyd-Warshall y Kruskal. Visualiza y calcula rutas óptimas en grafos.",
-		keywords: "algoritmos de grafos, dijkstra, floyd-warshall, kruskal, ruta más corta, visualización de grafos, solucionador de grafos",
+		description:
+			"Herramienta interactiva para resolver algoritmos de grafos como Dijkstra, " +
+			"Floyd-Warshall y Kruskal. Visualiza y calcula rutas óptimas en grafos.",
+		keywords:
+			"algoritmos de grafos, dijkstra, floyd-warshall, kruskal, ruta más corta, " +
+			"visualización de grafos, solucionador de grafos",
 		ogImage: "/og-image.png",
 	},
 	common: {
@@ -65,7 +69,7 @@ export default {
 		title: "Pegar contenido",
 		formatLabel: "Formato",
 		contentLabel: "Contenido",
-		placeholder: 'Pega tus datos de grafo aquí (ej. formato JSON)',
+		placeholder: "Pega tus datos de grafo aquí (ej. formato JSON)",
 		cancel: "Cancelar",
 		import: "Importar",
 	},
@@ -112,18 +116,17 @@ export default {
 		minCost: "Coste mínimo",
 		optimalPath: "Camino óptimo",
 		diameter: "Diámetro del grafo",
-		diameterTooltip:
-			"La mayor distancia mínima entre cualquier par de vértices conectados del grafo.",
+		diameterTooltip: "La mayor distancia mínima entre cualquier par de vértices conectados del grafo.",
 		iterationsTable: "Tabla de iteraciones",
 		stepCounter: "Paso {current} de {total}",
 		previous: "Anterior",
 		next: "Siguiente",
 		initialTitle: "Estado inicial",
 		stepTitle: "Iteración k={k} (pivote {pivot})",
-		initialDescription:
-			"Matriz de adyacencia inicial. Los nodos no conectados directamente son ∞.",
+		initialDescription: "Matriz de adyacencia inicial. Los nodos no conectados directamente son ∞.",
 		iterationDescription:
-			"Calculando rutas pasando por el nodo intermedio {pivot}. Las filas y columnas resaltadas no cambian en esta iteración.",
+			"Calculando rutas pasando por el nodo intermedio {pivot}. Las filas y " +
+			"columnas resaltadas no cambian en esta iteración.",
 		unreachableCost: "Inalcanzable",
 		noPath: "No existe camino",
 	},
@@ -131,13 +134,15 @@ export default {
 		resultTitle: "Resultado",
 		minCost: "Coste mínimo",
 		minCostTooltip:
-			"Coste mínimo para conectar todos los vértices del grafo.<br><br>Cálculo: Tras ejecutar el algoritmo de Kruskal, se ignoran las aristas que formarían ciclos y se suman los pesos de las aristas restantes que conforman el Árbol Generador Mínimo.",
+			"Coste mínimo para conectar todos los vértices del grafo.<br><br>Cálculo: Tras ejecutar " +
+			"el algoritmo de Kruskal, se ignoran las aristas que formarían ciclos y se suman los pesos " +
+			"de las aristas restantes que conforman el Árbol Generador Mínimo.",
 		edgesSelected: "Aristas seleccionadas",
-		edgesTooltip:
-			"Lista de aristas que forman el Árbol Generador Mínimo, ordenadas por peso y lexicográficamente.",
+		edgesTooltip: "Lista de aristas que forman el Árbol Generador Mínimo, ordenadas por peso y lexicográficamente.",
 		uniqueSolution: "Solución única",
 		uniqueTooltip:
-			"Determina si existe otro conjunto de aristas que forme un Árbol Generador Mínimo válido con el mismo coste total.",
+			"Determina si existe otro conjunto de aristas que forme un Árbol Generador Mínimo válido con el " +
+			"mismo coste total.",
 		invalidGraph: "No válido",
 		requiresUndirected: "El algoritmo espera un grafo no dirigido",
 		notConnected: "Grafo no conexo (no existe árbol)",
@@ -168,7 +173,10 @@ export default {
 		},
 		cardTooltips: {
 			complementary:
-				"El grafo complementario <span style=\"text-decoration: overline;\">G</span> tiene los mismos vértices que el original, pero sus aristas son exactamente los pares de vértices que no son adyacentes (no tienen arista directa) en el grafo base. Es como el \"negativo\" del grafo base: donde ahora hay camino, desaparece, y donde no lo hay, aparece.",
+				"El grafo complementario <span style=\"text-decoration: overline;\">G</span> tiene los mismos " +
+				"vértices que el original, pero sus aristas son exactamente los pares de vértices que no " +
+				"son adyacentes (no tienen arista directa) en el grafo base. Es como el \"negativo\" del " +
+				"grafo base: donde ahora hay camino, desaparece, y donde no lo hay, aparece.",
 		},
 		labels: {
 			graphType: "Tipo de grafo",
@@ -219,40 +227,56 @@ export default {
 			},
 		},
 		tooltips: {
-			order:
-				"Número de vértices del grafo. Se denota como <i>n</i>.",
+			order: "Número de vértices del grafo. Se denota como <i>n</i>.",
 			measure:
-				"Número de aristas del grafo. Se denota como <i>m</i>.<br><br><b>Nota</b>: En grafos no dirigidos, cada arista se cuenta una sola vez.",
+				"Número de aristas del grafo. Se denota como <i>m</i>.<br><br><b>Nota</b>: En grafos no " +
+				"dirigidos, cada arista se cuenta una sola vez.",
 			maxMeasure:
-				"Número máximo de aristas (<i>m<sub>max</sub></i>) posibles para este grafo {type}.<br><br><b>Fórmula</b>: {formula}",
+				"Número máximo de aristas (<i>m<sub>max</sub></i>) posibles para este grafo {type}." +
+				"<br><br><b>Fórmula</b>: {formula}",
 			density:
-				"Proporción de aristas existentes (<i>m</i>) frente al máximo posible (<i>m<sub>max</sub></i>). Un 100% indica un <b>grafo completo</b> (<i>K<sub>n</sub></i>).<br><br><b>Fórmula</b>: <i>m</i> / <i>m<sub>max</sub></i>",
+				"Proporción de aristas existentes (<i>m</i>) frente al máximo posible (<i>m<sub>max</sub></i>). " +
+				"Un 100% indica un <b>grafo completo</b> (<i>K<sub>n</sub></i>).<br><br><b>Fórmula</b>: <i>m</i> " +
+				" / <i>m<sub>max</sub></i>",
 			degreeSequence:
-				"Lista de grados de cada vértice en orden.<br><br><b>Definición</b>: El grado de un vértice es el número de aristas que inciden en él.",
+				"Lista de grados de cada vértice en orden.<br><br><b>Definición</b>: El grado de un vértice " +
+				"es el número de aristas que inciden en él.",
 			regularity:
-				"Un grafo es <b>regular</b> si todos sus vértices tienen el mismo grado. En ese caso, se denomina <i>k-Regular</i>, siendo <i>k</i> el grado común.",
-			adjacencyList:
-				"Muestra los vértices conectados directamente al vértice seleccionado.",
+				"Un grafo es <b>regular</b> si todos sus vértices tienen el mismo grado. En ese caso, se " +
+				"denomina <i>k-Regular</i>, siendo <i>k</i> el grado común.",
+			adjacencyList: "Muestra los vértices conectados directamente al vértice seleccionado.",
 			connectedComponents:
-				"Número de componentes conexas dentro del grafo. Se calcula mediante algoritmos de búsqueda en profundidad (DFS) o búsqueda en anchura (BFS).<br><br><b>Definición</b>: Una componente conexa es un subgrafo en el que cualquier par de vértices están conectados entre sí por caminos, y que no está conectado a ningún vértice fuera del subgrafo.",
-			isolatedVertices:
-				"Número de vértices que no están conectados a ningún otro vértice dentro del grafo.",
-			connected:
-				"Indica si existe un camino entre cualquier par de vértices.",
-			structure:
-				"Descripción del tipo de grafo según su estructura y propiedades básicas.",
+				"Número de componentes conexas dentro del grafo. Se calcula mediante algoritmos de búsqueda " +
+				"en profundidad (DFS) o búsqueda en anchura (BFS).<br><br><b>Definición</b>: Una componente " +
+				"conexa es un subgrafo en el que cualquier par de vértices están conectados entre sí por " +
+				"caminos, y que no está conectado a ningún vértice fuera del subgrafo.",
+			isolatedVertices: "Número de vértices que no están conectados a ningún otro vértice dentro del grafo.",
+			connected: "Indica si existe un camino entre cualquier par de vértices.",
+			structure: "Descripción del tipo de grafo según su estructura y propiedades básicas.",
 			bipartite:
-				"Un grafo es bipartito si sus vértices pueden dividirse en dos conjuntos disjuntos y cada arista conecta vértices de conjuntos distintos. Se comprueba con 2-coloración BFS sobre la versión no dirigida; los bucles o conflictos de color lo invalidan.",
+				"Un grafo es bipartito si sus vértices pueden dividirse en dos conjuntos disjuntos y cada " +
+				"arista conecta vértices de conjuntos distintos. Se comprueba con 2-coloración BFS sobre la " +
+				"versión no dirigida; los bucles o conflictos de color lo invalidan.",
 			eulerian:
-				"Un grafo es <b>euleriano</b> si contiene un ciclo que recorre todas las aristas exactamente una vez.<br><br><b>Dificultad computacional:</b> Determinar si un grafo es euleriano es un problema polinomialmente resoluble (P). <br><br><b>Tipos:</b><br>• <b>Ciclo</b>: Todos los vértices tienen grado par.<br>• <b>Camino</b>: Exactamente dos vértices tienen grado impar.<br>• <b>No</b>: No cumple las condiciones anteriores.",
+				"Un grafo es <b>euleriano</b> si contiene un ciclo que recorre todas las aristas exactamente " +
+				"una vez.<br><br><b>Dificultad computacional:</b> Determinar si un grafo es euleriano es un " +
+				"problema polinomialmente resoluble (P). <br><br><b>Tipos:</b><br>• <b>Ciclo</b>: Todos los " +
+				"vértices tienen grado par.<br>• <b>Camino</b>: Exactamente dos vértices tienen grado impar." +
+				"<br>• <b>No</b>: No cumple las condiciones anteriores.",
 			hamiltonian:
-				" Un grafo es <b>hamiltoniano</b> si contiene un ciclo que visita cada vértice exactamente una vez.<br><br><b>Dificultad computacional:</b> Determinar si un grafo es hamiltoniano es un problema NP-completo. <br><br><b>Nota</b>: No se realizará el análisis para grafos con más de 12 vértices debido a limitaciones computacionales.",
-			complementaryOrder:
-				"Número de aristas del grafo complementario. Tiene el mismo orden que el grafo original.",
+				" Un grafo es <b>hamiltoniano</b> si contiene un ciclo que visita cada vértice exactamente " +
+				"una vez.<br><br><b>Dificultad computacional:</b> Determinar si un grafo es hamiltoniano es " +
+				"un problema NP-completo. <br><br><b>Nota</b>: No se realizará el análisis para grafos con " +
+				"más de 12 vértices debido a limitaciones computacionales.",
+			complementaryOrder: "Número de aristas del grafo complementario. Tiene el mismo orden que el grafo original.",
 			complementaryMeasure:
-				"Número de aristas del grafo complementario.<br><br><b>Fórmula:</b> <i>m<sub><span style='text-decoration: overline;'>G</span></sub></i> = <i>m<sub>max</sub></i> - <i>m<sub>G</sub></i>",
+				"Número de aristas del grafo complementario.<br><br><b>Fórmula:</b> <i>m<sub><span " +
+				"style='text-decoration: overline;'>G</span></sub></i> = <i>m<sub>max</sub></i> - <i>m<sub>G</sub></i>",
 			complementaryConnectedComponents:
-				"Las componentes conexas de <i><span style='text-decoration: overline;'>G</span></i> son los subgrafos independientes que se forman al trazar las aristas que faltaban en el original. Si en el grafo original dos grupos estaban totalmente aislados, en el complementario esos grupos se fusionan.",
+				"Las componentes conexas de <i><span style='text-decoration: overline;'>G</span></i> son los " +
+				"subgrafos independientes que se forman al trazar las aristas que faltaban en el original. " +
+				"Si en el grafo original dos grupos estaban totalmente aislados, en el complementario esos " +
+				"grupos se fusionan.",
 		},
 	},
 };

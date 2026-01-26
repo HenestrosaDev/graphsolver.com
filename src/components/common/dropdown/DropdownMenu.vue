@@ -8,7 +8,7 @@ const props = defineProps<{
 	align?: "left" | "right";
 }>();
 
-const emit = defineEmits(["toggle", "close"]);
+const _emit = defineEmits(["toggle", "close"]);
 
 const containerRef = ref<HTMLElement | null>(null);
 const calculatedAlign = ref<"left" | "right">("left");
@@ -35,33 +35,37 @@ watch(
 				calculatedAlign.value = "left";
 			}
 		}
-	}
+	},
 );
 </script>
 
 <template>
-	<div ref="containerRef" class="relative">
+	<div
+		ref="containerRef"
+		class="relative"
+	>
 		<button
-			@click="$emit('toggle')"
-			class="text-sm bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-200 border border-slate-200 dark:border-slate-700 font-medium py-2 px-3 rounded-lg shadow-sm hover:bg-slate-50 dark:hover:bg-slate-800 transition-all active:scale-95 flex items-center gap-2 group relative"
+			class="group relative flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-600 shadow-sm transition-all hover:bg-slate-50 active:scale-95 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800"
 			:class="{ 'bg-slate-50 dark:bg-slate-800': isOpen }"
 			:title="label"
+			@click="$emit('toggle')"
 		>
-			<div class="text-slate-500 dark:text-slate-300 group-hover:text-blue-600 dark:group-hover:text-blue-300 ">
+			<div class="text-slate-500 group-hover:text-blue-600 dark:text-slate-300 dark:group-hover:text-blue-300">
 				<slot name="icon" />
 			</div>
-			<span v-if="label" class="hidden sm:inline">{{ label }}</span>
+			<span
+				v-if="label"
+				class="hidden sm:inline"
+			>{{ label }}</span>
 		</button>
 
 		<Transition name="menu">
 			<div
 				v-if="isOpen"
-				class="absolute top-full mt-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg shadow-lg overflow-hidden z-30"
+				class="absolute top-full z-30 mt-1 overflow-hidden rounded-lg border border-slate-200 bg-white shadow-lg dark:border-slate-700 dark:bg-slate-900"
 				:class="[
 					menuClass || 'w-40',
-					calculatedAlign === 'right'
-						? 'right-0 origin-top-right'
-						: 'left-0 origin-top-left',
+					calculatedAlign === 'right' ? 'right-0 origin-top-right' : 'left-0 origin-top-left',
 				]"
 			>
 				<slot />
@@ -70,7 +74,7 @@ watch(
 
 		<div
 			v-if="isOpen"
-			class="fixed inset-0 z-20 bg-transparent cursor-default"
+			class="fixed inset-0 z-20 cursor-default bg-transparent"
 			@click="$emit('close')"
 		/>
 	</div>

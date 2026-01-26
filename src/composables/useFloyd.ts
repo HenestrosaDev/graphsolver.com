@@ -8,13 +8,9 @@ export interface FloydResult {
 	hasInfPairs: boolean;
 }
 
-const cloneMatrix = (matrix: number[][]): number[][] =>
-	matrix.map((row) => [...row]);
+const cloneMatrix = (matrix: number[][]): number[][] => matrix.map((row) => [...row]);
 
-export const computeFloyd = (
-	matrix: number[][],
-	nodeLabels: string[] = []
-): FloydResult => {
+export const computeFloyd = (matrix: number[][], __nodeLabels: string[] = []): FloydResult => {
 	const n = matrix.length;
 	const dist: number[][] = cloneMatrix(matrix);
 
@@ -23,9 +19,7 @@ export const computeFloyd = (
 	}
 
 	const next: (number | null)[][] = Array.from({ length: n }, (_, i) =>
-		Array.from({ length: n }, (_, j) =>
-			dist[i][j] !== Infinity && i !== j ? j : null
-		)
+		Array.from({ length: n }, (_, j) => (dist[i][j] !== Infinity && i !== j ? j : null)),
 	);
 
 	const steps: FloydStep[] = [

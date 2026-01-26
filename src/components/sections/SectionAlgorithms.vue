@@ -14,21 +14,28 @@ const algorithms = computed(() => [
 	{ id: "mst", label: t("algorithmsSection.options.mst"), component: AlgorithmKruskal },
 ]);
 
-const algorithmById = computed(() =>
-	Object.fromEntries(algorithms.value.map((a) => [a.id, a.component]))
-);
+const algorithmById = computed(() => Object.fromEntries(algorithms.value.map((a) => [a.id, a.component])));
 </script>
 
 <template>
 	<div>
 		<div class="mb-4">
-			<label for="algorithm-selector" class="text-eyebrow"> {{ t("algorithmsSection.label") }} </label>
+			<label
+				for="algorithm-selector"
+				class="text-eyebrow"
+			>
+				{{ t("algorithmsSection.label") }}
+			</label>
 			<select
 				id="algorithm-selector"
 				v-model="selectedAlgorithm"
-				class="w-full px-3 py-2 border border-slate-300 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 "
+				class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-slate-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
 			>
-				<option v-for="algo in algorithms" :key="algo.id" :value="algo.id">
+				<option
+					v-for="algo in algorithms"
+					:key="algo.id"
+					:value="algo.id"
+				>
 					{{ algo.label }}
 				</option>
 			</select>

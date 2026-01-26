@@ -7,8 +7,7 @@ import PropertiesCard from "../properties/PropertiesCard.vue";
 import PropertyRow from "../properties/PropertyRow.vue";
 import type { MSTResult } from "../../types/graph";
 
-const { getGraphData, nodes, rawMatrix, numNodes, clearHighlights } =
-	useGraph();
+const { getGraphData, nodes, rawMatrix, numNodes, clearHighlights } = useGraph();
 const { t } = useI18n();
 
 const result = ref<MSTResult | null>(null);
@@ -17,9 +16,9 @@ const solveMST = () => {
 	const { matrix, isSymmetric } = getGraphData();
 	if (!isSymmetric) {
 		result.value = {
-			cost: t('kruskal.invalidGraph'),
+			cost: t("kruskal.invalidGraph"),
 			edges: "",
-			isUniqueKey: 'requiresUndirected',
+			isUniqueKey: "requiresUndirected",
 		};
 		return;
 	}
@@ -30,31 +29,36 @@ const uniqueSolutionStatus = computed(() => {
 	if (!result.value) return { text: "", classes: "" };
 	const key = result.value.isUniqueKey;
 
-	if (key === 'notConnected') {
+	if (key === "notConnected") {
 		return {
 			text: t(`kruskal.${key}`),
-			classes: "bg-slate-100 text-slate-500 border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700 cursor-help"
+			classes:
+				"bg-slate-100 text-slate-500 border-slate-200 dark:bg-slate-800 dark:text-slate-300 " +
+				"dark:border-slate-700 cursor-help",
 		};
 	}
 
-	if (key === 'uniqueYes') {
+	if (key === "uniqueYes") {
 		return {
 			text: t(`kruskal.${key}`),
-			classes: "bg-green-100 text-green-700 border-green-200 dark:bg-green-900/30 dark:text-green-200 dark:border-green-700"
+			classes:
+				"bg-green-100 text-green-700 border-green-200 dark:bg-green-900/30 dark:text-green-200 " +
+				"dark:border-green-700",
 		};
 	}
 
-	if (key === 'uniqueNo') {
+	if (key === "uniqueNo") {
 		return {
 			text: t(`kruskal.${key}`),
-			classes: "bg-red-50 text-red-600 border-red-200 dark:bg-red-900/30 dark:text-red-200 dark:border-red-800"
+			classes: "bg-red-50 text-red-600 border-red-200 dark:bg-red-900/30 dark:text-red-200 " + "dark:border-red-800",
 		};
 	}
 
 	// Fallback for requiresUndirected
 	return {
 		text: t(`kruskal.${key}`),
-		classes: "bg-slate-100 text-slate-500 border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700"
+		classes:
+			"bg-slate-100 text-slate-500 border-slate-200 dark:bg-slate-800 " + "dark:text-slate-300 dark:border-slate-700",
 	};
 });
 
@@ -62,7 +66,10 @@ watch([rawMatrix, numNodes], solveMST, { deep: true, immediate: true });
 </script>
 
 <template>
-	<PropertiesCard v-if="result" :title="t('kruskal.resultTitle')">
+	<PropertiesCard
+		v-if="result"
+		:title="t('kruskal.resultTitle')"
+	>
 		<PropertyRow
 			:label="t('kruskal.minCost')"
 			:tooltip="t('kruskal.minCostTooltip')"

@@ -11,9 +11,9 @@ const toggleLanguage = () => {
 
 <template>
 	<button
+		class="flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-1 text-sm font-bold text-gray-700 shadow-sm transition hover:bg-gray-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800"
 		@click="toggleLanguage"
-		class="flex items-center gap-2 px-3 py-1 bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 rounded-lg text-sm font-bold text-gray-700 dark:text-slate-200 hover:bg-gray-50 dark:hover:bg-slate-800 transition shadow-sm"
 	>
-		<span>{{ locale === "es" ? $t('language.es') : $t('language.en') }}</span>
+		<span>{{ locale === "es" ? $t("language.es") : $t("language.en") }}</span>
 	</button>
 </template>

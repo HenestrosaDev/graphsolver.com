@@ -6,8 +6,8 @@ import { useGraphFormats } from "./composables/useGraphFormats";
 import { useToast } from "./composables/useToast";
 import { useGraphIO } from "./composables/useGraphIO";
 
-import Navbar from "./components/common/Navbar.vue";
-import Footer from "./components/common/Footer.vue";
+import AppNavbar from "./components/common/AppNavbar.vue";
+import AppFooter from "./components/common/AppFooter.vue";
 import MatrixInput from "./components/sections/SectionMatrixInput.vue";
 import ToastNotification from "./components/common/ToastNotification.vue";
 import SectionCard from "./components/sections/SectionCard.vue";
@@ -85,9 +85,10 @@ const handleFileChange = async (event: Event) => {
 		} else {
 			throw new Error(t("app.toast.invalidContent"));
 		}
-	} catch (error: any) {
+	} catch (error: unknown) {
+		const errorMessage = error instanceof Error ? error.message : t("app.toast.readError");
 		triggerToast({
-			title: error.message || t("app.toast.readError"),
+			title: errorMessage,
 			severity: "error",
 		});
 	} finally {
@@ -109,21 +110,19 @@ const openModal = (mode: ModalIOMode) => {
 </script>
 
 <template>
-	<div
-		class="min-h-screen bg-slate-50 dark:bg-slate-950 font-sans text-slate-800 dark:text-slate-100 flex flex-col"
-	>
-		<Navbar />
+	<div class="flex min-h-screen flex-col bg-slate-50 font-sans text-slate-800 dark:bg-slate-950 dark:text-slate-100">
+		<AppNavbar />
 
-		<main class="grow w-full max-w-5xl mx-auto p-4 py-6 md:p-8">
+		<main class="mx-auto w-full max-w-5xl grow p-4 py-6 md:p-8">
 			<input
-				type="file"
 				ref="fileInput"
+				type="file"
 				class="hidden"
 				@change="handleFileChange"
-			/>
+			>
 
 			<div>
-				<div class="flex justify-between items-center mb-6 gap-4">
+				<div class="mb-6 flex items-center justify-between gap-4">
 					<h2 class="text-2xl font-bold text-slate-700 dark:text-slate-100">
 						{{ t("app.adjacencyTitle") }}
 					</h2>
@@ -138,23 +137,21 @@ const openModal = (mode: ModalIOMode) => {
 			</div>
 
 			<div class="mt-12">
-				<h2 class="text-2xl font-bold text-slate-700 dark:text-slate-100 mb-6">
+				<h2 class="mb-6 text-2xl font-bold text-slate-700 dark:text-slate-100">
 					{{ t("app.analysisTitle") }}
 				</h2>
 
-				<div
-					class="lg:grid lg:grid-cols-2 max-lg:flex max-lg:flex-col gap-6 items-stretch"
-				>
+				<div class="items-stretch gap-6 max-lg:flex max-lg:flex-col lg:grid lg:grid-cols-2">
 					<div class="h-full">
 						<SectionCard
 							:title="t('app.visualizationTitle')"
-							class="h-full flex flex-col"
+							class="flex h-full flex-col"
 							body-class="flex-1 flex flex-col min-h-[400px]"
 						>
-							<template #icon
-								><IconEye class="size-5 text-amber-600"
-							/></template>
-							<SectionVisualizer class="flex-1 w-full h-full" />
+							<template #icon>
+								<IconEye class="size-5 text-amber-600" />
+							</template>
+							<SectionVisualizer class="h-full w-full flex-1" />
 						</SectionCard>
 					</div>
 
@@ -167,7 +164,10 @@ const openModal = (mode: ModalIOMode) => {
 						</SectionCard>
 					</div>
 
-					<SectionCard :title="t('app.propertiesTitle')" class="col-span-2">
+					<SectionCard
+						:title="t('app.propertiesTitle')"
+						class="col-span-2"
+					>
 						<template #icon>
 							<IconChartBar class="size-5 text-green-600" />
 						</template>
@@ -177,7 +177,7 @@ const openModal = (mode: ModalIOMode) => {
 			</div>
 		</main>
 
-		<Footer />
+		<AppFooter />
 
 		<ModalIO
 			:is-open="modalState.isOpen"

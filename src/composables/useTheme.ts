@@ -14,10 +14,7 @@ const getInitialTheme = (): Theme => {
 	}
 
 	// Check system preference
-	if (
-		window.matchMedia &&
-		window.matchMedia("(prefers-color-scheme: dark)").matches
-	) {
+	if (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) {
 		return "dark";
 	}
 
@@ -46,7 +43,7 @@ watch(
 	(newTheme) => {
 		applyTheme(newTheme);
 	},
-	{ immediate: true }
+	{ immediate: true },
 );
 
 // Toggle theme
@@ -56,14 +53,12 @@ const toggleTheme = () => {
 
 // Listen for system theme changes
 if (typeof window !== "undefined" && window.matchMedia) {
-	window
-		.matchMedia("(prefers-color-scheme: dark)")
-		.addEventListener("change", (e) => {
-			// Only update if no manual preference is stored
-			if (!localStorage.getItem("theme")) {
-				theme.value = e.matches ? "dark" : "light";
-			}
-		});
+	window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", (e) => {
+		// Only update if no manual preference is stored
+		if (!localStorage.getItem("theme")) {
+			theme.value = e.matches ? "dark" : "light";
+		}
+	});
 }
 
 export const useTheme = () => {

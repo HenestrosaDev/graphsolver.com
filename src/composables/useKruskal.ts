@@ -32,10 +32,7 @@ const formatEdgeId = (u: number, v: number, labels: string[]): string => {
 	return n1 < n2 ? n1 + n2 : n2 + n1;
 };
 
-export const computeKruskal = (
-	matrix: number[][],
-	nodeLabels: string[]
-): MSTResult => {
+export const computeKruskal = (matrix: number[][], nodeLabels: string[]): MSTResult => {
 	const n = matrix.length;
 	const edges: Edge[] = [];
 
@@ -76,10 +73,10 @@ export const computeKruskal = (
 		if (uf.find(i) === root) connectedCount++;
 	}
 
-	let uniqueStatus: 'uniqueYes' | 'uniqueNo' | 'notConnected' = 'uniqueYes';
+	let uniqueStatus: "uniqueYes" | "uniqueNo" | "notConnected" = "uniqueYes";
 
 	if (connectedCount < n) {
-		uniqueStatus = 'notConnected';
+		uniqueStatus = "notConnected";
 	} else {
 		let isUnique = true;
 		for (const edgeToRemove of mstEdges) {
@@ -98,7 +95,7 @@ export const computeKruskal = (
 				break;
 			}
 		}
-		uniqueStatus = isUnique ? 'uniqueYes' : 'uniqueNo';
+		uniqueStatus = isUnique ? "uniqueYes" : "uniqueNo";
 	}
 
 	return { cost: mstCost, edges: edgeString, isUniqueKey: uniqueStatus };

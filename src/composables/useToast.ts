@@ -9,12 +9,7 @@ const message = ref("");
 const severity = ref<ToastSeverity>("info");
 
 export function useToast() {
-	const triggerToast = (opts: {
-		title: string;
-		message?: string;
-		severity?: ToastSeverity;
-		duration?: number;
-	}) => {
+	const triggerToast = (opts: { title: string; message?: string; severity?: ToastSeverity; duration?: number }) => {
 		title.value = opts.title;
 		message.value = opts.message || "";
 		severity.value = opts.severity || "info";

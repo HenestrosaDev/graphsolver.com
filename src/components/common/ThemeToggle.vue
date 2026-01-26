@@ -9,11 +9,17 @@ const { t } = useI18n();
 
 <template>
 	<button
-		@click="toggleTheme"
-		class="p-2 rounded-lg text-slate-400 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-100  duration-200"
+		class="rounded-lg p-2 text-slate-400 duration-200 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-100"
 		:title="isDark ? t('theme.toLight') : t('theme.toDark')"
+		@click="toggleTheme"
 	>
-		<IconSun v-if="isDark" class="size-6" />
-		<IconMoon v-else class="size-6" />
+		<IconSun
+			v-if="isDark"
+			class="size-6"
+		/>
+		<IconMoon
+			v-else
+			class="size-6"
+		/>
 	</button>
 </template>

@@ -8,15 +8,7 @@ import { useTheme } from "../../composables/useTheme";
 import PropertiesCard from "../properties/PropertiesCard.vue";
 import PropertyRow from "../properties/PropertyRow.vue";
 import type { FloydStep } from "../../types/graph";
-const {
-	getGraphData,
-	nodes,
-	toIdx,
-	rawMatrix,
-	numNodes,
-	setHighlightPath,
-	clearHighlights,
-} = useGraph();
+const { getGraphData, nodes, toIdx, rawMatrix, numNodes, setHighlightPath, clearHighlights } = useGraph();
 
 const steps = ref<FloydStep[]>([]);
 const diameter = ref<number>(0);
@@ -40,9 +32,7 @@ const safeStartNode = computed(() => {
 const safeEndNode = computed(() => {
 	const available = nodes.value;
 	if (!available.length) return endNode.value;
-	return available.includes(endNode.value)
-		? endNode.value
-		: available[available.length - 1];
+	return available.includes(endNode.value) ? endNode.value : available[available.length - 1];
 });
 
 const queryResult = computed(() => {
@@ -52,17 +42,10 @@ const queryResult = computed(() => {
 	const u = toIdx(safeStartNode.value);
 	const v = toIdx(safeEndNode.value);
 
-	if (
-		u < 0 ||
-		u >= finalDist.value.length ||
-		v < 0 ||
-		v >= finalDist.value.length
-	)
-		return null;
+	if (u < 0 || u >= finalDist.value.length || v < 0 || v >= finalDist.value.length) return null;
 
 	const d = finalDist.value[u][v];
-	if (d === Infinity)
-		return { status: "unreachable" as const, dist: null, path: null };
+	if (d === Infinity) return { status: "unreachable" as const, dist: null, path: null };
 
 	let pathArr: string[] = [nodes.value[u]];
 	let curr: number = u;
@@ -77,34 +60,26 @@ const queryResult = computed(() => {
 
 const minCostValue = computed(() => {
 	if (!queryResult.value) return null;
-	return queryResult.value.status === "ok"
-		? queryResult.value.dist
-		: t("floyd.unreachableCost");
+	return queryResult.value.status === "ok" ? queryResult.value.dist : t("floyd.unreachableCost");
 });
 
 const pathValue = computed(() => {
 	if (!queryResult.value) return null;
-	return queryResult.value.status === "ok"
-		? queryResult.value.path
-		: t("floyd.noPath");
+	return queryResult.value.status === "ok" ? queryResult.value.path : t("floyd.noPath");
 });
 
-const resultVariant = computed(() =>
-	queryResult.value?.status === "ok" ? "metric" : "badge"
-);
+const resultVariant = computed(() => (queryResult.value?.status === "ok" ? "metric" : "badge"));
 
 const applyHighlight = () => {
 	const result = queryResult.value;
 	clearHighlights();
 	if (!result || result.status !== "ok") return;
-	if (result.pathArr && result.pathArr.length >= 2)
-		setHighlightPath(result.pathArr);
+	if (result.pathArr && result.pathArr.length >= 2) setHighlightPath(result.pathArr);
 };
 
 const solveFloyd = () => {
 	const { matrix } = getGraphData();
-	const { steps: newSteps, dist, next, diameter: dia, hasInfPairs: inf } =
-		computeFloyd(matrix, nodes.value);
+	const { steps: newSteps, dist, next, diameter: dia, hasInfPairs: inf } = computeFloyd(matrix, nodes.value);
 
 	steps.value = newSteps;
 	finalDist.value = dist;
@@ -120,10 +95,9 @@ watch(
 	(newNodes) => {
 		if (!newNodes.length) return;
 		if (!newNodes.includes(startNode.value)) startNode.value = newNodes[0];
-		if (!newNodes.includes(endNode.value))
-			endNode.value = newNodes[newNodes.length - 1];
+		if (!newNodes.includes(endNode.value)) endNode.value = newNodes[newNodes.length - 1];
 	},
-	{ immediate: true }
+	{ immediate: true },
 );
 
 watch(
@@ -133,7 +107,7 @@ watch(
 		// Reset the carousel to the beginning
 		currentStepIndex.value = 0;
 	},
-	{ deep: true, immediate: true }
+	{ deep: true, immediate: true },
 );
 
 watch(queryResult, applyHighlight, { immediate: true });
@@ -174,10 +148,15 @@ const progressPercentage = computed(() => {
 });
 
 const rangeStyle = computed(() => {
-	const progressColor = isDark.value ? 'rgb(96 165 250)' : 'rgb(37 99 235)'; // blue-400 in dark, blue-600 in light
-	const remainingColor = isDark.value ? 'rgb(71 85 105)' : 'rgb(203 213 225)'; // slate-500 in dark, slate-200 in light
+	const progressColor = isDark.value ? "rgb(96 165 250)" : "rgb(37 99 235)"; // blue-400 in dark, blue-600 in light
+	const remainingColor = isDark.value ? "rgb(71 85 105)" : "rgb(203 213 225)"; // slate-500 in dark, slate-200 in light
+	const gradient = `linear-gradient(to right,
+		${progressColor} 0%,
+		${progressColor} ${progressPercentage.value}%,
+		${remainingColor} ${progressPercentage.value}%,
+		${remainingColor} 100%)`;
 	return {
-		background: `linear-gradient(to right, ${progressColor} 0%, ${progressColor} ${progressPercentage.value}%, ${remainingColor} ${progressPercentage.value}%, ${remainingColor} 100%)`
+		background: gradient,
 	};
 });
 </script>
@@ -185,34 +164,50 @@ const rangeStyle = computed(() => {
 <template>
 	<div class="space-y-8">
 		<div>
-			<h3 class="text-eyebrow">{{ t("floyd.routeTitle") }}</h3>
+			<h3 class="text-eyebrow">
+				{{ t("floyd.routeTitle") }}
+			</h3>
 
 			<PropertiesCard>
 				<template #header>
-					<div class="flex flex-wrap items-center justify-between gap-4 w-full">
+					<div class="flex w-full flex-wrap items-center justify-between gap-4">
 						<div class="flex items-center gap-2">
-							<label class="text-xs font-bold uppercase tracking-wide">
+							<label class="text-xs font-bold tracking-wide uppercase">
 								{{ t("floyd.origin") }}
 							</label>
 							<select
 								v-model="startNode"
-								class="bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-100 text-sm rounded-md px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-medium "
+								class="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
 							>
-								<option v-for="n in nodes" :key="n" :value="n">{{ n }}</option>
+								<option
+									v-for="n in nodes"
+									:key="n"
+									:value="n"
+								>
+									{{ n }}
+								</option>
 							</select>
 						</div>
 
-						<div class="text-lg text-slate-400">→</div>
+						<div class="text-lg text-slate-400">
+							→
+						</div>
 
 						<div class="flex items-center gap-2">
-							<label class="text-xs font-bold uppercase tracking-wide">
+							<label class="text-xs font-bold tracking-wide uppercase">
 								{{ t("floyd.destination") }}
 							</label>
 							<select
 								v-model="endNode"
-								class="bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-100 text-sm rounded-md px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-medium "
+								class="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
 							>
-								<option v-for="n in nodes" :key="n" :value="n">{{ n }}</option>
+								<option
+									v-for="n in nodes"
+									:key="n"
+									:value="n"
+								>
+									{{ n }}
+								</option>
 							</select>
 						</div>
 					</div>
@@ -239,54 +234,55 @@ const rangeStyle = computed(() => {
 		</div>
 
 		<div>
-			<h3 v-if="steps.length > 0" class="text-eyebrow">
+			<h3
+				v-if="steps.length > 0"
+				class="text-eyebrow"
+			>
 				{{ t("floyd.iterationsTable") }}
 			</h3>
 
 			<div
 				v-if="steps.length > 0"
-				class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-sm overflow-hidden "
+				class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900"
 			>
-				<div class="bg-slate-50 dark:bg-slate-800 border-b border-slate-200 dark:border-slate-800 p-4">
+				<div class="border-b border-slate-200 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-800">
 					<div class="flex flex-col items-center">
 						<span
-							class="inline-block bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-200 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider"
+							class="inline-block rounded-full bg-blue-100 px-2 py-0.5 text-[10px] font-bold tracking-wider text-blue-700 uppercase dark:bg-blue-900/40 dark:text-blue-200"
 						>
 							{{ t("floyd.stepCounter", { current: currentStepIndex + 1, total: steps.length }) }}
 						</span>
 
-						<h3 class="font-bold text-slate-800 dark:text-slate-100 text-lg mt-3">
+						<h3 class="mt-3 text-lg font-bold text-slate-800 dark:text-slate-100">
 							{{ currentStepTitle }}
 						</h3>
 
-						<div
-							class="flex items-center justify-center gap-3 w-full max-w-md -mb-1"
-						>
+						<div class="-mb-1 flex w-full max-w-md items-center justify-center gap-3">
 							<button
-								@click="prevStep"
 								:disabled="currentStepIndex === 0"
-								class="p-1.5 rounded-full hover:bg-white dark:hover:bg-slate-900 hover:shadow-sm border border-transparent hover:border-slate-200 dark:hover:border-slate-700 text-slate-500 dark:text-slate-300 disabled:opacity-30 disabled:hover:shadow-none disabled:hover:border-transparent transition-all"
+								class="rounded-full border border-transparent p-1.5 text-slate-500 transition-all hover:border-slate-200 hover:bg-white hover:shadow-sm disabled:opacity-30 disabled:hover:border-transparent disabled:hover:shadow-none dark:text-slate-300 dark:hover:border-slate-700 dark:hover:bg-slate-900"
 								:title="t('floyd.previous')"
+								@click="prevStep"
 							>
 								<IconChevronLeft class="size-6" />
 							</button>
 
-							<div class="flex-1 mx-2 relative flex items-center">
+							<div class="relative mx-2 flex flex-1 items-center">
 								<input
+									v-model.number="currentStepIndex"
 									type="range"
 									min="0"
 									:max="steps.length - 1"
-									v-model.number="currentStepIndex"
 									:style="rangeStyle"
-									class="w-full h-2 rounded-lg appearance-none cursor-pointer accent-blue-600 hover:accent-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30"
-								/>
+									class="h-2 w-full cursor-pointer appearance-none rounded-lg accent-blue-600 hover:accent-blue-500 focus:ring-2 focus:ring-blue-500/30 focus:outline-none"
+								>
 							</div>
 
 							<button
-								@click="nextStep"
 								:disabled="currentStepIndex === steps.length - 1"
-								class="p-1.5 rounded-full hover:bg-white dark:hover:bg-slate-900 hover:shadow-sm border border-transparent hover:border-slate-200 dark:hover:border-slate-700 text-slate-500 dark:text-slate-300 disabled:opacity-30 disabled:hover:shadow-none disabled:hover:border-transparent transition-all"
+								class="rounded-full border border-transparent p-1.5 text-slate-500 transition-all hover:border-slate-200 hover:bg-white hover:shadow-sm disabled:opacity-30 disabled:hover:border-transparent disabled:hover:shadow-none dark:text-slate-300 dark:hover:border-slate-700 dark:hover:bg-slate-900"
 								:title="t('floyd.next')"
+								@click="nextStep"
 							>
 								<IconChevronRight class="size-6" />
 							</button>
@@ -294,28 +290,29 @@ const rangeStyle = computed(() => {
 					</div>
 				</div>
 
-				<div
-					class="p-6 overflow-x-auto min-h-[300px] w-full bg-white dark:bg-slate-900 transition-all duration-300"
-				>
-					<table
-						class="text-sm border-collapse mx-auto shadow-sm rounded-lg overflow-hidden"
-					>
+				<div class="min-h-[300px] w-full overflow-x-auto bg-white p-6 transition-all duration-300 dark:bg-slate-900">
+					<table class="mx-auto border-collapse overflow-hidden rounded-lg text-sm shadow-sm">
 						<thead>
 							<tr>
-								<th class="p-3 bg-slate-50 dark:bg-slate-800/50 border-b border-r border-slate-200 dark:border-slate-800"></th>
+								<th
+									class="border-r border-b border-slate-200 bg-slate-50 p-3 dark:border-slate-800 dark:bg-slate-800/50"
+								/>
 								<th
 									v-for="n in nodes"
 									:key="n"
-									class="p-3 bg-slate-50 dark:bg-slate-800/50 border-b border-r border-slate-200 dark:border-slate-800 font-bold text-slate-500 dark:text-slate-300 text-xs w-10 text-center"
+									class="w-10 border-r border-b border-slate-200 bg-slate-50 p-3 text-center text-xs font-bold text-slate-500 dark:border-slate-800 dark:bg-slate-800/50 dark:text-slate-300"
 								>
 									{{ n }}
 								</th>
 							</tr>
 						</thead>
 						<tbody>
-							<tr v-for="(row, i) in currentStep.matrix" :key="i">
+							<tr
+								v-for="(row, i) in currentStep.matrix"
+								:key="i"
+							>
 								<th
-									class="p-3 bg-slate-50 dark:bg-slate-800/50 border-r border-b border-slate-200 dark:border-slate-800 font-bold text-slate-500 dark:text-slate-300 text-xs w-10 text-center"
+									class="w-10 border-r border-b border-slate-200 bg-slate-50 p-3 text-center text-xs font-bold text-slate-500 dark:border-slate-800 dark:bg-slate-800/50 dark:text-slate-300"
 								>
 									{{ nodes[i] }}
 								</th>
@@ -323,9 +320,9 @@ const rangeStyle = computed(() => {
 								<td
 									v-for="(val, j) in row"
 									:key="j"
-									class="p-3 border border-slate-100 dark:border-slate-800 text-center text-sm w-12 h-12  duration-200"
+									class="h-12 w-12 border border-slate-100 p-3 text-center text-sm duration-200 dark:border-slate-800"
 									:class="{
-										'bg-blue-50 dark:bg-blue-900/30 font-bold text-blue-700 dark:text-blue-200 ring-1 ring-inset ring-blue-200 dark:ring-blue-800':
+										'bg-blue-50 font-bold text-blue-700 ring-1 ring-blue-200 ring-inset dark:bg-blue-900/30 dark:text-blue-200 dark:ring-blue-800':
 											i === currentStep.pivot || j === currentStep.pivot,
 										'text-slate-400 dark:text-slate-500': val === Infinity,
 										'text-slate-800 dark:text-slate-100': val !== Infinity,
@@ -339,7 +336,7 @@ const rangeStyle = computed(() => {
 				</div>
 
 				<div
-					class="bg-slate-50 dark:bg-slate-800 p-3 text-xs text-slate-500 dark:text-slate-300 text-center border-t border-slate-200 dark:border-slate-800"
+					class="border-t border-slate-200 bg-slate-50 p-3 text-center text-xs text-slate-500 dark:border-slate-800 dark:bg-slate-800 dark:text-slate-300"
 				>
 					<span>{{ footerDescription }}</span>
 				</div>

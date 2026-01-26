@@ -1,9 +1,9 @@
-import { ref } from 'vue';
+import { ref } from "vue";
 
 const hasTouch = ref(false);
 
 const checkTouch = () => {
-	hasTouch.value = 'ontouchstart' in window || (navigator.maxTouchPoints ?? 0) > 0;
+	hasTouch.value = "ontouchstart" in window || (navigator.maxTouchPoints ?? 0) > 0;
 };
 
 checkTouch();

@@ -1,10 +1,7 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, watch, computed } from "vue";
+import { ref, onMounted, watch, computed } from "vue";
 import { useI18n } from "vue-i18n";
-import {
-	type FormatKey,
-	useGraphFormats,
-} from "../../composables/useGraphFormats";
+import { type FormatKey, useGraphFormats } from "../../composables/useGraphFormats";
 import { useGraphIO } from "../../composables/useGraphIO";
 import { IconCopy, IconDownload, IconUpload } from "@tabler/icons-vue";
 import ModalContainer from "./ModalContainer.vue";
@@ -54,16 +51,12 @@ const textareaContent = computed({
 
 // Get content label based on mode
 const contentLabel = computed(() => {
-	return props.mode === "import"
-		? t("modalPaste.contentLabel")
-		: t("modalExport.contentLabel");
+	return props.mode === "import" ? t("modalPaste.contentLabel") : t("modalExport.contentLabel");
 });
 
 // Get placeholder text based on mode
 const placeholder = computed(() => {
-	return props.mode === "import"
-		? t("modalPaste.placeholder")
-		: t("modalExport.placeholder");
+	return props.mode === "import" ? t("modalPaste.placeholder") : t("modalExport.placeholder");
 });
 
 // Handle import
@@ -100,35 +93,24 @@ const handleCopy = async () => {
 // Handle download
 const handleDownload = () => {
 	const fmt = formats[selectedFormat.value];
-	downloadFile(
-		generatedContent.value,
-		`grafo-${Date.now()}`,
-		fmt.ext,
-		fmt.mime
-	);
+	downloadFile(generatedContent.value, `grafo-${Date.now()}`, fmt.ext, fmt.mime);
 	localStorage.setItem("exportFormat", selectedFormat.value);
 	emit("close");
 };
 
 // Get modal title based on mode
 const modalTitle = computed(() => {
-	return props.mode === "import"
-		? t("modalPaste.title")
-		: t("modalExport.title", { format: selectedFormat.value });
+	return props.mode === "import" ? t("modalPaste.title") : t("modalExport.title", { format: selectedFormat.value });
 });
 
 // Get primary button text based on mode
 const primaryButtonText = computed(() => {
-	return props.mode === "import"
-		? t("modalPaste.import")
-		: t("modalExport.download");
+	return props.mode === "import" ? t("modalPaste.import") : t("modalExport.download");
 });
 
 // Get secondary button text based on mode
 const secondaryButtonText = computed(() => {
-	return props.mode === "import"
-		? null
-		: t("modalExport.copy");
+	return props.mode === "import" ? null : t("modalExport.copy");
 });
 
 // Check if primary button should be disabled
@@ -145,7 +127,7 @@ watch(
 				content.value = "";
 			}
 		}
-	}
+	},
 );
 </script>
 
@@ -160,14 +142,18 @@ watch(
 		@primary-action="props.mode === 'import' ? handleImport() : handleDownload()"
 		@secondary-action="props.mode === 'import' ? null : handleCopy()"
 	>
-		<div class="p-6 space-y-8">
+		<div class="space-y-8 p-6">
 			<div>
 				<label class="text-eyebrow"> {{ t("modalPaste.formatLabel") }} </label>
 				<select
 					v-model="selectedFormat"
-					class="w-full px-3 py-2 border border-slate-300 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-100 outline-none transition-all"
+					class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-slate-700 transition-all outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
 				>
-					<option v-for="key in formatOrder" :key="key" :value="key">
+					<option
+						v-for="key in formatOrder"
+						:key="key"
+						:value="key"
+					>
 						{{ key }}
 					</option>
 				</select>
@@ -178,20 +164,29 @@ watch(
 				<textarea
 					v-model="textareaContent"
 					:readonly="mode === 'export'"
-					class="w-full h-48 px-3 py-2 border border-slate-300 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm font-mono resize-none outline-none transition-all bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-600"
+					class="h-48 w-full resize-none rounded-lg border border-slate-300 bg-white px-3 py-2 font-mono text-sm text-slate-800 placeholder-slate-400 transition-all outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:placeholder-slate-600"
 					:placeholder="placeholder"
 					spellcheck="false"
-				></textarea>
+				/>
 			</div>
 		</div>
 
-		<template v-if="mode === 'export'" #secondaryButtonIcon>
+		<template
+			v-if="mode === 'export'"
+			#secondaryButtonIcon
+		>
 			<IconCopy class="size-4" />
 		</template>
 
 		<template #primaryButtonIcon>
-			<IconDownload v-if="mode === 'export'" class="size-4" />
-			<IconUpload v-else class="size-4" />
+			<IconDownload
+				v-if="mode === 'export'"
+				class="size-4"
+			/>
+			<IconUpload
+				v-else
+				class="size-4"
+			/>
 		</template>
 	</ModalContainer>
 </template>

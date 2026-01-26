@@ -60,13 +60,11 @@ const toggleLock = () => {
 				zoomView: !isLocked.value,
 				dragView: true,
 				dragNodes: !isLocked.value,
-			}
+			},
 		});
 	}
 
-	const msg = isLocked.value
-		? t("visualizer.scrollMode")
-		: t("visualizer.interactionMode");
+	const msg = isLocked.value ? t("visualizer.scrollMode") : t("visualizer.interactionMode");
 	triggerToast({ title: msg, severity: "info" });
 };
 
@@ -102,7 +100,7 @@ const parseData = () => {
 			color: {
 				background: isDark.value ? "#1e293b" : "#EFF6FF",
 				border: isDark.value ? "#60a5fa" : "#2563EB",
-				highlight: isDark.value ? "#3b82f6" : "#BFDBFE"
+				highlight: isDark.value ? "#3b82f6" : "#BFDBFE",
 			},
 			font: {
 				size: 20,
@@ -114,7 +112,7 @@ const parseData = () => {
 			borderWidth: 2,
 			margin: 15,
 			shadow: { enabled: true, color: "rgba(0,0,0,0.1)", x: 2, y: 2 },
-		}))
+		})),
 	);
 
 	// 2. Edges
@@ -135,12 +133,13 @@ const parseData = () => {
 					from: i,
 					to: j,
 					label: String(weight),
-					arrows: isSymmetric
-						? undefined
-						: { to: { enabled: true, scaleFactor: 1 } },
+					arrows: isSymmetric ? undefined : { to: { enabled: true, scaleFactor: 1 } },
 					color: isHighlighted
 						? { color: "#ef4444", highlight: "#ef4444" }
-						: { color: isDark.value ? "#94a3b8" : "#64748b", highlight: isDark.value ? "#60a5fa" : "#2563EB" },
+						: {
+							color: isDark.value ? "#94a3b8" : "#64748b",
+							highlight: isDark.value ? "#60a5fa" : "#2563EB",
+						},
 					font: {
 						align: "middle",
 						color: isDark.value ? "#f1f5f9" : "#000000",
@@ -192,11 +191,7 @@ const drawGraph = () => {
 		layout: { randomSeed: 10 },
 	};
 
-	networkInstance = new Network(
-		networkContainer.value,
-		data as unknown as Data,
-		options
-	);
+	networkInstance = new Network(networkContainer.value, data as unknown as Data, options);
 
 	// --- ADDED CODE ---
 	// Once the graph calculates its initial position, we disable physics.
@@ -300,37 +295,42 @@ watch(isDark, () => drawGraph());
 </script>
 
 <template>
-	<div class="relative w-full h-full min-h-[550px]">
-		<Teleport to="body" :disabled="!isFullscreen">
+	<div class="relative h-full min-h-[550px] w-full">
+		<Teleport
+			to="body"
+			:disabled="!isFullscreen"
+		>
 			<div
 				ref="wrapperRef"
-				class="border-gray-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 shadow-inner overflow-hidden flex flex-col "
+				class="flex flex-col overflow-hidden border-gray-200 bg-slate-50 shadow-inner dark:border-slate-800 dark:bg-slate-900"
 				:class="[
 					isFullscreen
-						? 'fixed inset-0 z-[9999] w-screen h-screen rounded-none border-0' // z-9999 vence al Navbar
-						: 'relative w-full h-full min-h-[550px] rounded-xl border', // Se adapta al padre original
+						? 'fixed inset-0 z-[9999] h-screen w-screen rounded-none border-0' // z-9999 vence al Navbar
+						: 'relative h-full min-h-[550px] w-full rounded-xl border', // Se adapta al padre original
 				]"
 			>
 				<div
 					ref="networkContainer"
-					class="absolute inset-0 w-full h-full cursor-grab active:cursor-grabbing"
+					class="absolute inset-0 h-full w-full cursor-grab active:cursor-grabbing"
 					:class="{ 'touch-manipulation': isLocked && hasTouch, 'touch-none': !isLocked && hasTouch }"
 				/>
 
 				<div
 					v-if="isLocked && !isFullscreen"
-					class="absolute inset-0 z-10 lg:hidden touch-pan-y flex items-center justify-center pb-32"
+					class="absolute inset-0 z-10 flex touch-pan-y items-center justify-center pb-32 lg:hidden"
 					@touchstart="handleTouchStart"
 					@touchend="handleTouchEnd"
 				>
 					<Transition name="fade">
 						<div
 							v-if="showOverlayHint"
-							class="bg-slate-900/70 backdrop-blur-[2px] rounded-xl flex flex-col items-center justify-center text-white p-6 text-center select-none mx-6 shadow-2xl"
+							class="mx-6 flex flex-col items-center justify-center rounded-xl bg-slate-900/70 p-6 text-center text-white shadow-2xl backdrop-blur-[2px] select-none"
 						>
-							<IconLock class="size-10 mb-3 opacity-90" />
-							<p class="font-bold text-lg">{{ t("visualizer.overlayTitle") }}</p>
-							<p class="text-sm text-slate-200 mt-1 leading-snug">
+							<IconLock class="mb-3 size-10 opacity-90" />
+							<p class="text-lg font-bold">
+								{{ t("visualizer.overlayTitle") }}
+							</p>
+							<p class="mt-1 text-sm leading-snug text-slate-200">
 								{{ t("visualizer.overlayDescription") }}
 							</p>
 						</div>
@@ -338,75 +338,89 @@ watch(isDark, () => drawGraph());
 				</div>
 
 				<div
-					class="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1 p-1.5 bg-white/90 dark:bg-slate-900/85 backdrop-blur shadow-lg border border-gray-200/80 dark:border-slate-700/70 rounded-full animate-fade-in transition-all duration-300 hover:shadow-xl hover:scale-102"
+					class="animate-fade-in absolute bottom-6 left-1/2 z-20 flex -translate-x-1/2 items-center gap-1 rounded-full border border-gray-200/80 bg-white/90 p-1.5 shadow-lg backdrop-blur transition-all duration-300 hover:scale-102 hover:shadow-xl dark:border-slate-700/70 dark:bg-slate-900/85"
 					:class="isFullscreen ? 'max-sm:!bottom-16' : ''"
 				>
 					<button
 						v-if="hasTouch"
-						@click="toggleLock"
-						class="relative p-2 rounded-full text-gray-500 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-slate-800 transition-all duration-300"
+						class="relative rounded-full p-2 text-gray-500 transition-all duration-300 hover:bg-blue-50 hover:text-blue-600 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-blue-300"
 						:class="{
-							'text-blue-600 bg-blue-50 ring-1 ring-blue-200 dark:text-blue-200 dark:bg-blue-900/30 dark:ring-blue-700': !isLocked,
-							'scale-110 bg-white dark:bg-slate-900 ring-2 ring-blue-400 dark:ring-blue-700 shadow-xl z-50':
+							'bg-blue-50 text-blue-600 ring-1 ring-blue-200 dark:bg-blue-900/30 dark:text-blue-200 dark:ring-blue-700':
+								!isLocked,
+							'z-50 scale-110 bg-white shadow-xl ring-2 ring-blue-400 dark:bg-slate-900 dark:ring-blue-700':
 								showOverlayHint,
 						}"
+						@click="toggleLock"
 					>
 						<span
 							v-if="showOverlayHint"
-							class="absolute inset-0 -z-10 inline-flex h-full w-full rounded-full bg-blue-400 opacity-75 animate-ping"
+							class="absolute inset-0 -z-10 inline-flex h-full w-full animate-ping rounded-full bg-blue-400 opacity-75"
 						/>
-						<IconLock v-if="isLocked" class="size-5" />
-						<IconLockOpen v-else class="size-5" />
+						<IconLock
+							v-if="isLocked"
+							class="size-5"
+						/>
+						<IconLockOpen
+							v-else
+							class="size-5"
+						/>
 					</button>
 
 					<button
-						@click="zoomOut"
-						class="p-2 rounded-full text-gray-500 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-slate-800 transition"
+						class="rounded-full p-2 text-gray-500 transition hover:bg-blue-50 hover:text-blue-600 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-blue-300"
 						:title="t('visualizer.zoomOut')"
+						@click="zoomOut"
 					>
 						<IconZoomOut class="size-5" />
 					</button>
 
 					<button
-						@click="zoomIn"
-						class="p-2 rounded-full text-gray-500 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-slate-800 transition"
+						class="rounded-full p-2 text-gray-500 transition hover:bg-blue-50 hover:text-blue-600 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-blue-300"
 						:title="t('visualizer.zoomIn')"
+						@click="zoomIn"
 					>
 						<IconZoomIn class="size-5" />
 					</button>
 
 					<button
-						@click="fitGraph"
-						class="p-2 rounded-full text-gray-500 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-slate-800 transition"
+						class="rounded-full p-2 text-gray-500 transition hover:bg-blue-50 hover:text-blue-600 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-blue-300"
 						:title="t('visualizer.fitView')"
+						@click="fitGraph"
 					>
 						<IconKeyframeAlignCenter class="size-5" />
 					</button>
 
 					<button
-						@click="exportImage"
-						class="p-2 rounded-full text-gray-500 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-slate-800 transition"
+						class="rounded-full p-2 text-gray-500 transition hover:bg-blue-50 hover:text-blue-600 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-blue-300"
 						:title="t('visualizer.downloadPng')"
+						@click="exportImage"
 					>
 						<IconCamera class="size-5" />
 					</button>
 
 					<button
-						@click="toggleFullscreen"
-						class="p-2 rounded-full text-gray-500 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-slate-800 transition"
+						class="rounded-full p-2 text-gray-500 transition hover:bg-blue-50 hover:text-blue-600 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-blue-300"
 						:class="{
-							'text-blue-600 bg-blue-50 ring-1 ring-blue-200 dark:text-blue-200 dark:bg-blue-900/40 dark:ring-blue-700': isFullscreen,
+							'bg-blue-50 text-blue-600 ring-1 ring-blue-200 dark:bg-blue-900/40 dark:text-blue-200 dark:ring-blue-700':
+								isFullscreen,
 						}"
 						:title="t('visualizer.fullscreen')"
+						@click="toggleFullscreen"
 					>
-						<IconArrowsMaximize v-if="!isFullscreen" class="size-5" />
-						<IconArrowsMinimize v-else class="size-5" />
+						<IconArrowsMaximize
+							v-if="!isFullscreen"
+							class="size-5"
+						/>
+						<IconArrowsMinimize
+							v-else
+							class="size-5"
+						/>
 					</button>
 				</div>
 
 				<div
 					v-if="isFullscreen"
-					class="sm:block hidden absolute top-6 left-1/2 -translate-x-1/2 z-20 bg-white/90 dark:bg-slate-900/85 backdrop-blur px-4 py-1.5 rounded-full text-xs font-medium text-slate-500 dark:text-slate-200 shadow-sm pointer-events-none animate-fade-in border border-gray-100 dark:border-slate-700"
+					class="animate-fade-in pointer-events-none absolute top-6 left-1/2 z-20 hidden -translate-x-1/2 rounded-full border border-gray-100 bg-white/90 px-4 py-1.5 text-xs font-medium text-slate-500 shadow-sm backdrop-blur sm:block dark:border-slate-700 dark:bg-slate-900/85 dark:text-slate-200"
 				>
 					{{ t("visualizer.escHint") }}
 				</div>

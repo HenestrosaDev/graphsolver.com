@@ -12,7 +12,7 @@ describe("useGraphFormats", () => {
 		rawMatrix.value = [
 			["0", "1", "2"],
 			["1", "0", "3"],
-			["2", "3", "0"]
+			["2", "3", "0"],
 		];
 	});
 
@@ -47,7 +47,7 @@ describe("useGraphFormats", () => {
 		expect(parsed.rawMatrix).toEqual([
 			["0", "1", "2"],
 			["1", "0", "3"],
-			["2", "3", "0"]
+			["2", "3", "0"],
 		]);
 		expect(parsed.timestamp).toBeDefined();
 	});
@@ -59,7 +59,7 @@ describe("useGraphFormats", () => {
 		const testJson = JSON.stringify({
 			numNodes: 2,
 			rawMatrix: [["0", "5"], ["5", "0"]],
-			timestamp: new Date().toISOString()
+			timestamp: new Date().toISOString(),
 		});
 
 		const result = formats.JSON.parse(testJson);
@@ -121,12 +121,12 @@ describe("useGraphFormats", () => {
 		const { formats } = useGraphFormats();
 		const graphmlString = formats.GraphML.serialize();
 
-		expect(graphmlString).toContain('<?xml version="1.0" encoding="UTF-8"?>');
-		expect(graphmlString).toContain('<graphml');
-		expect(graphmlString).toContain('<graph');
-		expect(graphmlString).toContain('<node id="n0"/>');
-		expect(graphmlString).toContain('<edge');
-		expect(graphmlString).toContain('<data key="weight">1</data>');
+		expect(graphmlString).toContain("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+		expect(graphmlString).toContain("<graphml");
+		expect(graphmlString).toContain("<graph");
+		expect(graphmlString).toContain("<node id=\"n0\"/>");
+		expect(graphmlString).toContain("<edge");
+		expect(graphmlString).toContain("<data key=\"weight\">1</data>");
 	});
 
 	it("should parse GraphML correctly", () => {
@@ -145,7 +145,7 @@ describe("useGraphFormats", () => {
 </graphml>`;
 
 		// Skip test if DOMParser is not available (test environment)
-		if (typeof DOMParser === 'undefined') {
+		if (typeof DOMParser === "undefined") {
 			expect(true).toBe(true); // Skip test
 			return;
 		}
@@ -161,11 +161,11 @@ describe("useGraphFormats", () => {
 		const { formats } = useGraphFormats();
 		const csvString = formats.CSV.serialize();
 
-		const lines = csvString.trim().split('\n');
-		expect(lines[0]).toBe(',A,B,C');
-		expect(lines[1]).toBe('A,0,1,2');
-		expect(lines[2]).toBe('B,1,0,3');
-		expect(lines[3]).toBe('C,2,3,0');
+		const lines = csvString.trim().split("\n");
+		expect(lines[0]).toBe(",A,B,C");
+		expect(lines[1]).toBe("A,0,1,2");
+		expect(lines[2]).toBe("B,1,0,3");
+		expect(lines[3]).toBe("C,2,3,0");
 	});
 
 	it("should parse CSV correctly", () => {
@@ -188,13 +188,13 @@ B,6,0`;
 
 		expect(gmlString).toContain("graph [");
 		expect(gmlString).toContain("directed 0"); // Should be undirected for symmetric test graph
-		expect(gmlString).toContain('node [');
-		expect(gmlString).toContain('id 0');
-		expect(gmlString).toContain('label "A"');
-		expect(gmlString).toContain('edge [');
-		expect(gmlString).toContain('source 0');
-		expect(gmlString).toContain('target 1');
-		expect(gmlString).toContain('weight 1');
+		expect(gmlString).toContain("node [");
+		expect(gmlString).toContain("id 0");
+		expect(gmlString).toContain("label \"A\"");
+		expect(gmlString).toContain("edge [");
+		expect(gmlString).toContain("source 0");
+		expect(gmlString).toContain("target 1");
+		expect(gmlString).toContain("weight 1");
 	});
 
 	it("should parse GML correctly", () => {
@@ -244,7 +244,7 @@ B,6,0`;
 		expect(rawMatrix.value).toEqual([
 			["0", "1", "2"],
 			["1", "0", "3"],
-			["2", "3", "0"]
+			["2", "3", "0"],
 		]);
 	});
 
@@ -261,7 +261,7 @@ B,6,0`;
 		expect(formats.Dot.parse("not dot")).toBe(false);
 
 		// Test invalid GraphML (skip if DOMParser not available)
-		if (typeof DOMParser !== 'undefined') {
+		if (typeof DOMParser !== "undefined") {
 			expect(formats.GraphML.parse("not xml")).toBe(false);
 		}
 

@@ -6,14 +6,7 @@ import { computeDijkstra, type DijkstraStep } from "../../composables/useDijkstr
 import PropertiesCard from "../properties/PropertiesCard.vue";
 import PropertyRow from "../properties/PropertyRow.vue";
 
-const {
-	getGraphData,
-	nodes,
-	rawMatrix,
-	numNodes,
-	setHighlightPath,
-	clearHighlights,
-} = useGraph();
+const { getGraphData, nodes, rawMatrix, numNodes, setHighlightPath, clearHighlights } = useGraph();
 
 const startNode = ref<string>("A");
 const endNode = ref<string>("B");
@@ -34,21 +27,14 @@ const safeStartNode = computed(() => {
 const safeEndNode = computed(() => {
 	const available = nodes.value;
 	if (!available.length) return endNode.value;
-	return available.includes(endNode.value)
-		? endNode.value
-		: available[available.length - 1];
+	return available.includes(endNode.value) ? endNode.value : available[available.length - 1];
 });
 
 const solveDijkstra = () => {
 	isSolved.value = false;
 	clearHighlights();
 	const { matrix } = getGraphData();
-	const result = computeDijkstra(
-		matrix,
-		nodes.value,
-		safeStartNode.value,
-		safeEndNode.value
-	);
+	const result = computeDijkstra(matrix, nodes.value, safeStartNode.value, safeEndNode.value);
 
 	steps.value = result.steps;
 	finalCost.value = result.cost;
@@ -68,16 +54,10 @@ watch([rawMatrix, numNodes, startNode, endNode], () => solveDijkstra(), {
 	immediate: true,
 });
 
-const costDisplay = computed(() =>
-	resultStatus.value === "ok"
-		? finalCost.value
-		: t("dijkstra.unreachableCost")
-);
+const costDisplay = computed(() => (resultStatus.value === "ok" ? finalCost.value : t("dijkstra.unreachableCost")));
 
 const pathDisplay = computed(() =>
-	resultStatus.value === "ok" && finalPath.value
-		? finalPath.value
-		: t("dijkstra.noPath")
+	resultStatus.value === "ok" && finalPath.value ? finalPath.value : t("dijkstra.noPath"),
 );
 
 watch(
@@ -85,10 +65,9 @@ watch(
 	(newNodes) => {
 		if (!newNodes.length) return;
 		if (!newNodes.includes(startNode.value)) startNode.value = newNodes[0];
-		if (!newNodes.includes(endNode.value))
-			endNode.value = newNodes[newNodes.length - 1];
+		if (!newNodes.includes(endNode.value)) endNode.value = newNodes[newNodes.length - 1];
 	},
-	{ immediate: true }
+	{ immediate: true },
 );
 
 onActivated(() => {
@@ -103,42 +82,58 @@ onUnmounted(() => {
 <template>
 	<div class="space-y-8">
 		<div>
-			<h3 class="text-eyebrow">{{ t("dijkstra.routeTitle") }}</h3>
+			<h3 class="text-eyebrow">
+				{{ t("dijkstra.routeTitle") }}
+			</h3>
 
 			<PropertiesCard>
 				<template #header>
-					<div class="flex flex-wrap items-center justify-between gap-4 w-full">
+					<div class="flex w-full flex-wrap items-center justify-between gap-4">
 						<div class="flex items-center gap-2">
 							<label
 								for="start-node"
-								class="text-xs font-bold uppercase tracking-wide"
+								class="text-xs font-bold tracking-wide uppercase"
 							>
 								{{ t("dijkstra.origin") }}
 							</label>
 							<select
 								id="start-node"
 								v-model="startNode"
-								class="bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-100 text-sm rounded-md px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-medium "
+								class="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
 							>
-								<option v-for="n in nodes" :key="n" :value="n">{{ n }}</option>
+								<option
+									v-for="n in nodes"
+									:key="n"
+									:value="n"
+								>
+									{{ n }}
+								</option>
 							</select>
 						</div>
 
-						<div class="text-lg text-slate-400">→</div>
+						<div class="text-lg text-slate-400">
+							→
+						</div>
 
 						<div class="flex items-center gap-2">
 							<label
 								for="end-node"
-								class="text-xs font-bold uppercase tracking-wide"
+								class="text-xs font-bold tracking-wide uppercase"
 							>
 								{{ t("dijkstra.destination") }}
 							</label>
 							<select
 								id="end-node"
 								v-model="endNode"
-								class="bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-100 text-sm rounded-md px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-medium "
+								class="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
 							>
-								<option v-for="n in nodes" :key="n" :value="n">{{ n }}</option>
+								<option
+									v-for="n in nodes"
+									:key="n"
+									:value="n"
+								>
+									{{ n }}
+								</option>
 							</select>
 						</div>
 					</div>
@@ -160,23 +155,29 @@ onUnmounted(() => {
 		</div>
 
 		<div v-if="isSolved">
-			<h3 class="text-eyebrow">{{ t("dijkstra.iterationsTable") }}</h3>
+			<h3 class="text-eyebrow">
+				{{ t("dijkstra.iterationsTable") }}
+			</h3>
 
 			<div
-				class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg overflow-x-auto shadow-sm "
+				class="overflow-x-auto rounded-lg border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900"
 			>
 				<table class="w-full text-sm">
-					<thead class="bg-slate-50 dark:bg-slate-800 border-b border-slate-200 dark:border-slate-800">
+					<thead class="border-b border-slate-200 bg-slate-50 dark:border-slate-800 dark:bg-slate-800">
 						<tr>
-							<th class="px-4 py-3 text-left">{{ t("dijkstra.iteration") }}</th>
+							<th class="px-4 py-3 text-left">
+								{{ t("dijkstra.iteration") }}
+							</th>
 							<th
 								v-for="n in nodes"
 								:key="n"
-								class="px-4 py-3 text-center font-bold w-12"
+								class="w-12 px-4 py-3 text-center font-bold"
 							>
 								{{ n }}
 							</th>
-							<th class="px-4 py-3 text-center text-blue-600">{{ t("dijkstra.pivot") }}</th>
+							<th class="px-4 py-3 text-center text-blue-600">
+								{{ t("dijkstra.pivot") }}
+							</th>
 						</tr>
 					</thead>
 
@@ -184,7 +185,7 @@ onUnmounted(() => {
 						<tr
 							v-for="row in steps"
 							:key="row.step"
-							class="hover:bg-slate-50 dark:hover:bg-slate-800 "
+							class="hover:bg-slate-50 dark:hover:bg-slate-800"
 						>
 							<td class="px-4 py-3 font-medium text-slate-900 dark:text-slate-100">
 								{{ t("dijkstra.stepLabel", { step: row.step }) }}
@@ -206,11 +207,14 @@ onUnmounted(() => {
 							<td class="px-4 py-3 text-center">
 								<span
 									v-if="row.pivot !== '-'"
-									class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-blue-50 dark:bg-blue-900/40 border-2 border-blue-500 dark:border-blue-400 text-slate-900 dark:text-slate-100 font-medium text-sm"
+									class="inline-flex h-8 w-8 items-center justify-center rounded-full border-2 border-blue-500 bg-blue-50 text-sm font-medium text-slate-900 dark:border-blue-400 dark:bg-blue-900/40 dark:text-slate-100"
 								>
 									{{ row.pivot }}
 								</span>
-								<span v-else class="text-slate-300 dark:text-slate-600">-</span>
+								<span
+									v-else
+									class="text-slate-300 dark:text-slate-600"
+								>-</span>
 							</td>
 						</tr>
 					</tbody>

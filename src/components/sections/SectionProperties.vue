@@ -40,8 +40,7 @@ const calculateProperties = () => {
 	const tIdx = toIdx(adjTarget.value);
 	let adjNodes: string[] = [];
 	if (tIdx >= 0 && tIdx < n) {
-		for (let j = 0; j < n; j++)
-			if (hasArc[tIdx][j]) adjNodes.push(nodes.value[j]);
+		for (let j = 0; j < n; j++) if (hasArc[tIdx][j]) adjNodes.push(nodes.value[j]);
 	}
 	adjNodes.sort((a, b) => b.localeCompare(a));
 
@@ -61,10 +60,7 @@ const calculateProperties = () => {
 				while (q.length) {
 					let u = q.shift()!;
 					for (let v = 0; v < n; v++) {
-						if (
-							!visited[v] &&
-							(adjacencyMatrix[u][v] || adjacencyMatrix[v][u])
-						) {
+						if (!visited[v] && (adjacencyMatrix[u][v] || adjacencyMatrix[v][u])) {
 							visited[v] = true;
 							q.push(v);
 						}
@@ -122,10 +118,7 @@ const calculateProperties = () => {
 		else if (hasCycles && isConnected) structureType = "connectedCyclic";
 		else structureType = "disconnectedCyclic";
 	} else {
-		if (isConnected)
-			structureType = hasCycles
-				? "weakConnectedCyclic"
-				: "weakConnectedAcyclic";
+		if (isConnected) structureType = hasCycles ? "weakConnectedCyclic" : "weakConnectedAcyclic";
 		else structureType = "disconnected";
 	}
 
@@ -166,12 +159,9 @@ const calculateProperties = () => {
 	else {
 		const visited = new Array(n).fill(false);
 		const checkHamiltonianRecursive = (u: number, count: number): boolean => {
-			if (count === n)
-				return isSymmetric ? hasArc[u][0] || hasArc[0][u] : hasArc[u][0];
+			if (count === n) return isSymmetric ? hasArc[u][0] || hasArc[0][u] : hasArc[u][0];
 			for (let v = 0; v < n; v++) {
-				const hasEdge = isSymmetric
-					? hasArc[u][v] || hasArc[v][u]
-					: hasArc[u][v];
+				const hasEdge = isSymmetric ? hasArc[u][v] || hasArc[v][u] : hasArc[u][v];
 				if (hasEdge && !visited[v]) {
 					visited[v] = true;
 					if (checkHamiltonianRecursive(v, count + 1)) return true;
@@ -213,25 +203,21 @@ const calculateProperties = () => {
 
 const maxMeasureTooltip = computed(() => {
 	if (!analysis.value) return "";
-	const typeLabel = analysis.value.isSymmetric
-		? t("properties.values.undirected")
-		: t("properties.values.directed");
-	const formula = analysis.value.isSymmetric
-		? "<i>n(n-1)</i> / <i>2</i>"
-		: "<i>n(n-1)</i>";
+	const typeLabel = analysis.value.isSymmetric ? t("properties.values.undirected") : t("properties.values.directed");
+	const formula = analysis.value.isSymmetric ? "<i>n(n-1)</i> / <i>2</i>" : "<i>n(n-1)</i>";
 	return t("properties.tooltips.maxMeasure", { type: typeLabel, formula });
 });
 
 const hamiltonianStatus = computed(() => {
-	if (!analysis.value)
-		return { text: "", classes: "", title: undefined as string | undefined };
+	if (!analysis.value) return { text: "", classes: "", title: undefined as string | undefined };
 	const value = analysis.value.isHamiltonian;
 
 	if (value === "npLimit") {
 		return {
 			text: t("properties.values.hamiltonian.npLimit"),
 			classes:
-				"bg-slate-100 text-slate-500 border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700 cursor-help",
+				"bg-slate-100 text-slate-500 border-slate-200 dark:bg-slate-800 dark:text-slate-300 " +
+				"dark:border-slate-700 cursor-help",
 			title: t("properties.values.hamiltonian.npLimit"),
 		};
 	}
@@ -240,15 +226,15 @@ const hamiltonianStatus = computed(() => {
 		return {
 			text: t("properties.values.hamiltonian.yes"),
 			classes:
-				"bg-green-100 text-green-700 border-green-200 dark:bg-green-900/30 dark:text-green-200 dark:border-green-700",
+				"bg-green-100 text-green-700 border-green-200 dark:bg-green-900/30 dark:text-green-200 " +
+				"dark:border-green-700",
 			title: undefined,
 		};
 	}
 
 	return {
 		text: t("properties.values.hamiltonian.no"),
-		classes:
-			"bg-red-50 text-red-600 border-red-200 dark:bg-red-900/30 dark:text-red-200 dark:border-red-800",
+		classes: "bg-red-50 text-red-600 border-red-200 dark:bg-red-900/30 dark:text-red-200 dark:border-red-800",
 		title: undefined,
 	};
 });
@@ -260,17 +246,16 @@ watch([rawMatrix, numNodes, adjTarget], () => calculateProperties(), {
 </script>
 
 <template>
-	<div v-if="analysis" class="animate-fade-in">
-		<div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+	<div
+		v-if="analysis"
+		class="animate-fade-in"
+	>
+		<div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
 			<div class="space-y-4">
 				<PropertiesCard :title="t('properties.cardTitles.basic')">
 					<PropertyRow
 						:label="t('properties.labels.graphType')"
-						:value="
-							analysis.isSymmetric
-								? t('properties.values.undirected')
-								: t('properties.values.directed')
-						"
+						:value="analysis.isSymmetric ? t('properties.values.undirected') : t('properties.values.directed')"
 					/>
 
 					<PropertyRow
@@ -331,16 +316,20 @@ watch([rawMatrix, numNodes, adjTarget], () => calculateProperties(), {
 						"
 						:tooltip="t('properties.tooltips.regularity')"
 						variant="badge"
-						:badge-class="`${analysis.isRegular ? 'bg-indigo-100 text-indigo-700 border-indigo-200' : 'bg-slate-50 text-slate-900 border-slate-200'}`"
+						:badge-class="`${
+							analysis.isRegular
+								? 'bg-indigo-100 text-indigo-700 border-indigo-200'
+								: 'bg-slate-50 text-slate-900 border-slate-200'
+						}`"
 					/>
 				</PropertiesCard>
 			</div>
 
 			<div class="space-y-4">
 				<PropertiesCard :title="t('properties.cardTitles.vertices')">
-					<PropertyRow 
+					<PropertyRow
 						:label="t('properties.labels.adjacentsTo')"
-						:value="analysis.adjList || t('common.emptySet')" 
+						:value="analysis.adjList || t('common.emptySet')"
 						variant="metric"
 						:tooltip="t('properties.tooltips.adjacencyList')"
 					>
@@ -348,9 +337,13 @@ watch([rawMatrix, numNodes, adjTarget], () => calculateProperties(), {
 							<select
 								v-model="adjTarget"
 								for="label-vortex"
-								class="ml-0.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded px-2 py-0.5 text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none normal-case text-slate-700 dark:text-slate-100"
+								class="ml-0.5 rounded border border-slate-200 bg-slate-50 px-2 py-0.5 text-sm font-medium text-slate-700 normal-case outline-none focus:ring-2 focus:ring-blue-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
 							>
-								<option v-for="n in nodes" :key="n" :value="n">
+								<option
+									v-for="n in nodes"
+									:key="n"
+									:value="n"
+								>
 									{{ n }}
 								</option>
 							</select>
@@ -378,8 +371,9 @@ watch([rawMatrix, numNodes, adjTarget], () => calculateProperties(), {
 						variant="badge"
 						:badge-class="
 							analysis.isConnected
-								? 'bg-green-100 text-green-700 border-green-200 dark:bg-green-900/30 dark:text-green-200 dark:border-green-700'
-								: 'bg-red-50 text-red-600 border-red-200 dark:bg-red-900/30 dark:text-red-200 dark:border-red-800'
+								? 'bg-green-100 text-green-700 border-green-200 ' +
+									'dark:bg-green-900/30 dark:text-green-200 dark:border-green-700'
+								: 'bg-red-50 text-red-600 border-red-200 ' + 'dark:bg-red-900/30 dark:text-red-200 dark:border-red-800'
 						"
 					/>
 				</PropertiesCard>
@@ -398,8 +392,9 @@ watch([rawMatrix, numNodes, adjTarget], () => calculateProperties(), {
 						variant="badge"
 						:badge-class="
 							analysis.isBipartite
-								? 'bg-green-100 text-green-700 border-green-200 dark:bg-green-900/30 dark:text-green-200 dark:border-green-700'
-								: 'bg-red-50 text-red-600 border-red-200 dark:bg-red-900/30 dark:text-red-200 dark:border-red-800'
+								? 'bg-green-100 text-green-700 border-green-200 ' +
+									'dark:bg-green-900/30 dark:text-green-200 dark:border-green-700'
+								: 'bg-red-50 text-red-600 border-red-200 ' + 'dark:bg-red-900/30 dark:text-red-200 dark:border-red-800'
 						"
 					/>
 
@@ -410,8 +405,9 @@ watch([rawMatrix, numNodes, adjTarget], () => calculateProperties(), {
 						variant="badge"
 						:badge-class="
 							analysis.eulerianType !== 'none'
-								? 'bg-green-100 text-green-700 border-green-200 dark:bg-green-900/30 dark:text-green-200 dark:border-green-700'
-								: 'bg-red-50 text-red-600 border-red-200 dark:bg-red-900/30 dark:text-red-200 dark:border-red-800'
+								? 'bg-green-100 text-green-700 border-green-200 ' +
+									'dark:bg-green-900/30 dark:text-green-200 dark:border-green-700'
+								: 'bg-red-50 text-red-600 border-red-200 ' + 'dark:bg-red-900/30 dark:text-red-200 dark:border-red-800'
 						"
 					/>
 

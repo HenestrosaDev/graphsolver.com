@@ -2,10 +2,7 @@
 import { ref } from "vue";
 import { useI18n } from "vue-i18n";
 import { IconDownload, IconUpload } from "@tabler/icons-vue";
-import {
-	type FormatKey,
-	useGraphFormats,
-} from "../../composables/useGraphFormats";
+import { type FormatKey, useGraphFormats } from "../../composables/useGraphFormats";
 import DropdownDivider from "../common/dropdown/DropdownDivider.vue";
 import DropdownHeader from "../common/dropdown/DropdownHeader.vue";
 import DropdownItem from "../common/dropdown/DropdownItem.vue";
@@ -46,11 +43,11 @@ const handleImportFile = (format: FormatKey) => {
 <template>
 	<div class="flex gap-2">
 		<button
-			@click="handleExportModal"
-			class="text-sm bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-200 border border-slate-200 dark:border-slate-700 font-medium py-2 px-3 rounded-lg shadow-sm hover:bg-slate-50 dark:hover:bg-slate-800 transition-all active:scale-95 flex items-center gap-2 group relative"
+			class="group relative flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-600 shadow-sm transition-all hover:bg-slate-50 active:scale-95 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800"
 			:title="t('graphIO.export')"
+			@click="handleExportModal"
 		>
-			<div class="text-slate-500 dark:text-slate-300 group-hover:text-blue-600 dark:group-hover:text-blue-300">
+			<div class="text-slate-500 group-hover:text-blue-600 dark:text-slate-300 dark:group-hover:text-blue-300">
 				<IconDownload class="size-4" />
 			</div>
 			<span class="hidden sm:inline">{{ t("graphIO.export") }}</span>
@@ -78,7 +75,9 @@ const handleImportFile = (format: FormatKey) => {
 			<DropdownDivider />
 
 			<DropdownHeader>{{ t("graphIO.text") }}</DropdownHeader>
-			<DropdownItem @click="handleImportModal">{{ t("graphIO.paste") }}</DropdownItem>
+			<DropdownItem @click="handleImportModal">
+				{{ t("graphIO.paste") }}
+			</DropdownItem>
 		</DropdownMenu>
 	</div>
 </template>

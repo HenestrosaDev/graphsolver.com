@@ -33,7 +33,7 @@ watch(
 		} else {
 			document.removeEventListener("keydown", handleKeydown);
 		}
-	}
+	},
 );
 
 // Cleanup on unmount
@@ -46,22 +46,22 @@ onUnmounted(() => {
 	<Transition name="modal">
 		<div
 			v-if="isOpen"
-			class="fixed inset-0 z-50 p-4 bg-slate-900/60 backdrop-blur-sm"
+			class="fixed inset-0 z-50 bg-slate-900/60 p-4 backdrop-blur-sm"
 			@click.self="$emit('close')"
 		>
 			<div
-				class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white dark:bg-slate-950 rounded-xl shadow-2xl w-full overflow-hidden flex flex-col max-h-[90vh] border border-slate-200 dark:border-slate-800 max-w-[90vw] sm:max-w-lg"
+				class="absolute top-1/2 left-1/2 flex max-h-[90vh] w-full max-w-[90vw] -translate-x-1/2 -translate-y-1/2 transform flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-2xl sm:max-w-lg dark:border-slate-800 dark:bg-slate-950"
 			>
 				<div
-					class="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-slate-50 dark:bg-slate-900"
+					class="flex items-center justify-between border-b border-slate-100 bg-slate-50 px-6 py-4 dark:border-slate-800 dark:bg-slate-900"
 				>
 					<h3 class="text-lg font-bold text-slate-800 dark:text-slate-100">
 						{{ title }}
 					</h3>
 					<button
-						@click="$emit('close')"
 						class="text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300"
 						:aria-label="t('common.close')"
+						@click="$emit('close')"
 					>
 						✕
 					</button>
@@ -71,15 +71,15 @@ onUnmounted(() => {
 
 				<div
 					v-if="secondaryButtonText || primaryButtonText"
-					class="px-6 py-4 bg-slate-50 dark:bg-slate-900 border-t border-slate-100 dark:border-slate-800 flex justify-end gap-3"
+					class="flex justify-end gap-3 border-t border-slate-100 bg-slate-50 px-6 py-4 dark:border-slate-800 dark:bg-slate-900"
 				>
 					<div class="flex gap-2">
 						<button
 							v-if="secondaryButtonText"
-							@click="$emit('secondaryAction')"
-							class="flex px-4 py-2 text-sm font-medium text-slate-700 dark:text-slate-100 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 items-center gap-2 shadow-sm"
+							class="flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:hover:bg-slate-800"
 							:class="secondaryButtonClass"
 							:disabled="isSecondaryDisabled"
+							@click="$emit('secondaryAction')"
 						>
 							<slot name="secondaryButtonIcon" />
 							{{ secondaryButtonText }}
@@ -87,10 +87,10 @@ onUnmounted(() => {
 
 						<button
 							v-if="primaryButtonText"
-							@click="$emit('primaryAction')"
-							class="flex px-4 py-2 text-sm font-medium text-white bg-blue-600 dark:bg-blue-700 rounded-lg hover:bg-blue-700 dark:hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm gap-2 items-center"
+							class="flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-blue-700 dark:hover:bg-blue-600"
 							:class="primaryButtonClass"
 							:disabled="isPrimaryDisabled"
+							@click="$emit('primaryAction')"
 						>
 							<slot name="primaryButtonIcon" />
 							{{ primaryButtonText }}

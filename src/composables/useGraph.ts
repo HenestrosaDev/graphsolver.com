@@ -7,11 +7,7 @@ const rawMatrix = ref<Matrix>([]);
 const highlightedPath = ref<string[]>([]);
 
 export function useGraph() {
-	const nodes = computed<string[]>(() =>
-		Array.from({ length: numNodes.value }, (_, i) =>
-			String.fromCharCode(65 + i)
-		)
-	);
+	const nodes = computed<string[]>(() => Array.from({ length: numNodes.value }, (_, i) => String.fromCharCode(65 + i)));
 
 	// Function to initialize from scratch (total reset)
 	const createGrid = (): void => {
@@ -36,10 +32,7 @@ export function useGraph() {
 		}
 
 		// If the matrix already has the correct size, do not resize (for imports)
-		if (
-			rawMatrix.value.length === newN &&
-			rawMatrix.value.every((row) => row.length === newN)
-		) {
+		if (rawMatrix.value.length === newN && rawMatrix.value.every((row) => row.length === newN)) {
 			return;
 		}
 
@@ -79,15 +72,13 @@ export function useGraph() {
 		for (let i = 0; i < n; i++) {
 			for (let j = 0; j < n; j++) {
 				const val = rawMatrix.value[i]?.[j]; // Optional chaining for safety
-				const numVal =
-					typeof val === "string" && val === "" ? NaN : Number(val);
+				const numVal = typeof val === "string" && val === "" ? NaN : Number(val);
 
 				const isEmpty = val === "" || val === null || val === undefined;
 				const isZero = numVal === 0;
 				const isMinusOne = numVal === -1;
 
-				const isConnection =
-					!isEmpty && !isMinusOne && !isNaN(numVal) && !isZero;
+				const isConnection = !isEmpty && !isMinusOne && !isNaN(numVal) && !isZero;
 
 				if (!isConnection) {
 					matrix[i][j] = Infinity;

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import Logo from "./Logo.vue";
+import GraphLogo from "./GraphLogo.vue";
 
 interface Props {
 	logoSize?: string;
@@ -12,10 +12,8 @@ const props = withDefaults(defineProps<Props>(), {
 
 <template>
 	<div class="flex items-center gap-2">
-		<Logo :class="props.logoSize" />
-		<span
-			class="text-[1.33rem] font-bold text-slate-800 dark:text-slate-100 tracking-tight font-['Outfit']"
-		>
+		<GraphLogo :class="props.logoSize" />
+		<span class="font-['Outfit'] text-[1.33rem] font-bold tracking-tight text-slate-800 dark:text-slate-100">
 			Graph<span class="text-blue-500">Solver</span>
 		</span>
 	</div>
