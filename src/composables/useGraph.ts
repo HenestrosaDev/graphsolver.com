@@ -226,6 +226,47 @@ export function useGraph() {
 		return dot;
 	};
 
+	const toGraphML = () => {
+		const { hasArc, isSymmetric } = getGraphData();
+		const n = numNodes.value;
+		let graphml = '<?xml version="1.0" encoding="UTF-8"?>\n';
+		graphml += '<graphml xmlns="http://graphml.graphdrawing.org/xmlns" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd">\n';
+		graphml += '  <key id="weight" for="edge" attr.name="weight" attr.type="double"/>\n';
+		graphml += `  <graph id="G" edgedefault="${isSymmetric ? 'undirected' : 'directed'}">\n`;
+
+		// Add nodes
+		for (let i = 0; i < n; i++) {
+			graphml += `    <node id="n${i}"/>\n`;
+		}
+
+		// Add edges
+		let edgeId = 0;
+		for (let i = 0; i < n; i++) {
+			for (let j = 0; j < n; j++) {
+				if (hasArc[i][j]) {
+					const weight = rawMatrix.value[i][j];
+					if (isSymmetric && i < j) {
+						// For undirected graphs, only add edge once
+						graphml += `    <edge id="e${edgeId}" source="n${i}" target="n${j}">\n`;
+						graphml += `      <data key="weight">${weight}</data>\n`;
+						graphml += '    </edge>\n';
+						edgeId++;
+					} else if (!isSymmetric) {
+						// For directed graphs, add all edges
+						graphml += `    <edge id="e${edgeId}" source="n${i}" target="n${j}">\n`;
+						graphml += `      <data key="weight">${weight}</data>\n`;
+						graphml += '    </edge>\n';
+						edgeId++;
+					}
+				}
+			}
+		}
+
+		graphml += '  </graph>\n';
+		graphml += '</graphml>';
+		return graphml;
+	};
+
 	// --- NEW: Import state ---
 	const loadFromJSON = (jsonString: string): boolean => {
 		try {
@@ -329,6 +370,80 @@ export function useGraph() {
 		}
 	};
 
+	const loadFromGraphML = (graphmlString: string): boolean => {
+		try {
+			const parser = new DOMParser();
+			const xmlDoc = parser.parseFromString(graphmlString, "text/xml");
+
+			// Check for parser errors
+			const parseError = xmlDoc.querySelector("parsererror");
+			if (parseError) {
+				throw new Error("Invalid XML format");
+			}
+
+			const graphElement = xmlDoc.querySelector("graph");
+			if (!graphElement) {
+				throw new Error("No graph element found");
+			}
+
+			// Get all nodes and edges
+			const nodeElements = xmlDoc.querySelectorAll("node");
+			const edgeElements = xmlDoc.querySelectorAll("edge");
+
+			const n = nodeElements.length;
+			if (n === 0) return false;
+
+			// Create node mapping (n0 -> 0, n1 -> 1, etc.)
+			const nodeMap = new Map<string, number>();
+			nodeElements.forEach((node, index) => {
+				const id = node.getAttribute("id");
+				if (id) {
+					nodeMap.set(id, index);
+				}
+			});
+
+			// Initialize matrix
+			const matrix: Matrix = Array(n)
+				.fill(0)
+				.map(() => Array(n).fill(""));
+
+			numNodes.value = n;
+			rawMatrix.value = matrix;
+
+			// Process edges
+			edgeElements.forEach((edge) => {
+				const sourceId = edge.getAttribute("source");
+				const targetId = edge.getAttribute("target");
+				const sourceIdx = sourceId ? nodeMap.get(sourceId) : undefined;
+				const targetIdx = targetId ? nodeMap.get(targetId) : undefined;
+
+				if (sourceIdx !== undefined && targetIdx !== undefined) {
+					// Get weight from data element
+					let weight = "1"; // Default weight
+					const dataElements = edge.querySelectorAll("data");
+					dataElements.forEach((data) => {
+						if (data.getAttribute("key") === "weight") {
+							weight = data.textContent || "1";
+						}
+					});
+
+					rawMatrix.value[sourceIdx][targetIdx] = weight;
+
+					// Check if graph is undirected by looking at edgedefault
+					const edgedefault = graphElement.getAttribute("edgedefault");
+					if (edgedefault === "undirected") {
+						rawMatrix.value[targetIdx][sourceIdx] = weight;
+					}
+				}
+			});
+
+			return true;
+		} catch (e) {
+			console.error("Error importing GraphML:", e);
+			return false;
+		}
+	};
+
 	const toIdx = (char: string | undefined | null): number => {
 		if (!char) return -1;
 		return char.toUpperCase().charCodeAt(0) - 65;
@@ -349,9 +464,11 @@ export function useGraph() {
 		toJSON,
 		toLaTeX,
 		toDot,
+		toGraphML,
 		loadFromJSON,
 		loadFromLaTeX,
 		loadFromDot,
+		loadFromGraphML,
 		toIdx,
 		toChar,
 	};

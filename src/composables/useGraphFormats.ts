@@ -1,6 +1,6 @@
 import { useGraph } from "./useGraph";
 
-export type FormatKey = "JSON" | "LaTeX" | "Dot";
+export type FormatKey = "JSON" | "LaTeX" | "Dot" | "GraphML";
 
 export interface GraphFormat {
 	serialize: () => string;
@@ -11,7 +11,7 @@ export interface GraphFormat {
 }
 
 export const useGraphFormats = () => {
-	const { toJSON, toLaTeX, toDot, loadFromJSON, loadFromLaTeX, loadFromDot } =
+	const { toJSON, toLaTeX, toDot, toGraphML, loadFromJSON, loadFromLaTeX, loadFromDot, loadFromGraphML } =
 		useGraph();
 
 	const formats: Record<FormatKey, GraphFormat> = {
@@ -36,9 +36,16 @@ export const useGraphFormats = () => {
 			ext: "dot",
 			accept: ".dot,.gv",
 		},
+		GraphML: {
+			serialize: toGraphML,
+			parse: loadFromGraphML,
+			mime: "application/xml",
+			ext: "graphml",
+			accept: ".graphml,.xml",
+		},
 	};
 
-	const formatOrder: FormatKey[] = ["JSON", "LaTeX", "Dot"];
+	const formatOrder: FormatKey[] = ["JSON", "LaTeX", "Dot", "GraphML"];
 
 	const getFormatByExtension = (filename: string): FormatKey | undefined => {
 		const ext = filename.split(".").pop()?.toLowerCase();
