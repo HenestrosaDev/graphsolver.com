@@ -381,6 +381,23 @@ watch(isDark, () => drawGraph());
 					class="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1 p-1.5 bg-white/90 dark:bg-slate-900/85 backdrop-blur shadow-lg border border-gray-200/80 dark:border-slate-700/70 rounded-full animate-fade-in transition-all duration-300 hover:shadow-xl hover:scale-102"
 				>
 					<button
+						@click="toggleLock"
+						class="relative p-2 rounded-full text-gray-500 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-slate-800 transition-all duration-300"
+						:class="{
+							'text-blue-600 bg-blue-50 ring-1 ring-blue-200 dark:text-blue-200 dark:bg-blue-900/30 dark:ring-blue-700': !isLocked,
+							'scale-110 bg-white dark:bg-slate-900 ring-2 ring-blue-400 dark:ring-blue-700 shadow-xl z-50':
+								showOverlayHint,
+						}"
+					>
+						<span
+							v-if="showOverlayHint"
+							class="absolute inset-0 -z-10 inline-flex h-full w-full rounded-full bg-blue-400 opacity-75 animate-ping"
+						/>
+						<IconLock v-if="isLocked" class="size-5" />
+						<IconLockOpen v-else class="size-5" />
+					</button>
+
+					<button
 						@click="zoomOut"
 						class="p-2 rounded-full text-gray-500 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-slate-800 transition"
 						:title="t('visualizer.zoomOut')"
