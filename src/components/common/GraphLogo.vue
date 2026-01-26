@@ -39,15 +39,16 @@
 				y1="72"
 				x2="64"
 				y2="184"
-				stroke="#1E293B"
+				stroke="var(--dynamic-color)"
 			/>
 			<line
 				x1="64"
 				y1="184"
 				x2="180"
 				y2="128"
-				stroke="#1E293B"
+				stroke="var(--dynamic-color)"
 			/>
+
 			<line
 				x1="64"
 				y1="72"
@@ -62,13 +63,15 @@
 				fill="#3B82F6"
 				stroke="none"
 			/>
+
 			<circle
 				cx="64"
 				cy="184"
 				r="28"
-				fill="#1E293B"
+				fill="var(--dynamic-color)"
 				stroke="none"
 			/>
+
 			<g filter="url(#softGlow)">
 				<circle
 					cx="180"
@@ -78,6 +81,7 @@
 					stroke="none"
 				/>
 			</g>
+
 			<polyline
 				points="156 128 172 144 204 112"
 				fill="none"
@@ -87,3 +91,14 @@
 		</g>
 	</svg>
 </template>
+
+<style>
+:root {
+	--dynamic-color: #1e293b;
+}
+
+/* When the user uses DARK THEME, change to almost white (Slate-50) */
+.dark {
+	--dynamic-color: #f8fafc;
+}
+</style>
