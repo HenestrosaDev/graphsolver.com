@@ -1,4 +1,4 @@
-Source,Target,Weight
-A,B,5
-B,C,3
-C,A,7
+,A,B,C
+A,0,3,5
+B,3,0,1
+C,5,1,0
