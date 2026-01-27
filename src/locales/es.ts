@@ -69,7 +69,7 @@ export default {
 		title: "Pegar contenido",
 		formatLabel: "Formato",
 		contentLabel: "Contenido",
-		placeholder: "Pega tus datos de grafo aquí (ej. formato JSON)",
+		placeholder: "Pega tus datos de grafo aquí",
 		cancel: "Cancelar",
 		import: "Importar",
 	},

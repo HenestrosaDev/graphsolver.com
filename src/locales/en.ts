@@ -68,7 +68,7 @@ export default {
 		title: "Paste content",
 		formatLabel: "Format",
 		contentLabel: "Content",
-		placeholder: "Paste your graph data here (e.g. JSON format)",
+		placeholder: "Paste your graph data here",
 		cancel: "Cancel",
 		import: "Import",
 	},
