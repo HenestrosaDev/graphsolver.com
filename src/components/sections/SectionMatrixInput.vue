@@ -87,7 +87,7 @@ onMounted(() => {
 		<div class="flex w-full justify-center overflow-x-auto bg-white p-4 sm:p-6 dark:bg-slate-900">
 			<div
 				v-if="rawMatrix.length"
-				class="inline-block overflow-hidden rounded-lg border border-slate-200 shadow-sm dark:border-slate-800"
+				class="inline-block overflow-x-auto rounded-lg border border-slate-200 shadow-sm dark:border-slate-800"
 			>
 				<table class="w-auto table-fixed border-collapse">
 					<thead>
