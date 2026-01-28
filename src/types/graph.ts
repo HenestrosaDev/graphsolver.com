@@ -11,7 +11,7 @@ export interface GraphData {
 }
 
 export interface MSTResult {
-	cost: number;
+	cost: number | string;
 	edges: string;
 	isUniqueKey: "uniqueYes" | "uniqueNo" | "notConnected" | "requiresUndirected";
 }

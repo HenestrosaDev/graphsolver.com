@@ -11,6 +11,7 @@ const { getGraphData, nodes, rawMatrix, numNodes, clearHighlights } = useGraph()
 const { t } = useI18n();
 
 const result = ref<MSTResult | null>(null);
+
 const solveMST = () => {
 	clearHighlights();
 	const { matrix, isSymmetric } = getGraphData();
