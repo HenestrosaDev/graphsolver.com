@@ -8,6 +8,8 @@ const { generateRandomGraph, nodes, rawMatrix, numNodes: _numNodes, createGrid, 
 
 const { t } = useI18n();
 
+const buttonClass = "h-8 w-8 flex items-center justify-center border-slate-200 bg-white text-slate-500 transition hover:bg-slate-50 hover:text-blue-600 active:bg-blue-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-blue-300 dark:active:bg-slate-700";
+
 // Node validation
 const numNodes = computed({
 	get: () => _numNodes.value,
@@ -39,7 +41,7 @@ onMounted(() => {
 					</span>
 					<div class="flex items-center overflow-hidden rounded-md shadow-sm">
 						<button
-							class="flex h-8 w-8 items-center justify-center border-r border-slate-200 bg-white text-slate-500 transition hover:bg-slate-50 hover:text-blue-600 active:bg-blue-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-blue-300 dark:active:bg-slate-700"
+							:class="buttonClass"
 							@click="numNodes--"
 						>
 							-
@@ -54,7 +56,7 @@ onMounted(() => {
 						>
 
 						<button
-							class="flex h-8 w-8 items-center justify-center border-l border-slate-200 bg-white text-slate-500 transition hover:bg-slate-50 hover:text-blue-600 active:bg-blue-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-blue-300 dark:active:bg-slate-700"
+							:class="buttonClass"
 							@click="numNodes++"
 						>
 							+
