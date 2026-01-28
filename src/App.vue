@@ -121,7 +121,7 @@ const titleClass = "text-2xl font-bold text-slate-700 dark:text-slate-100";
 				ref="fileInput"
 				type="file"
 				class="hidden"
-				aria-label="File input for graph import"
+				@change="handleFileChange"
 			>
 
 			<div class="space-y-6">
