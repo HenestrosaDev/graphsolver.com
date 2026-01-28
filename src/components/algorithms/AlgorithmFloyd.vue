@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { IconChevronLeft, IconChevronRight } from "@tabler/icons-vue";
 import { ref, computed, watch, onMounted, onActivated, nextTick } from "vue";
 import { useI18n } from "vue-i18n";
 import { useGraph } from "../../composables/useGraph";
@@ -7,6 +6,7 @@ import { computeFloyd } from "../../composables/useFloyd";
 import { useTheme } from "../../composables/useTheme";
 import PropertiesCard from "../properties/PropertiesCard.vue";
 import PropertyRow from "../properties/PropertyRow.vue";
+import Stepper from "../common/Stepper.vue";
 import type { FloydStep } from "../../types/graph";
 const { getGraphData, nodes, toIdx, rawMatrix, numNodes, setHighlightPath, clearHighlights } = useGraph();
 
@@ -29,6 +29,7 @@ const safeStartNode = computed(() => {
 	if (!available.length) return startNode.value;
 	return available.includes(startNode.value) ? startNode.value : available[0];
 });
+
 const safeEndNode = computed(() => {
 	const available = nodes.value;
 	if (!available.length) return endNode.value;
@@ -118,13 +119,7 @@ onActivated(async () => {
 });
 
 // --- NAVIGATION FUNCTIONS ---
-const nextStep = () => {
-	if (currentStepIndex.value < steps.value.length - 1) currentStepIndex.value++;
-};
-
-const prevStep = () => {
-	if (currentStepIndex.value > 0) currentStepIndex.value--;
-};
+// Moved to Stepper component
 
 const currentStepTitle = computed(() => {
 	const step = currentStep.value;
@@ -140,24 +135,6 @@ const footerDescription = computed(() => {
 	if (step.pivot === -1) return t("floyd.initialDescription");
 	const pivotLabel = nodes.value[step.pivot] ?? step.pivot;
 	return t("floyd.iterationDescription", { pivot: pivotLabel });
-});
-
-const progressPercentage = computed(() => {
-	if (steps.value.length <= 1) return 0;
-	return (currentStepIndex.value / (steps.value.length - 1)) * 100;
-});
-
-const rangeStyle = computed(() => {
-	const progressColor = isDark.value ? "rgb(96 165 250)" : "rgb(37 99 235)"; // blue-400 in dark, blue-600 in light
-	const remainingColor = isDark.value ? "rgb(71 85 105)" : "rgb(203 213 225)"; // slate-500 in dark, slate-200 in light
-	const gradient = `linear-gradient(to right,
-		${progressColor} 0%,
-		${progressColor} ${progressPercentage.value}%,
-		${remainingColor} ${progressPercentage.value}%,
-		${remainingColor} 100%)`;
-	return {
-		background: gradient,
-	};
 });
 </script>
 
@@ -241,106 +218,59 @@ const rangeStyle = computed(() => {
 				{{ t("floyd.iterationsTable") }}
 			</h3>
 
-			<div
-				v-if="steps.length > 0"
-				class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900"
+			<Stepper
+				v-model:current-step-index="currentStepIndex"
+				:total-steps="steps.length"
+				:title="currentStepTitle"
+				:description="footerDescription"
+				:step-counter="t('floyd.stepCounter', { current: currentStepIndex + 1, total: steps.length })"
+				:is-dark="isDark"
+				:prev-title="t('floyd.previous')"
+				:next-title="t('floyd.next')"
 			>
-				<div class="border-b border-slate-200 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-800">
-					<div class="flex flex-col items-center">
-						<span
-							class="inline-block rounded-full bg-blue-100 px-2 py-0.5 text-[10px] font-bold tracking-wider text-blue-700 uppercase dark:bg-blue-900/40 dark:text-blue-200"
+				<table class="mx-auto border-collapse overflow-hidden rounded-lg text-sm shadow-sm">
+					<thead>
+						<tr>
+							<th
+								class="border-r border-b border-slate-200 bg-slate-50 p-3 dark:border-slate-800 dark:bg-slate-800/50"
+							/>
+							<th
+								v-for="n in nodes"
+								:key="n"
+								class="w-10 border-r border-b border-slate-200 bg-slate-50 p-3 text-center text-xs font-bold text-slate-500 dark:border-slate-800 dark:bg-slate-800/50 dark:text-slate-300"
+							>
+								{{ n }}
+							</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr
+							v-for="(row, i) in currentStep.matrix"
+							:key="i"
 						>
-							{{ t("floyd.stepCounter", { current: currentStepIndex + 1, total: steps.length }) }}
-						</span>
-
-						<h3 class="mt-3 text-lg font-bold text-slate-800 dark:text-slate-100">
-							{{ currentStepTitle }}
-						</h3>
-
-						<div class="-mb-1 flex w-full max-w-md items-center justify-center gap-3">
-							<button
-								:disabled="currentStepIndex === 0"
-								class="rounded-full border border-transparent p-1.5 text-slate-500 transition-all hover:border-slate-200 hover:bg-white hover:shadow-sm disabled:opacity-30 disabled:hover:border-transparent disabled:hover:shadow-none dark:text-slate-300 dark:hover:border-slate-700 dark:hover:bg-slate-900"
-								:title="t('floyd.previous')"
-								@click="prevStep"
+							<th
+								class="w-10 border-r border-b border-slate-200 bg-slate-50 p-3 text-center text-xs font-bold text-slate-500 dark:border-slate-800 dark:bg-slate-800/50 dark:text-slate-300"
 							>
-								<IconChevronLeft class="size-6" />
-							</button>
+								{{ nodes[i] }}
+							</th>
 
-							<div class="relative mx-2 flex flex-1 items-center">
-								<input
-									v-model.number="currentStepIndex"
-									type="range"
-									min="0"
-									:max="steps.length - 1"
-									:style="rangeStyle"
-									class="h-2 w-full cursor-pointer appearance-none rounded-lg accent-blue-600 hover:accent-blue-500 focus:ring-2 focus:ring-blue-500/30 focus:outline-none"
-								>
-							</div>
-
-							<button
-								:disabled="currentStepIndex === steps.length - 1"
-								class="rounded-full border border-transparent p-1.5 text-slate-500 transition-all hover:border-slate-200 hover:bg-white hover:shadow-sm disabled:opacity-30 disabled:hover:border-transparent disabled:hover:shadow-none dark:text-slate-300 dark:hover:border-slate-700 dark:hover:bg-slate-900"
-								:title="t('floyd.next')"
-								@click="nextStep"
+							<td
+								v-for="(val, j) in row"
+								:key="j"
+								class="h-12 w-12 border border-slate-100 p-3 text-center text-sm duration-200 dark:border-slate-800"
+								:class="{
+									'bg-blue-50 font-bold text-blue-700 ring-1 ring-blue-200 ring-inset dark:bg-blue-900/30 dark:text-blue-200 dark:ring-blue-800':
+										i === currentStep.pivot || j === currentStep.pivot,
+									'text-slate-400 dark:text-slate-500': val === Infinity,
+									'text-slate-800 dark:text-slate-100': val !== Infinity,
+								}"
 							>
-								<IconChevronRight class="size-6" />
-							</button>
-						</div>
-					</div>
-				</div>
-
-				<div class="min-h-[300px] w-full overflow-x-auto bg-white p-6 transition-all duration-300 dark:bg-slate-900">
-					<table class="mx-auto border-collapse overflow-hidden rounded-lg text-sm shadow-sm">
-						<thead>
-							<tr>
-								<th
-									class="border-r border-b border-slate-200 bg-slate-50 p-3 dark:border-slate-800 dark:bg-slate-800/50"
-								/>
-								<th
-									v-for="n in nodes"
-									:key="n"
-									class="w-10 border-r border-b border-slate-200 bg-slate-50 p-3 text-center text-xs font-bold text-slate-500 dark:border-slate-800 dark:bg-slate-800/50 dark:text-slate-300"
-								>
-									{{ n }}
-								</th>
-							</tr>
-						</thead>
-						<tbody>
-							<tr
-								v-for="(row, i) in currentStep.matrix"
-								:key="i"
-							>
-								<th
-									class="w-10 border-r border-b border-slate-200 bg-slate-50 p-3 text-center text-xs font-bold text-slate-500 dark:border-slate-800 dark:bg-slate-800/50 dark:text-slate-300"
-								>
-									{{ nodes[i] }}
-								</th>
-
-								<td
-									v-for="(val, j) in row"
-									:key="j"
-									class="h-12 w-12 border border-slate-100 p-3 text-center text-sm duration-200 dark:border-slate-800"
-									:class="{
-										'bg-blue-50 font-bold text-blue-700 ring-1 ring-blue-200 ring-inset dark:bg-blue-900/30 dark:text-blue-200 dark:ring-blue-800':
-											i === currentStep.pivot || j === currentStep.pivot,
-										'text-slate-400 dark:text-slate-500': val === Infinity,
-										'text-slate-800 dark:text-slate-100': val !== Infinity,
-									}"
-								>
-									{{ val === Infinity ? "∞" : val }}
-								</td>
-							</tr>
-						</tbody>
-					</table>
-				</div>
-
-				<div
-					class="border-t border-slate-200 bg-slate-50 p-3 text-center text-xs text-slate-500 dark:border-slate-800 dark:bg-slate-800 dark:text-slate-300"
-				>
-					<span>{{ footerDescription }}</span>
-				</div>
-			</div>
+								{{ val === Infinity ? "∞" : val }}
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</Stepper>
 		</div>
 	</div>
 </template>
