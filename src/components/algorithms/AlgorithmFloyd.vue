@@ -22,8 +22,10 @@ const { isDark } = useTheme();
 const currentStepIndex = ref(0);
 const currentStep = computed(() => steps.value[currentStepIndex.value]);
 
+// --- BUSINESS LOGIC ---
 const startNode = ref<string>("A");
 const endNode = ref<string>("B");
+
 const safeStartNode = computed(() => {
 	const available = nodes.value;
 	if (!available.length) return startNode.value;
@@ -56,7 +58,7 @@ const queryResult = computed(() => {
 		curr = nextNode;
 		pathArr.push(nodes.value[curr]);
 	}
-	return { status: "ok" as const, dist: d, path: pathArr.join(" → "), pathArr };
+	return { status: "ok", dist: d, path: pathArr.join(" → "), pathArr };
 });
 
 const minCostValue = computed(() => {
@@ -118,14 +120,13 @@ onActivated(async () => {
 	applyHighlight();
 });
 
-// --- NAVIGATION FUNCTIONS ---
-// Moved to Stepper component
-
 const currentStepTitle = computed(() => {
 	const step = currentStep.value;
 	if (!step) return "";
 	if (step.pivot === -1) return t("floyd.initialTitle");
+
 	const pivotLabel = nodes.value[step.pivot] ?? step.pivot;
+
 	return t("floyd.stepTitle", { k: step.k ?? currentStepIndex.value, pivot: pivotLabel });
 });
 
@@ -133,7 +134,9 @@ const footerDescription = computed(() => {
 	const step = currentStep.value;
 	if (!step) return "";
 	if (step.pivot === -1) return t("floyd.initialDescription");
+
 	const pivotLabel = nodes.value[step.pivot] ?? step.pivot;
+
 	return t("floyd.iterationDescription", { pivot: pivotLabel });
 });
 </script>
@@ -195,7 +198,6 @@ const footerDescription = computed(() => {
 					:value="minCostValue"
 					:variant="resultVariant"
 				/>
-				<!-- <span v-if="hasInfPairs" class="text-xs text-red-500 ml-2">(pares inalcanzables)</span>-->
 				<PropertyRow
 					:label="t('floyd.optimalPath')"
 					:value="pathValue"
