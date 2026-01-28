@@ -11,7 +11,7 @@ import {
 } from "@tabler/icons-vue";
 import { ref, onMounted, onUnmounted, watch, nextTick } from "vue";
 import { useI18n } from "vue-i18n";
-import { Network, type Data } from "vis-network";
+import { Network, type Data, type Edge, type Node } from "vis-network";
 import { DataSet } from "vis-data";
 import { useGraph } from "../../composables/useGraph";
 import { useToast } from "../../composables/useToast";
@@ -24,10 +24,12 @@ const { isDark } = useTheme();
 const { hasTouch } = useTouch();
 const { t } = useI18n();
 
-const networkContainer = ref<HTMLElement | null>(null);
-const wrapperRef = ref<HTMLElement | null>(null);
+const $networkContainer = ref<HTMLElement | null>(null);
+const $wrapper = ref<HTMLElement | null>(null);
 let networkInstance: Network | null = null;
 let resizeObserver: ResizeObserver | null = null;
+const nodesRef = ref<DataSet<Node> | null>(null);
+const edgesRef = ref<DataSet<Edge> | null>(null);
 
 // States
 const isLocked = ref(true);
@@ -88,12 +90,12 @@ const handleKeydown = (e: KeyboardEvent) => {
 	}
 };
 
-// --- DATA PREPARATION (Same as before) ---
+// --- DATA PREPARATION ---
 const parseData = () => {
 	const { n, matrix, isSymmetric } = getGraphData();
 
-	// 1. Nodes
-	const visNodes = new DataSet(
+	// Nodes
+	const visNodes = new DataSet<Node>(
 		nodes.value.map((label, id) => ({
 			id,
 			label,
@@ -110,17 +112,29 @@ const parseData = () => {
 				size: 20,
 				face: "ui-sans-serif, system-ui",
 				color: isDark.value ? "#f1f5f9" : "#1e293b",
-				bold: true,
+				multi: "md",
+				bold: {
+					color: isDark.value ? "#f1f5f9" : "#1e293b",
+					size: 20,
+					face: "ui-sans-serif, system-ui",
+					vadjust: 0,
+					mod: "bold",
+				},
 			},
 			shape: "circle",
 			borderWidth: 2,
-			margin: 15,
+			margin: {
+				top: 15,
+				bottom: 15,
+				left: 15,
+				right: 15,
+			},
 			shadow: { enabled: true, color: "rgba(0,0,0,0.1)", x: 2, y: 2 },
 		})),
 	);
 
-	// 2. Edges
-	const visEdgesArray = [];
+	// Edges
+	const visEdgesArray: Edge[] = [];
 	const limit = n;
 
 	for (let i = 0; i < n; i++) {
@@ -141,10 +155,7 @@ const parseData = () => {
 					arrows: isSymmetric ? undefined : { to: { enabled: true, scaleFactor: 1 } },
 					color: isHighlighted
 						? { color: "#ef4444", highlight: "#ef4444" }
-						: {
-							color: isDark.value ? "#94a3b8" : "#64748b",
-							highlight: isDark.value ? "#60a5fa" : "#2563EB",
-						},
+						: { color: isDark.value ? "#94a3b8" : "#64748b", highlight: isDark.value ? "#60a5fa" : "#2563EB" },
 					font: {
 						align: "middle",
 						color: isDark.value ? "#f1f5f9" : "#000000",
@@ -153,18 +164,22 @@ const parseData = () => {
 						size: 14,
 					},
 					width: isHighlighted ? 4 : 2,
-					smooth: { type: "curvedCW", roundness: 0.2 },
+					smooth: { enabled: true, type: "curvedCW", roundness: 0.2 },
 				});
 			}
 		}
 	}
-	return { nodes: visNodes, edges: new DataSet(visEdgesArray) };
+	return { nodes: visNodes, edges: new DataSet<Edge>(visEdgesArray) };
 };
 
 const drawGraph = () => {
-	if (!networkContainer.value) return;
+	if (!$networkContainer.value) return;
 
-	const data = parseData();
+	const { nodes: visNodes, edges: visEdges } = parseData();
+	nodesRef.value = visNodes;
+	edgesRef.value = visEdges;
+
+	const data = { nodes: visNodes, edges: visEdges };
 
 	const options = {
 		height: "100%",
@@ -179,11 +194,15 @@ const drawGraph = () => {
 				springConstant: 0.05,
 				damping: 0.09,
 			},
-			// Important: we ensure it performs iterations before showing
+			// iterations before showing
 			stabilization: {
 				enabled: true,
+				// User sees the graph only after it has settled into a clean structure.
+				// Run the physics simulation 1000 times in memory for that.
 				iterations: 1000,
+				// If it takes too long, update the loading bar every 25 iterations so the page doesn't look frozen
 				updateInterval: 25,
+				// Once the iterations are done, zoom the camera to fit all nodes
 				fit: true,
 			},
 		},
@@ -196,42 +215,32 @@ const drawGraph = () => {
 		layout: { randomSeed: 10 },
 	};
 
-	networkInstance = new Network(networkContainer.value, data as unknown as Data, options);
+	networkInstance = new Network($networkContainer.value, data as unknown as Data, options);
 
-	// --- ADDED CODE ---
 	// Once the graph calculates its initial position, we disable physics.
 	// This makes the nodes stay "frozen" in place.
 	networkInstance.on("stabilizationIterationsDone", () => {
-		networkInstance.setOptions({ physics: { enabled: false } });
+		networkInstance?.setOptions({ physics: { enabled: false } });
 	});
-
-	// Optional: If you want to reactivate physics while dragging (only for that node)
-	// and disable them when releasing, you can use these events.
-	// But for what you ask (that the rest does NOT move), the code above is enough.
-
-	// ----------------------
 
 	// Fit the graph to view
 	networkInstance.fit();
 };
 
 const updateHighlights = () => {
-	if (!networkInstance) return;
+	if (!edgesRef.value) return;
 
-	const edges = networkInstance.body.data.edges.get();
-	const updatedEdges = edges.map(edge => {
-		const isHighlighted = highlightedPath.value.includes(edge.id);
+	const edges = edgesRef.value.get();
+	const updatedEdges = edges.map((edge) => {
+		const isHighlighted = highlightedPath.value.includes(edge.id as string);
 		return {
 			id: edge.id,
 			color: isHighlighted
 				? { color: "#ef4444", highlight: "#ef4444" }
-				: {
-					color: isDark.value ? "#94a3b8" : "#64748b",
-					highlight: isDark.value ? "#60a5fa" : "#2563EB",
-				},
+				: { color: isDark.value ? "#94a3b8" : "#64748b", highlight: isDark.value ? "#60a5fa" : "#2563EB" },
 		};
 	});
-	networkInstance.body.data.edges.update(updatedEdges);
+	edgesRef.value.update(updatedEdges);
 };
 
 // --- Controls ---
@@ -250,36 +259,36 @@ const zoomOut = () =>
 const fitGraph = () => networkInstance?.fit({ animation: true });
 
 const exportImage = () => {
-	if (!networkContainer.value || !networkInstance) return;
+	if (!$networkContainer.value || !networkInstance) return;
 
-	// 1. Find the canvas element inside the container
-	const canvas = networkContainer.value.querySelector("canvas");
+	// Find the canvas element inside the container
+	const canvas = $networkContainer.value.querySelector("canvas");
 	if (!canvas) return;
 
-	// 2. Get the 2D context
+	// Get the 2D context
 	const ctx = canvas.getContext("2d");
 	if (!ctx) return;
 
-	// 3. Save the current canvas state
+	// Save the current canvas state
 	ctx.save();
 
-	// 4. Draw a white background behind everything (destination-over)
+	// Draw a white/black background behind everything (destination-over)
 	// This is necessary because the vis-network canvas is transparent by default.
 	ctx.globalCompositeOperation = "destination-over";
 	ctx.fillStyle = isDark.value ? "#0f172a" : "#ffffff";
 	// We use the internal width/height of the canvas to cover everything
 	ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-	// 5. Get the image in base64
+	// Get the image in base64
 	const dataURL = canvas.toDataURL("image/png");
 
-	// 6. Restore the canvas state (make it transparent again for interaction)
+	// Restore the canvas state (make it transparent again for interaction)
 	ctx.restore();
 
-	// 7. Create a temporary link to force the download
+	// Create a temporary link to force the download
 	const link = document.createElement("a");
 	link.href = dataURL;
-	link.download = `grafo-exportado-${new Date().getTime()}.png`;
+	link.download = `graph-${new Date().getTime()}.png`;
 	document.body.appendChild(link);
 	link.click();
 	document.body.removeChild(link);
@@ -293,7 +302,7 @@ onMounted(() => {
 	window.addEventListener("keydown", handleKeydown);
 
 	// Watch for container resizing to update the canvas
-	if (wrapperRef.value) {
+	if ($wrapper.value) {
 		resizeObserver = new ResizeObserver(() => {
 			// This forces Vis.js to recalculate the canvas size
 			if (networkInstance) {
@@ -301,7 +310,7 @@ onMounted(() => {
 				networkInstance.redraw();
 			}
 		});
-		resizeObserver.observe(wrapperRef.value);
+		resizeObserver.observe($wrapper.value);
 	}
 });
 
@@ -310,7 +319,11 @@ onUnmounted(() => {
 	if (resizeObserver) resizeObserver.disconnect();
 });
 
-watch(() => getGraphData(), () => drawGraph(), { deep: true });
+watch(
+	() => getGraphData(),
+	() => drawGraph(),
+	{ deep: true },
+);
 
 // Watch for highlighted path changes to update only edge colors
 watch(highlightedPath, () => updateHighlights(), { deep: true });
@@ -326,7 +339,7 @@ watch(isDark, () => drawGraph());
 			:disabled="!isFullscreen"
 		>
 			<div
-				ref="wrapperRef"
+				ref="$wrapper"
 				class="flex flex-col overflow-hidden border-gray-200 bg-slate-50 shadow-inner dark:border-slate-800 dark:bg-slate-900"
 				:class="[
 					isFullscreen
@@ -335,7 +348,7 @@ watch(isDark, () => drawGraph());
 				]"
 			>
 				<div
-					ref="networkContainer"
+					ref="$networkContainer"
 					class="absolute inset-0 h-full w-full cursor-grab active:cursor-grabbing"
 					:class="{ 'touch-manipulation': isLocked && hasTouch, 'touch-none': !isLocked && hasTouch }"
 				/>
@@ -455,10 +468,12 @@ watch(isDark, () => drawGraph());
 </template>
 
 <style scoped>
+/* Let the user scroll and zoom, but disable double-tap to zoom */
 .touch-manipulation {
 	touch-action: manipulation;
 }
 
+/* Ignore all native browser gestures on this element (scroll, zoom, double-tap zoom) */
 .touch-none {
 	touch-action: none;
 }
