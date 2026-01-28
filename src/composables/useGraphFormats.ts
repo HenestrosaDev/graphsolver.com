@@ -11,7 +11,6 @@ export interface GraphFormat {
 	accept: string;
 }
 
-// Format conversion functions moved from useGraph
 const toJSON = () => {
 	const { numNodes, rawMatrix } = useGraph();
 	return JSON.stringify(
@@ -184,7 +183,6 @@ const toGML = () => {
 	return gml;
 };
 
-// Import functions moved from useGraph
 const loadFromJSON = (jsonString: string): boolean => {
 	const { numNodes, rawMatrix } = useGraph();
 	try {
@@ -369,6 +367,7 @@ const loadFromCSV = (csvString: string): boolean => {
 			.split("\n")
 			.map((line) => line.trim())
 			.filter((line) => line.length > 0);
+
 		if (lines.length === 0) throw new Error("Empty CSV");
 
 		// Parse CSV rows
