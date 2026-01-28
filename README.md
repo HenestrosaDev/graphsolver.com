@@ -31,12 +31,6 @@
     A complete web tool for graph theory. It solves the Dijkstra, Floyd–Warshall, and MST (Kruskal) algorithms and analyzes structural properties via adjacency matrices. Includes dynamic visualization and import/export options.
 </p>
   <p>
-    <a href="https://github.com/HenestrosaDev/graphsolver.com/releases/latest">
-      <img
-        src="https://img.shields.io/github/v/release/HenestrosaDev/graphsolver.com"
-        alt="Version"
-      />
-    </a>
     <a href="https://github.com/HenestrosaDev/graphsolver.com/stargazers">
       <img
         src="https://img.shields.io/github/stars/HenestrosaDev/graphsolver.com"
