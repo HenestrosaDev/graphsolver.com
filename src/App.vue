@@ -107,6 +107,9 @@ const openModal = (mode: ModalIOMode) => {
 	modalState.value.isOpen = true;
 	modalState.value.mode = mode;
 };
+
+// Styles
+const titleClass = "text-2xl font-bold text-slate-700 dark:text-slate-100";
 </script>
 
 <template>
@@ -118,12 +121,12 @@ const openModal = (mode: ModalIOMode) => {
 				ref="fileInput"
 				type="file"
 				class="hidden"
-				@change="handleFileChange"
+				aria-label="File input for graph import"
 			>
 
-			<div>
-				<div class="mb-6 flex items-center justify-between gap-4">
-					<h2 class="text-2xl font-bold text-slate-700 dark:text-slate-100">
+			<div class="space-y-6">
+				<div class="flex items-center justify-between gap-4">
+					<h2 :class="titleClass">
 						{{ t("app.adjacencyTitle") }}
 					</h2>
 
@@ -136,8 +139,8 @@ const openModal = (mode: ModalIOMode) => {
 				<MatrixInput />
 			</div>
 
-			<div class="mt-12">
-				<h2 class="mb-6 text-2xl font-bold text-slate-700 dark:text-slate-100">
+			<div class="my-12 space-y-6">
+				<h2 :class="titleClass">
 					{{ t("app.analysisTitle") }}
 				</h2>
 
