@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { ref, onMounted, onUnmounted } from "vue";
 import { useI18n } from "vue-i18n";
 import LanguageSelector from "./LanguageSelector.vue";
 import ThemeToggle from "./ThemeToggle.vue";
@@ -6,11 +7,26 @@ import AppLogo from "./AppLogo.vue";
 import { IconBrandGithub } from "@tabler/icons-vue";
 
 const { t } = useI18n();
+
+const isAtTop = ref(true);
+
+const handleScroll = () => {
+	isAtTop.value = window.scrollY === 0;
+};
+
+onMounted(() => {
+	window.addEventListener("scroll", handleScroll);
+});
+
+onUnmounted(() => {
+	window.removeEventListener("scroll", handleScroll);
+});
 </script>
 
 <template>
 	<nav
-		class="sticky top-0 z-50 border-b border-slate-200 bg-white/80 backdrop-blur supports-[backdrop-filter]:bg-white/70 dark:border-slate-800 dark:bg-slate-900/80 supports-[backdrop-filter]:dark:bg-slate-900/70"
+		class="sticky top-0 z-50 border-b border-slate-200 bg-white/80 backdrop-blur supports-backdrop-filter:bg-white/70 dark:border-slate-800 "
+		:class="isAtTop ? 'dark:bg-slate-900' : 'bg-slate-900/80 supports-backdrop-filter:dark:bg-slate-900/70'"
 	>
 		<div class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
 			<div class="flex h-16 justify-between">

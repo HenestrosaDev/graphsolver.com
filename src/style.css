@@ -22,6 +22,10 @@
 		color-scheme: light;
 	}
 
+	html {
+		@apply bg-white dark:bg-slate-900;
+	}
+
 	body * {
 		@apply transition-colors duration-150;
 	}
