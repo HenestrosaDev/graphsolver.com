@@ -60,12 +60,12 @@ const queryResult = computed(() => {
 });
 
 const minCostValue = computed(() => {
-	if (!queryResult.value) return null;
+	if (!queryResult.value) return undefined;
 	return queryResult.value.status === "ok" ? queryResult.value.dist : t("floyd.unreachableCost");
 });
 
 const pathValue = computed(() => {
-	if (!queryResult.value) return null;
+	if (!queryResult.value) return undefined;
 	return queryResult.value.status === "ok" ? queryResult.value.path : t("floyd.noPath");
 });
 
