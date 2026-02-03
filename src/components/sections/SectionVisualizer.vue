@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, nextTick } from "vue";
+import { ref, onMounted, onUnmounted, nextTick, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import { useGraph } from "../../composables/useGraph";
 import { useToast } from "../../composables/useToast";
@@ -9,7 +9,7 @@ import { useGraphVisualizer } from "../../composables/useGraphVisualizer";
 import VisualizerControls from "../visualizer/VisualizerControls.vue";
 import VisualizerTouchHint from "../visualizer/VisualizerTouchHint.vue";
 
-const { getGraphData, nodes, highlightedPath } = useGraph();
+const { getGraphData, nodes, highlightedPath, rawMatrix } = useGraph();
 const { triggerToast } = useToast();
 const { isDark } = useTheme();
 const { hasTouch } = useTouch();
@@ -46,6 +46,7 @@ const {
 	fitGraph,
 	exportImage,
 	resizeAndFit,
+	rebuildNetwork,
 } = useGraphVisualizer({
 	containerRef: $networkContainer,
 	wrapperRef: $wrapper,
@@ -94,6 +95,11 @@ onMounted(() => {
 onUnmounted(() => {
 	window.removeEventListener("keydown", handleKeydown);
 });
+
+// Watch for matrix changes and rebuild the network
+watch(rawMatrix, () => {
+	rebuildNetwork();
+}, { deep: true });
 </script>
 
 <template>

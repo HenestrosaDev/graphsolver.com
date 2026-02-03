@@ -128,7 +128,7 @@ export const useGraphVisualizer = ({
 				const weight = matrix[i][j];
 
 				if (weight !== Infinity) {
-					const edgeId = nodes.value[i] + nodes.value[j];
+					const edgeId = isSymmetric ? [nodes.value[i], nodes.value[j]].sort().join('') : nodes.value[i] + nodes.value[j];
 					const isHighlighted = highlightedPath.value.includes(edgeId);
 
 					visEdgesArray.push({
@@ -285,12 +285,6 @@ export const useGraphVisualizer = ({
 		networkInstance.value?.destroy();
 	});
 
-	watch(
-		() => getGraphData(),
-		() => rebuildNetwork(),
-		{ deep: true }
-	);
-
 	watch(highlightedPath, () => updateHighlights(), { deep: true });
 	watch(isDark, () => updateThemeStyles());
 
@@ -301,5 +295,6 @@ export const useGraphVisualizer = ({
 		fitGraph,
 		exportImage,
 		resizeAndFit,
+		rebuildNetwork,
 	};
 };

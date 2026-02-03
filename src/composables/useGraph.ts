@@ -160,11 +160,13 @@ export function useGraph() {
 		highlightedPath.value = [];
 		if (nodesInPath.length < 2) return;
 
+		const { isSymmetric } = getGraphData();
+
 		for (let i = 0; i < nodesInPath.length - 1; i++) {
 			const u = nodesInPath[i];
 			const v = nodesInPath[i + 1];
-			// Only highlight the directed edge in the path direction
-			highlightedPath.value.push(u + v);
+			const edgeId = isSymmetric ? [u, v].sort().join('') : u + v;
+			highlightedPath.value.push(edgeId);
 		}
 	};
 
