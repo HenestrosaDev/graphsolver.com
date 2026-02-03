@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { useI18n } from "vue-i18n";
-import { IconLanguage } from "@tabler/icons-vue";
 
 const { locale } = useI18n();
 
