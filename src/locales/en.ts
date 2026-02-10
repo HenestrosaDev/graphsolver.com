@@ -215,6 +215,7 @@ export default {
 				connectedCyclic: "Connected cyclic",
 				disconnectedCyclic: "Disconnected with cycles",
 				weakConnectedCyclic: "Weakly connected with cycles",
+				weakConnectedAcyclic: "Weakly connected acyclic",
 				disconnected: "Disconnected",
 			},
 			hamiltonian: {

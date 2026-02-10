@@ -217,7 +217,8 @@ export default {
 				forest: "Bosque",
 				connectedCyclic: "Cíclico conexo",
 				disconnectedCyclic: "Disconexo con ciclos",
-				weakConnectedCyclic: "Conexo (débil) con ciclos",
+				weakConnectedCyclic: "Débilmente conexo con ciclos",
+				weakConnectedAcyclic: "Débilmente conexo acíclico",
 				disconnected: "Disconexo",
 			},
 			hamiltonian: {
