@@ -73,6 +73,53 @@ const calculateProperties = () => {
 
 	const cc = countComponents(hasArc);
 
+	// Helper functions for directed graphs
+	const dfs = (u: number, adj: boolean[][], visited: boolean[]) => {
+		visited[u] = true;
+		for (let v = 0; v < n; v++) {
+			if (adj[u][v] && !visited[v]) dfs(v, adj, visited);
+		}
+	};
+
+	const hasDirectedCycles = (adj: boolean[][]) => {
+		const visited = new Array(n).fill(false);
+		const recStack = new Array(n).fill(false);
+		const dfsCycle = (u: number): boolean => {
+			visited[u] = true;
+			recStack[u] = true;
+			for (let v = 0; v < n; v++) {
+				if (adj[u][v]) {
+					if (!visited[v] && dfsCycle(v)) return true;
+					else if (recStack[v]) return true;
+				}
+			}
+			recStack[u] = false;
+			return false;
+		};
+		for (let i = 0; i < n; i++) {
+			if (!visited[i] && dfsCycle(i)) return true;
+		}
+		return false;
+	};
+
+	const isStronglyConnected = (adj: boolean[][]) => {
+		if (n <= 1) return true;
+		// Check reachability from 0
+		const visited = new Array(n).fill(false);
+		dfs(0, adj, visited);
+		if (!visited.every(v => v)) return false;
+		// Check reachability in transpose
+		const transpose = adj.map(row => row.slice());
+		for (let i = 0; i < n; i++) {
+			for (let j = 0; j < n; j++) {
+				transpose[i][j] = adj[j][i];
+			}
+		}
+		visited.fill(false);
+		dfs(0, transpose, visited);
+		return visited.every(v => v);
+	};
+
 	// 5. Complementary Graph Stats
 	// Calculate max edges based on symmetry
 	const maxEdges = isSymmetric ? (n * (n - 1)) / 2 : n * (n - 1);
@@ -109,17 +156,24 @@ const calculateProperties = () => {
 
 	// 10. Extended Structure Analysis
 	const isConnected = cc === 1;
-	const hasCycles = measure >= n - cc + 1;
+	const hasCycles = measure >= n - cc + 1; // For undirected
 
-	let structureType: GraphAnalysis["structureType"] = "disconnected";
+	let structureType: GraphAnalysis["structureType"] = "disconnectedCyclic";
 	if (isSymmetric) {
 		if (!hasCycles && isConnected) structureType = "tree";
 		else if (!hasCycles && !isConnected) structureType = "forest";
 		else if (hasCycles && isConnected) structureType = "connectedCyclic";
 		else structureType = "disconnectedCyclic";
 	} else {
-		if (isConnected) structureType = hasCycles ? "weakConnectedCyclic" : "weakConnectedAcyclic";
-		else structureType = "disconnected";
+		const hasDirCycles = hasDirectedCycles(hasArc);
+		const isStrong = isStronglyConnected(hasArc);
+		if (isStrong) {
+			structureType = "stronglyConnected";
+		} else if (isConnected) {
+			structureType = hasDirCycles ? "weakConnectedCyclic" : "directedAcyclic";
+		} else {
+			structureType = "disconnectedCyclic";
+		}
 	}
 
 	// 11. Bipartite check (2-coloring over undirected view)

@@ -212,11 +212,12 @@ export default {
 			structure: {
 				tree: "Tree",
 				forest: "Forest",
-				connectedCyclic: "Connected cyclic",
 				disconnectedCyclic: "Disconnected with cycles",
+				connectedCyclic: "Connected cyclic",
 				weakConnectedCyclic: "Weakly connected with cycles",
 				weakConnectedAcyclic: "Weakly connected acyclic",
-				disconnected: "Disconnected",
+				stronglyConnected: "Strongly connected",
+				directedAcyclic: "Directed acyclic",
 			},
 			hamiltonian: {
 				yes: "Yes",
@@ -248,7 +249,18 @@ export default {
 				"connected by paths and no vertex is connected to a vertex outside the subgraph.",
 			isolatedVertices: "Number of vertices not connected to any other vertex in the graph.",
 			connected: "Indicates whether there is a path between every pair of vertices.",
-			structure: "Description of the graph type based on its structure and basic properties.",
+			structure: "Description of the graph type according to its structure and basic properties:<br><br>" +
+				"<b>General classifications:</b><br>" +
+				"• <b>Tree</b>: Connected and acyclic.<br>" +
+				"• <b>Forest</b>: Disconnected and acyclic, consisting of multiple disconnected trees.<br>" +
+				"• <b>Disconnected with cycles</b>: Contains multiple components, where at least one component contains cycles.<br>" +
+				"<b>For undirected graphs:</b><br>" +
+				"• <b>Connected cyclic</b>: Connected, containing at least one cycle.<br>" +
+				"<b>For directed graphs:</b><br>" +
+				"• <b>Strongly connected</b>: Connected, containing a directed path from every vertex to every other vertex.<br>" +
+				"• <b>Directed acyclic</b>: Does not contain directed cycles.<br>" +
+				"• <b>Weakly connected with cycles</b>: Contains cycles and is connected only when ignoring the direction of its edges.<br>" +
+				"• <b>Weakly connected acyclic</b>: Directed graph without cycles that is connected when the direction of its edges is ignored.<br>",
 			bipartite:
 				"A graph is bipartite if its vertices can be split into two disjoint sets and every edge " +
 				"connects vertices from different sets. Checked with BFS 2-coloring on the undirected view; " +

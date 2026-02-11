@@ -45,7 +45,8 @@ export interface GraphAnalysis {
 		| "disconnectedCyclic"
 		| "weakConnectedCyclic"
 		| "weakConnectedAcyclic"
-		| "disconnected";
+		| "stronglyConnected"
+		| "directedAcyclic";
 	isHamiltonian: boolean | "npLimit"; // true, false o "NP"
 }
 

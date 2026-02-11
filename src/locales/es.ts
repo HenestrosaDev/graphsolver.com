@@ -219,7 +219,8 @@ export default {
 				disconnectedCyclic: "Disconexo con ciclos",
 				weakConnectedCyclic: "Cíclico débilmente conexo",
 				weakConnectedAcyclic: "Acíclico débilmente conexo",
-				disconnected: "Disconexo",
+				stronglyConnected: "Fuertemente conexo",
+				directedAcyclic: "Dirigido acíclico",
 			},
 			hamiltonian: {
 				yes: "Sí",
@@ -253,7 +254,18 @@ export default {
 				"caminos, y que no está conectado a ningún vértice fuera del subgrafo.",
 			isolatedVertices: "Número de vértices que no están conectados a ningún otro vértice dentro del grafo.",
 			connected: "Indica si existe un camino entre cualquier par de vértices.",
-			structure: "Descripción del tipo de grafo según su estructura y propiedades básicas.",
+			structure: "Descripción del tipo de grafo según su estructura y propiedades básicas:<br><br>" +
+				"<b>Clasificaciones generales:</b><br>" +
+				"• <b>Árbol</b>: Conexo acíclico.<br>" +
+				"• <b>Bosque</b>: Disconexo acíclico formado por múltiples árboles desconectados.<br>" +
+				"• <b>Disconexo con ciclos</b>: Contiene múltiples componentes, donde al menos una componente contiene ciclos.<br>" +
+				"<b>Para grafos no dirigidos:</b><br>" +
+				"• <b>Cíclico conexo</b>: Conexo que contiene al menos un ciclo.<br>" +
+				"<b>Para grafos dirigidos:</b><br>" +
+				"• <b>Fuertemente conexo</b>: Conexo que contiene un camino dirigido desde cualquier vértice hacia cualquier otro vértice.<br>" +
+				"• <b>Dirigido acíclico</b>: No contiene ciclos dirigidos.<br>" +
+				"• <b>Débilmente conexo con ciclos</b>: Contiene ciclos y es conexo únicamente al ignorar la dirección de sus aristas.<br>" +
+				"• <b>Débilmente conexo acíclico</b>: Grafo dirigido sin ciclos, que es conexo cuando se ignora la dirección de sus aristas.<br>",
 			bipartite:
 				"Un grafo es bipartito si sus vértices pueden dividirse en dos conjuntos disjuntos y cada " +
 				"arista conecta vértices de conjuntos distintos. Se comprueba con 2-coloración BFS sobre la " +
