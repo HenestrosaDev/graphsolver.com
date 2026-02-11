@@ -226,6 +226,11 @@ export default {
 			},
 		},
 		tooltips: {
+		graphType:
+			"Indicates whether the graph is directed or undirected.<br>" +
+			"<br>" +
+			"<b>Directed graph</b>: Edges indicate a unidirectional flow from one vertex to another.<br>" +
+			"<b>Undirected graph</b>: Edges indicate a bidirectional flow between vertices, without a strict sense of direction.",
 			order: "Number of vertices in the graph. Denoted as <i>n</i>.",
 			measure:
 				"Number of edges in the graph. Denoted as <i>m</i>.<br><br><b>Note</b>: In undirected " +
@@ -250,12 +255,15 @@ export default {
 			isolatedVertices: "Number of vertices not connected to any other vertex in the graph.",
 			connected: "Indicates whether there is a path between every pair of vertices.",
 			structure: "Description of the graph type according to its structure and basic properties:<br><br>" +
+				"<br>" +
 				"<b>General classifications:</b><br>" +
 				"• <b>Tree</b>: Connected and acyclic.<br>" +
 				"• <b>Forest</b>: Disconnected and acyclic, consisting of multiple disconnected trees.<br>" +
 				"• <b>Disconnected with cycles</b>: Contains multiple components, where at least one component contains cycles.<br>" +
+				"<br>" +
 				"<b>For undirected graphs:</b><br>" +
 				"• <b>Connected cyclic</b>: Connected, containing at least one cycle.<br>" +
+				"<br>" +
 				"<b>For directed graphs:</b><br>" +
 				"• <b>Strongly connected</b>: Connected, containing a directed path from every vertex to every other vertex.<br>" +
 				"• <b>Directed acyclic</b>: Does not contain directed cycles.<br>" +

@@ -229,6 +229,11 @@ export default {
 			},
 		},
 		tooltips: {
+			graphType:
+				"Indica si el grafo es dirigido o no dirigido.<br>" +
+				"<br>" +
+				"<b>Grafo dirigido</b>: Las aristas indican un flujo unidireccional de un vértice a otro.<br>" +
+				"<b>Grafo no dirigido</b>: Las aristas indican un flujo bidireccional entre los vértices, sin indicar el sentido estrictamente.",
 			order: "Número de vértices del grafo. Se denota como <i>n</i>.",
 			measure:
 				"Número de aristas del grafo. Se denota como <i>m</i>.<br><br><b>Nota</b>: En grafos no " +
@@ -255,12 +260,15 @@ export default {
 			isolatedVertices: "Número de vértices que no están conectados a ningún otro vértice dentro del grafo.",
 			connected: "Indica si existe un camino entre cualquier par de vértices.",
 			structure: "Descripción del tipo de grafo según su estructura y propiedades básicas:<br><br>" +
+				"<br>" +
 				"<b>Clasificaciones generales:</b><br>" +
 				"• <b>Árbol</b>: Conexo acíclico.<br>" +
 				"• <b>Bosque</b>: Disconexo acíclico formado por múltiples árboles desconectados.<br>" +
 				"• <b>Disconexo con ciclos</b>: Contiene múltiples componentes, donde al menos una componente contiene ciclos.<br>" +
+				"<br>" +
 				"<b>Para grafos no dirigidos:</b><br>" +
 				"• <b>Cíclico conexo</b>: Conexo que contiene al menos un ciclo.<br>" +
+				"<br>" +
 				"<b>Para grafos dirigidos:</b><br>" +
 				"• <b>Fuertemente conexo</b>: Conexo que contiene un camino dirigido desde cualquier vértice hacia cualquier otro vértice.<br>" +
 				"• <b>Dirigido acíclico</b>: No contiene ciclos dirigidos.<br>" +

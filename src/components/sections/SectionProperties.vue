@@ -310,6 +310,7 @@ watch([rawMatrix, numNodes, adjTarget], () => calculateProperties(), {
 					<PropertyRow
 						:label="t('properties.labels.graphType')"
 						:value="analysis.isSymmetric ? t('properties.values.undirected') : t('properties.values.directed')"
+						:tooltip="t('properties.tooltips.graphType')"
 					/>
 
 					<PropertyRow
