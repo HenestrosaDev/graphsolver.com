@@ -6,6 +6,7 @@ export interface GraphData {
 	matrix: number[][]; // Processed matrix with Infinity/numbers
 	hasArc: boolean[][]; // Boolean adjacency matrix
 	isSymmetric: boolean;
+	symmetryType: "strict" | "non-strict" | "asymmetric";
 	rawValues: Matrix; // Raw matrix (user inputs)
 	nodes: string[]; // Array of labels ['A', 'B', 'C'...]
 }
@@ -20,6 +21,7 @@ export interface GraphAnalysis {
 	orden: number;
 	medida: number;
 	isSymmetric: boolean;
+	symmetryType: "strict" | "non-strict" | "asymmetric";
 	adjList: string;
 	seq: string;
 	isolated: number;

@@ -180,6 +180,7 @@ export default {
 		},
 		labels: {
 			graphType: "Tipo de grafo",
+			symmetry: "Simetría",
 			order: "Orden",
 			measure: "Medida",
 			maxMeasure: "Medida máxima",
@@ -201,8 +202,11 @@ export default {
 			complementaryConnectedComponents: "Componentes conexas",
 		},
 		values: {
-			directed: "Dirigido (asimétrico)",
-			undirected: "No dirigido (simétrico)",
+			directed: "Dirigido",
+			undirected: "No dirigido",
+			symmetric: "Estricta",
+			symmetricNonStrict: "Estructural",
+			asymmetric: "Asimétrica",
 			regular: "{degree}-Regular",
 			notRegular: "No regular",
 			yes: "Sí",
@@ -234,6 +238,12 @@ export default {
 				"<br>" +
 				"<b>Grafo dirigido</b>: Las aristas indican un flujo unidireccional de un vértice a otro.<br>" +
 				"<b>Grafo no dirigido</b>: Las aristas indican un flujo bidireccional entre los vértices, sin indicar el sentido estrictamente.",
+			symmetry:
+				"Indica las propiedades de simetría de la matriz de adyacencia del grafo.<br>" +
+				"<br>" +
+				"<b>Simetría estructural</b>: Si existe una arista de un vértice A a un vértice B, también existe una de B hacia A, sin importar su peso o coste. Esto implica que el grafo sea dirigido.<br>" +
+				"<b>Simetría estricta</b>: Todas las conexiones son recíprocas y el coste es exactamente el mismo en ambas direcciones. Esto significa que el grafo puede ser no dirigido.<br>" +
+				"<b>Asimetría</b>: Las conexiones no son simétricas ni a nivel estructural ni de pesos, por lo que el grafo es dirigido.",
 			order: "Número de vértices del grafo. Se denota como <i>n</i>.",
 			measure:
 				"Número de aristas del grafo. Se denota como <i>m</i>.<br><br><b>Nota</b>: En grafos no " +

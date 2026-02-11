@@ -177,6 +177,7 @@ export default {
 		},
 		labels: {
 			graphType: "Graph type",
+			symmetry: "Symmetry",
 			order: "Order",
 			measure: "Size",
 			maxMeasure: "Maximum size",
@@ -198,8 +199,11 @@ export default {
 			complementaryConnectedComponents: "Connected components",
 		},
 		values: {
-			directed: "Directed (asymmetric)",
-			undirected: "Undirected (symmetric)",
+			directed: "Directed",
+			undirected: "Undirected",
+			symmetric: "Strict",
+			symmetricNonStrict: "Structural",
+			asymmetric: "Asymmetric",
 			regular: "{degree}-Regular",
 			notRegular: "Not regular",
 			yes: "Yes",
@@ -231,6 +235,12 @@ export default {
 			"<br>" +
 			"<b>Directed graph</b>: Edges indicate a unidirectional flow from one vertex to another.<br>" +
 			"<b>Undirected graph</b>: Edges indicate a bidirectional flow between vertices, without a strict sense of direction.",
+		symmetry:
+			"Indicates the symmetry properties of the graph's adjacency matrix.<br>" +
+			"<br>" +
+			"<b>Structural symmetry</b>: If an edge exists from vertex A to vertex B, one also exists from B to A, regardless of its weight or cost. This implies that the graph is directed.<br>" +
+			"<b>Strict symmetry</b>: All connections are reciprocal and the cost is exactly the same in both directions. This means that the graph can be undirected.<br>" +
+			"<b>Asymmetry</b>: Connections are not symmetric at either the structural or weight level, meaning the graph is directed.",
 			order: "Number of vertices in the graph. Denoted as <i>n</i>.",
 			measure:
 				"Number of edges in the graph. Denoted as <i>m</i>.<br><br><b>Note</b>: In undirected " +

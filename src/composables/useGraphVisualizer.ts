@@ -5,7 +5,9 @@ import { DataSet } from "vis-data";
 export type GraphData = {
 	n: number;
 	matrix: number[][];
+	hasArc: boolean[][];
 	isSymmetric: boolean;
+	symmetryType: "strict" | "non-strict" | "asymmetric";
 };
 
 type UseGraphVisualizerOptions = {

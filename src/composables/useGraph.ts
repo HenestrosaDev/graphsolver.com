@@ -62,7 +62,8 @@ export function useGraph() {
 		const n = numNodes.value;
 		const matrix: number[][] = [];
 		const hasArc: boolean[][] = [];
-		let isSymmetric = true;
+		let connectionSymmetric = true;
+		let weightSymmetric = true;
 
 		for (let i = 0; i < n; i++) {
 			matrix[i] = [];
@@ -93,17 +94,31 @@ export function useGraph() {
 		for (let i = 0; i < n; i++) {
 			for (let j = 0; j < n; j++) {
 				if (hasArc[i][j] !== hasArc[j][i]) {
-					isSymmetric = false;
-					break;
+					connectionSymmetric = false;
+				}
+				if (hasArc[i][j] && hasArc[j][i] && matrix[i][j] !== matrix[j][i]) {
+					weightSymmetric = false;
 				}
 			}
 		}
+
+		let symmetryType: "strict" | "non-strict" | "asymmetric";
+		if (connectionSymmetric && weightSymmetric) {
+			symmetryType = "strict";
+		} else if (connectionSymmetric) {
+			symmetryType = "non-strict";
+		} else {
+			symmetryType = "asymmetric";
+		}
+
+		const isSymmetric = symmetryType === "strict";
 
 		return {
 			n,
 			matrix,
 			hasArc,
 			isSymmetric,
+			symmetryType,
 			rawValues: rawMatrix.value,
 			nodes: nodes.value,
 		};

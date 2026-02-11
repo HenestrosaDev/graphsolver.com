@@ -12,8 +12,20 @@ const { t } = useI18n();
 const analysis = ref<GraphAnalysis | null>(null);
 const adjTarget = ref<string>("A");
 
+const symmetryBadgeClass = computed(() => {
+	if (!analysis.value) return "";
+	const type = analysis.value.symmetryType;
+	if (type === "strict") {
+		return "bg-green-100 text-green-700 border-green-200 dark:bg-green-900/30 dark:text-green-200 dark:border-green-700";
+	} else if (type === "non-strict") {
+		return "bg-blue-100 text-blue-700 border-blue-200 dark:bg-blue-900/30 dark:text-blue-200 dark:border-blue-700";
+	}
+
+	return undefined;
+});
+
 const calculateProperties = () => {
-	const { n, hasArc, isSymmetric } = getGraphData();
+	const { n, hasArc, isSymmetric, symmetryType } = getGraphData();
 	if (!Number.isFinite(n) || n <= 0) {
 		analysis.value = null;
 		return;
@@ -233,6 +245,7 @@ const calculateProperties = () => {
 		medida: measure,
 		maxEdges, // <--- Added property here
 		isSymmetric,
+		symmetryType,
 		adjList: adjNodes.join(","),
 		seq: [...degrees].join(","),
 		isolated,
@@ -311,6 +324,13 @@ watch([rawMatrix, numNodes, adjTarget], () => calculateProperties(), {
 						:label="t('properties.labels.graphType')"
 						:value="analysis.isSymmetric ? t('properties.values.undirected') : t('properties.values.directed')"
 						:tooltip="t('properties.tooltips.graphType')"
+					/>
+
+					<PropertyRow
+						:label="t('properties.labels.symmetry')"
+						:value="analysis.symmetryType === 'strict' ? t('properties.values.symmetric') : analysis.symmetryType === 'non-strict' ? t('properties.values.symmetricNonStrict') : t('properties.values.asymmetric')"
+						:tooltip="t('properties.tooltips.symmetry')"
+						:badge-class="symmetryBadgeClass"
 					/>
 
 					<PropertyRow
