@@ -48,7 +48,7 @@ const handleImportFile = (format: FormatKey) => {
 			@click="handleExportModal"
 		>
 			<div class="text-slate-500 group-hover:text-blue-600 dark:text-slate-300 dark:group-hover:text-blue-300">
-				<IconDownload class="size-4" />
+				<IconUpload class="size-4" />
 			</div>
 			<span class="hidden sm:inline">{{ t("graphIO.export") }}</span>
 		</button>
@@ -60,7 +60,7 @@ const handleImportFile = (format: FormatKey) => {
 			@close="closeMenu"
 		>
 			<template #icon>
-				<IconUpload class="size-4" />
+				<IconDownload class="size-4" />
 			</template>
 
 			<DropdownHeader>{{ t("graphIO.file") }}</DropdownHeader>

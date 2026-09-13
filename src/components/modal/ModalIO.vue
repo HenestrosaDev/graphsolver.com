@@ -179,11 +179,11 @@ watch(
 		</template>
 
 		<template #primaryButtonIcon>
-			<IconDownload
+			<IconUpload
 				v-if="mode === 'export'"
 				class="size-4"
 			/>
-			<IconUpload
+			<IconDownload
 				v-else
 				class="size-4"
 			/>
